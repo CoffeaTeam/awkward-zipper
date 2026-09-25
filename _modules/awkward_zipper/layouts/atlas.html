@@ -1,0 +1,660 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>awkward_zipper.layouts.atlas &mdash; awkward-zipper 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/logo_unfilled_with_text.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            awkward-zipper
+              <img src="../../../_static/logo_unfilled_with_black_text.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">awkward-zipper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">awkward_zipper.layouts.atlas</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for awkward_zipper.layouts.atlas</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Layout builder for ATLAS ntuples (the ``atlas-schema`` NtupleSchema)"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">difflib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">awkward</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">particle</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.awkward_util</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_check_equal_lengths</span><span class="p">,</span>
+    <span class="n">_non_materializing_get_field</span><span class="p">,</span>
+    <span class="n">_rewrap</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="n">full_like_from_array</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.layouts.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseLayoutBuilder</span>
+
+
+<div class="viewcode-block" id="Ntuple">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.Ntuple">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Ntuple</span><span class="p">(</span><span class="n">BaseLayoutBuilder</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Builder for ATLAS ntuples following the typical centralized formats.</span>
+
+<span class="sd">    Collections are built from all branches found in the tree, based on the naming</span>
+<span class="sd">    pattern of the branches, which is assumed to be</span>
+
+<span class="sd">    .. code-block:: bash</span>
+
+<span class="sd">       {collection:str}_{subcollection:str}_{systematic:str}</span>
+
+<span class="sd">    So ``el_pt_NOSYS`` is the ``pt`` subcollection of the ``el`` collection, for the</span>
+<span class="sd">    nominal (``NOSYS``) systematic. Branches carrying a systematic variation are</span>
+<span class="sd">    additionally gathered into one record per systematic, sitting alongside the</span>
+<span class="sd">    nominal collections, so that ``events.EG_SCALE_ALL__1up.el.pt`` reads the varied</span>
+<span class="sd">    electron transverse momentum while ``events.el.pt`` reads the nominal one.</span>
+
+<span class="sd">    Collections are assigned mixin types according to the `mixins` mapping; anything</span>
+<span class="sd">    unrecognized falls back to `suggested_behavior`. All collections are then zipped</span>
+<span class="sd">    into one `base.NanoEvents` record and returned.</span>
+<span class="sd">    """</span>
+
+    <span class="c1">#: warn when a cross-reference index or target is missing</span>
+    <span class="n">warn_missing_crossrefs</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="c1">#: treat missing event-level branches as an error instead of a warning</span>
+    <span class="n">error_missing_event_ids</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="c1">#: determine closest behavior for a given branch, or use `default_behavior`</span>
+    <span class="n">identify_closest_behavior</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1">#: event IDs to expect in data datasets</span>
+    <span class="n">event_ids_data</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"actualInteractionsPerCrossing"</span><span class="p">,</span>
+        <span class="s2">"averageInteractionsPerCrossing"</span><span class="p">,</span>
+        <span class="s2">"dataTakingYear"</span><span class="p">,</span>
+        <span class="s2">"lumiBlock"</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="c1">#: event IDs to expect in MC datasets</span>
+    <span class="n">event_ids_mc</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"eventNumber"</span><span class="p">,</span>
+        <span class="s2">"mcChannelNumber"</span><span class="p">,</span>
+        <span class="s2">"mcEventWeights"</span><span class="p">,</span>
+        <span class="s2">"runNumber"</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="c1">#: all event IDs to expect in the dataset</span>
+    <span class="n">event_ids</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span><span class="o">*</span><span class="n">event_ids_data</span><span class="p">,</span> <span class="o">*</span><span class="n">event_ids_mc</span><span class="p">}</span>
+
+    <span class="c1">#: mapping from collection name to the behavior to use for that collection</span>
+    <span class="n">mixins</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"el"</span><span class="p">:</span> <span class="s2">"Electron"</span><span class="p">,</span>
+        <span class="s2">"jet"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"met"</span><span class="p">:</span> <span class="s2">"MissingET"</span><span class="p">,</span>
+        <span class="s2">"mu"</span><span class="p">:</span> <span class="s2">"Muon"</span><span class="p">,</span>
+        <span class="s2">"pass"</span><span class="p">:</span> <span class="s2">"Pass"</span><span class="p">,</span>
+        <span class="s2">"ph"</span><span class="p">:</span> <span class="s2">"Photon"</span><span class="p">,</span>
+        <span class="s2">"trigPassed"</span><span class="p">:</span> <span class="s2">"Trigger"</span><span class="p">,</span>
+        <span class="s2">"weight"</span><span class="p">:</span> <span class="s2">"Weight"</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="c1">#: additional branches to pass through with no zipping or interpretation</span>
+    <span class="n">singletons</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="c1">#: docstrings to assign for specific subcollections across the collections</span>
+    <span class="n">docstrings</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"charge"</span><span class="p">:</span> <span class="s2">"charge"</span><span class="p">,</span>
+        <span class="s2">"eta"</span><span class="p">:</span> <span class="s2">"pseudorapidity"</span><span class="p">,</span>
+        <span class="s2">"mass"</span><span class="p">:</span> <span class="s2">"invariant mass [MeV]"</span><span class="p">,</span>
+        <span class="s2">"met"</span><span class="p">:</span> <span class="s2">"missing transverse energy [MeV]"</span><span class="p">,</span>
+        <span class="s2">"phi"</span><span class="p">:</span> <span class="s2">"azimuthal angle"</span><span class="p">,</span>
+        <span class="s2">"pt"</span><span class="p">:</span> <span class="s2">"transverse momentum [MeV]"</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="c1">#: default behavior to use for any collection</span>
+    <span class="n">default_behavior</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"NanoCollection"</span>
+
+    <span class="c1">#: fields to materialize as full_like arrays, keyed by behavior name.</span>
+    <span class="c1">#: Each entry maps new_field -&gt; (source_field, fill_value).</span>
+    <span class="n">full_like_items</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"Electron"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"mass"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"pt"</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">literals</span><span class="o">.</span><span class="n">e_minus</span><span class="o">.</span><span class="n">mass</span><span class="p">))},</span>
+        <span class="s2">"Muon"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"mass"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"pt"</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">literals</span><span class="o">.</span><span class="n">mu_minus</span><span class="o">.</span><span class="n">mass</span><span class="p">))},</span>
+        <span class="s2">"Photon"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"mass"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"pt"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="s2">"charge"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"pt"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)},</span>
+        <span class="s2">"Tau"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"mass"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"pt"</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">particle</span><span class="o">.</span><span class="n">literals</span><span class="o">.</span><span class="n">tau_minus</span><span class="o">.</span><span class="n">mass</span><span class="p">))},</span>
+    <span class="p">}</span>
+    <span class="c1">#: fields to rename, keyed by behavior name. Maps new_field -&gt; old_field.</span>
+    <span class="n">rename_items</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"Jet"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"mass"</span><span class="p">:</span> <span class="s2">"m"</span><span class="p">},</span>
+    <span class="p">}</span>
+    <span class="c1">#: fields to alias, keyed by behavior name. Maps new_field -&gt; source_field.</span>
+    <span class="n">alias_items</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"MissingET"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"rho"</span><span class="p">:</span> <span class="s2">"met"</span><span class="p">},</span>  <span class="c1"># vector reads 'rho', not 'r' or 'met'</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">"latest"</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_version</span> <span class="o">=</span> <span class="n">version</span>
+
+<div class="viewcode-block" id="Ntuple.v1">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.Ntuple.v1">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">v1</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Build the NtupleEvents for version 1"""</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="s2">"1"</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_vector_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">behavior_name</span><span class="p">,</span> <span class="n">collection_content</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Materialize vector coordinate fields into ``collection_content`` in place.</span>
+
+<span class="sd">        Keyed by behavior name so custom collections mapped via `mixins` get the same</span>
+<span class="sd">        treatment. Silently skips if the source field is absent (optional branches),</span>
+<span class="sd">        warns and skips if the target field already exists.</span>
+<span class="sd">        """</span>
+        <span class="k">for</span> <span class="n">new_field</span><span class="p">,</span> <span class="p">(</span><span class="n">source_field</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">full_like_items</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">behavior_name</span><span class="p">,</span> <span class="p">{}</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">source_field</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">collection_content</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">new_field</span> <span class="ow">in</span> <span class="n">collection_content</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Field '</span><span class="si">{</span><span class="n">new_field</span><span class="si">}</span><span class="s2">' already present in collection with behavior "</span>
+                    <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">behavior_name</span><span class="si">}</span><span class="s2">'; skipping materialization. [vector-field-exists]"</span><span class="p">,</span>
+                    <span class="ne">RuntimeWarning</span><span class="p">,</span>
+                    <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">collection_content</span><span class="p">[</span><span class="n">new_field</span><span class="p">]</span> <span class="o">=</span> <span class="n">full_like_from_array</span><span class="p">(</span>
+                <span class="n">collection_content</span><span class="p">[</span><span class="n">source_field</span><span class="p">],</span> <span class="n">fill_value</span>
+            <span class="p">)</span>
+        <span class="k">for</span> <span class="n">new_field</span><span class="p">,</span> <span class="n">old_field</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rename_items</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">behavior_name</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">old_field</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">collection_content</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">new_field</span> <span class="ow">in</span> <span class="n">collection_content</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Field '</span><span class="si">{</span><span class="n">new_field</span><span class="si">}</span><span class="s2">' already present in collection with behavior "</span>
+                    <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">behavior_name</span><span class="si">}</span><span class="s2">'; skipping rename of '</span><span class="si">{</span><span class="n">old_field</span><span class="si">}</span><span class="s2">'. [vector-field-exists]"</span><span class="p">,</span>
+                    <span class="ne">RuntimeWarning</span><span class="p">,</span>
+                    <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">collection_content</span><span class="p">[</span><span class="n">new_field</span><span class="p">]</span> <span class="o">=</span> <span class="n">collection_content</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">old_field</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">new_field</span><span class="p">,</span> <span class="n">source_field</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alias_items</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">behavior_name</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">source_field</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">collection_content</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">new_field</span> <span class="ow">in</span> <span class="n">collection_content</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Field '</span><span class="si">{</span><span class="n">new_field</span><span class="si">}</span><span class="s2">' already present in collection with behavior "</span>
+                    <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">behavior_name</span><span class="si">}</span><span class="s2">'; skipping alias. [vector-field-exists]"</span><span class="p">,</span>
+                    <span class="ne">RuntimeWarning</span><span class="p">,</span>
+                    <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">collection_content</span><span class="p">[</span><span class="n">new_field</span><span class="p">]</span> <span class="o">=</span> <span class="n">collection_content</span><span class="p">[</span><span class="n">source_field</span><span class="p">]</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_zip_collection</span><span class="p">(</span><span class="n">collection_content</span><span class="p">,</span> <span class="n">collection_name</span><span class="p">,</span> <span class="n">behavior_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Zip a mapping of field name -&gt; content into one (jagged) RecordArray.</span>
+
+<span class="sd">        The branches of an ATLAS ntuple carry their own offsets, so a jagged</span>
+<span class="sd">        collection is rebuilt by sharing the offsets of its first field and zipping</span>
+<span class="sd">        the flat contents underneath; event-level collections stay flat records.</span>
+<span class="sd">        """</span>
+        <span class="n">contents</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">awkward</span><span class="o">.</span><span class="n">to_layout</span><span class="p">(</span><span class="n">content</span><span class="p">)</span> <span class="k">for</span> <span class="n">content</span> <span class="ow">in</span> <span class="n">collection_content</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="p">]</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">collection_content</span><span class="p">)</span>
+
+        <span class="c1"># like atlas-schema's zip_forms: only ListOffsetArray fields form a jagged</span>
+        <span class="c1"># collection, and its ``collection_name`` sits on the outer list node</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">content</span> <span class="ow">in</span> <span class="n">contents</span>
+        <span class="p">):</span>
+            <span class="n">inner</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">content</span> <span class="k">for</span> <span class="n">content</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">)</span>
+            <span class="n">record</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">(</span>
+                <span class="n">inner</span><span class="p">,</span>
+                <span class="n">fields</span><span class="p">,</span>
+                <span class="n">length</span><span class="o">=</span><span class="n">_check_equal_lengths</span><span class="p">(</span><span class="n">inner</span><span class="p">),</span>
+                <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">"__record__"</span><span class="p">:</span> <span class="n">behavior_name</span><span class="p">},</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+                <span class="n">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">offsets</span><span class="p">,</span>
+                <span class="n">record</span><span class="p">,</span>
+                <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">"collection_name"</span><span class="p">:</span> <span class="n">collection_name</span><span class="p">},</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">(</span>
+            <span class="nb">tuple</span><span class="p">(</span><span class="n">contents</span><span class="p">),</span>
+            <span class="n">fields</span><span class="p">,</span>
+            <span class="n">length</span><span class="o">=</span><span class="n">_check_equal_lengths</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">contents</span><span class="p">)),</span>
+            <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">"__record__"</span><span class="p">:</span> <span class="n">behavior_name</span><span class="p">,</span>
+                <span class="s2">"collection_name"</span><span class="p">:</span> <span class="n">collection_name</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_collection_behavior</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection_name</span><span class="p">,</span> <span class="n">warn</span><span class="p">):</span>
+        <span class="n">behavior_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixins</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">collection_name</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">behavior_name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">behavior_name</span>
+        <span class="n">behavior_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">suggested_behavior</span><span class="p">(</span><span class="n">collection_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">warn</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"I found a collection with no defined mixin: '</span><span class="si">{</span><span class="n">collection_name</span><span class="si">}</span><span class="s2">'. "</span>
+                <span class="sa">f</span><span class="s2">"I will assume behavior: '</span><span class="si">{</span><span class="n">behavior_name</span><span class="si">}</span><span class="s2">'. To suppress this warning "</span>
+                <span class="s2">"next time, please define mixins for your custom collections. [mixin-undefined]"</span><span class="p">,</span>
+                <span class="ne">RuntimeWarning</span><span class="p">,</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">behavior_name</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
+        <span class="n">branch_arrays</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">field</span><span class="p">:</span> <span class="n">_non_materializing_get_field</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">array</span><span class="o">.</span><span class="n">fields</span>
+        <span class="p">}</span>
+
+        <span class="c1"># parse into high-level records (collections, list collections, and singletons)</span>
+        <span class="n">collections</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">branch_arrays</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">singletons</span>
+        <span class="p">}</span>
+        <span class="n">collections</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ids</span>
+        <span class="n">collections</span> <span class="o">-=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">singletons</span><span class="p">)</span>
+
+        <span class="c1"># handle collections that are substrings of the items in the mixins</span>
+        <span class="n">bf_str</span> <span class="o">=</span> <span class="s2">","</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">branch_arrays</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">mixin</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixins</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mixin</span> <span class="ow">in</span> <span class="n">collections</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="sa">f</span><span class="s2">",</span><span class="si">{</span><span class="n">mixin</span><span class="si">}</span><span class="s2">_"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">bf_str</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">bf_str</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">mixin</span><span class="si">}</span><span class="s2">_"</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="s2">"_"</span> <span class="ow">in</span> <span class="n">mixin</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"I identified a mixin that I did not automatically identify as a "</span>
+                    <span class="sa">f</span><span class="s2">"collection because it contained an underscore: '</span><span class="si">{</span><span class="n">mixin</span><span class="si">}</span><span class="s2">'. I will add "</span>
+                    <span class="s2">"this to the known collections. To suppress this warning next time, "</span>
+                    <span class="s2">"please create your ntuples with collections without underscores. "</span>
+                    <span class="s2">"[mixin-underscore]"</span><span class="p">,</span>
+                    <span class="ne">RuntimeWarning</span><span class="p">,</span>
+                    <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="n">collections</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mixin</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">collection</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">collections</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">mixin</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">collection</span><span class="si">}</span><span class="s2">_"</span><span class="p">):</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">"I found a misidentified collection: '</span><span class="si">{</span><span class="n">collection</span><span class="si">}</span><span class="s2">'. I will remove "</span>
+                        <span class="s2">"this from the known collections. To suppress this warning next time, "</span>
+                        <span class="s2">"please create your ntuples with collections that are not similarly "</span>
+                        <span class="s2">"named with underscores. [collection-subset]"</span><span class="p">,</span>
+                        <span class="ne">RuntimeWarning</span><span class="p">,</span>
+                        <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">collections</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+                    <span class="k">break</span>
+
+        <span class="c1"># rename needed because easyjet breaks the AMG assumptions</span>
+        <span class="c1"># https://gitlab.cern.ch/easyjet/easyjet/-/issues/246</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">branch_arrays</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s2">"NOSYS"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">k</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">branch_arrays</span><span class="p">[</span><span class="n">k</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"_NOSYS"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"_NOSYS"</span><span class="p">]</span> <span class="o">=</span> <span class="n">branch_arrays</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+
+        <span class="c1"># these are collections with systematic variations</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">subcollections</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">k</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"__"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"_"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"_NOSYS"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">branch_arrays</span>
+                <span class="k">if</span> <span class="s2">"NOSYS"</span> <span class="ow">in</span> <span class="n">k</span> <span class="ow">and</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">singletons</span>
+            <span class="p">}</span>
+        <span class="k">except</span> <span class="ne">IndexError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">"One of the branches does not follow the assumed pattern for this "</span>
+                <span class="s2">"schema. [invalid-branch-name]"</span>
+            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+
+        <span class="n">all_systematics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_discover_systematics</span><span class="p">(</span>
+            <span class="n">branch_arrays</span><span class="p">,</span> <span class="n">collections</span><span class="p">,</span> <span class="n">subcollections</span>
+        <span class="p">)</span>
+
+        <span class="c1"># pre-compute systematic branch patterns for O(1) lookups</span>
+        <span class="n">systematic_branch_patterns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">collection</span> <span class="ow">in</span> <span class="n">collections</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">subcoll</span> <span class="ow">in</span> <span class="n">subcollections</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">systematic</span> <span class="ow">in</span> <span class="n">all_systematics</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">systematic</span> <span class="o">!=</span> <span class="s2">"NOSYS"</span><span class="p">:</span>
+                        <span class="n">systematic_branch_patterns</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">collection</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">subcoll</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">systematic</span><span class="si">}</span><span class="s2">"</span>
+                        <span class="p">)</span>
+
+        <span class="n">missing_event_ids</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">event_id</span> <span class="k">for</span> <span class="n">event_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ids</span> <span class="k">if</span> <span class="n">event_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">branch_arrays</span>
+        <span class="p">]</span>
+        <span class="n">missing_singletons</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">singleton</span> <span class="k">for</span> <span class="n">singleton</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">singletons</span> <span class="k">if</span> <span class="n">singleton</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">branch_arrays</span>
+        <span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_event_ids</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_missing_event_ids</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"There are missing event ID fields: </span><span class="si">{</span><span class="n">missing_event_ids</span><span class="si">}</span><span class="s2"> </span><span class="se">\n\n\</span>
+<span class="s2">                    The event ID fields </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">event_ids</span><span class="si">}</span><span class="s2"> are necessary to perform sub-run identification </span><span class="se">\</span>
+<span class="s2">                    (e.g. for corrections and sub-dividing data during different detector conditions),</span><span class="se">\</span>
+<span class="s2">                    to cross-validate MC and Data (i.e. matching events for comparison), and to generate event displays. </span><span class="se">\</span>
+<span class="s2">                    It's advised to never drop these branches from the dataformat.</span><span class="se">\n\n\</span>
+<span class="s2">                    This error can be demoted to a warning by setting the class level variable error_missing_event_ids to False."</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Missing event_ids : </span><span class="si">{</span><span class="n">missing_event_ids</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                <span class="ne">RuntimeWarning</span><span class="p">,</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_singletons</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Missing singletons : </span><span class="si">{</span><span class="n">missing_singletons</span><span class="si">}</span><span class="s2">. [singleton-missing]"</span><span class="p">,</span>
+                <span class="ne">RuntimeWarning</span><span class="p">,</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">output</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># first, register singletons (event-level, others)</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">{</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">event_ids</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">singletons</span><span class="p">}:</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="o">*</span><span class="n">missing_event_ids</span><span class="p">,</span> <span class="o">*</span><span class="n">missing_singletons</span><span class="p">]:</span>
+                <span class="k">continue</span>
+            <span class="n">output</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">to_layout</span><span class="p">(</span><span class="n">branch_arrays</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+
+        <span class="c1"># build the nominal collections</span>
+        <span class="n">nominal_collections</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">collection_name</span> <span class="ow">in</span> <span class="n">collections</span><span class="p">:</span>
+            <span class="n">collection_content</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">used</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+            <span class="c1"># subcollections with NOSYS variations</span>
+            <span class="k">for</span> <span class="n">subname</span> <span class="ow">in</span> <span class="n">subcollections</span><span class="p">:</span>
+                <span class="n">nosys_branch</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">collection_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">subname</span><span class="si">}</span><span class="s2">_NOSYS"</span>
+                <span class="k">if</span> <span class="n">nosys_branch</span> <span class="ow">in</span> <span class="n">branch_arrays</span><span class="p">:</span>
+                    <span class="n">collection_content</span><span class="p">[</span><span class="n">subname</span><span class="p">]</span> <span class="o">=</span> <span class="n">branch_arrays</span><span class="p">[</span><span class="n">nosys_branch</span><span class="p">]</span>
+                    <span class="n">used</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">nosys_branch</span><span class="p">)</span>
+
+            <span class="c1"># non-systematic branches (like eta, phi, that do not vary)</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">content</span> <span class="ow">in</span> <span class="n">branch_arrays</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">collection_name</span> <span class="o">+</span> <span class="s2">"_"</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">used</span>
+                    <span class="ow">and</span> <span class="s2">"_NOSYS"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">k</span>
+                    <span class="ow">and</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">systematic_branch_patterns</span>
+                <span class="p">):</span>
+                    <span class="n">field_name</span> <span class="o">=</span> <span class="n">k</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">collection_name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span>
+                    <span class="k">if</span> <span class="n">field_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">collection_content</span><span class="p">:</span>
+                        <span class="n">collection_content</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span>
+
+            <span class="k">if</span> <span class="n">collection_content</span><span class="p">:</span>
+                <span class="n">behavior_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collection_behavior</span><span class="p">(</span><span class="n">collection_name</span><span class="p">,</span> <span class="n">warn</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_apply_vector_fields</span><span class="p">(</span><span class="n">behavior_name</span><span class="p">,</span> <span class="n">collection_content</span><span class="p">)</span>
+                <span class="n">nominal_collections</span><span class="p">[</span><span class="n">collection_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zip_collection</span><span class="p">(</span>
+                    <span class="n">collection_content</span><span class="p">,</span> <span class="n">collection_name</span><span class="p">,</span> <span class="n">behavior_name</span>
+                <span class="p">)</span>
+
+        <span class="n">output</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">nominal_collections</span><span class="p">)</span>
+
+        <span class="c1"># build the systematic event structures</span>
+        <span class="k">for</span> <span class="n">systematic</span> <span class="ow">in</span> <span class="n">all_systematics</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">systematic</span> <span class="o">==</span> <span class="s2">"NOSYS"</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">systematic_collections</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">collection_name</span> <span class="ow">in</span> <span class="n">collections</span><span class="p">:</span>
+                <span class="n">has_systematic_data</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">collection_content</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">used</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+                <span class="k">for</span> <span class="n">subname</span> <span class="ow">in</span> <span class="n">subcollections</span><span class="p">:</span>
+                    <span class="n">prefix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">collection_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">subname</span><span class="si">}</span><span class="s2">_"</span>
+                    <span class="n">target_branch</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}{</span><span class="n">systematic</span><span class="si">}</span><span class="s2">"</span>
+                    <span class="n">fallback_branch</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">NOSYS"</span>
+
+                    <span class="k">if</span> <span class="n">target_branch</span> <span class="ow">in</span> <span class="n">branch_arrays</span><span class="p">:</span>
+                        <span class="n">collection_content</span><span class="p">[</span><span class="n">subname</span><span class="p">]</span> <span class="o">=</span> <span class="n">branch_arrays</span><span class="p">[</span><span class="n">target_branch</span><span class="p">]</span>
+                        <span class="n">used</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">target_branch</span><span class="p">)</span>
+                        <span class="n">has_systematic_data</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">elif</span> <span class="n">fallback_branch</span> <span class="ow">in</span> <span class="n">branch_arrays</span><span class="p">:</span>
+                        <span class="n">collection_content</span><span class="p">[</span><span class="n">subname</span><span class="p">]</span> <span class="o">=</span> <span class="n">branch_arrays</span><span class="p">[</span><span class="n">fallback_branch</span><span class="p">]</span>
+                        <span class="n">used</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">fallback_branch</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">content</span> <span class="ow">in</span> <span class="n">branch_arrays</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="p">(</span>
+                        <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">collection_name</span> <span class="o">+</span> <span class="s2">"_"</span><span class="p">)</span>
+                        <span class="ow">and</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">used</span>
+                        <span class="ow">and</span> <span class="s2">"_NOSYS"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">k</span>
+                        <span class="ow">and</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">systematic_branch_patterns</span>
+                    <span class="p">):</span>
+                        <span class="n">field_name</span> <span class="o">=</span> <span class="n">k</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">collection_name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span>
+                        <span class="k">if</span> <span class="n">field_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">collection_content</span><span class="p">:</span>
+                            <span class="n">collection_content</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span>
+
+                <span class="k">if</span> <span class="n">collection_content</span><span class="p">:</span>
+                    <span class="n">behavior_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collection_behavior</span><span class="p">(</span>
+                        <span class="n">collection_name</span><span class="p">,</span> <span class="n">warn</span><span class="o">=</span><span class="kc">False</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="p">(</span>
+                        <span class="ow">not</span> <span class="n">has_systematic_data</span>
+                        <span class="ow">and</span> <span class="n">collection_name</span> <span class="ow">in</span> <span class="n">nominal_collections</span>
+                    <span class="p">):</span>
+                        <span class="c1"># no variation for this collection: reuse the nominal one</span>
+                        <span class="n">systematic_collections</span><span class="p">[</span><span class="n">collection_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">nominal_collections</span><span class="p">[</span>
+                            <span class="n">collection_name</span>
+                        <span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_apply_vector_fields</span><span class="p">(</span><span class="n">behavior_name</span><span class="p">,</span> <span class="n">collection_content</span><span class="p">)</span>
+                        <span class="n">systematic_collections</span><span class="p">[</span><span class="n">collection_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zip_collection</span><span class="p">(</span>
+                            <span class="n">collection_content</span><span class="p">,</span> <span class="n">collection_name</span><span class="p">,</span> <span class="n">behavior_name</span>
+                        <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">systematic_collections</span><span class="p">:</span>
+                <span class="n">_content</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">systematic_collections</span><span class="o">.</span><span class="n">values</span><span class="p">(),)</span>
+                <span class="n">output</span><span class="p">[</span><span class="n">systematic</span><span class="p">]</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">(</span>
+                    <span class="n">_content</span><span class="p">,</span>
+                    <span class="p">(</span><span class="o">*</span><span class="n">systematic_collections</span><span class="o">.</span><span class="n">keys</span><span class="p">(),),</span>
+                    <span class="n">length</span><span class="o">=</span><span class="n">_check_equal_lengths</span><span class="p">(</span><span class="n">_content</span><span class="p">),</span>
+                    <span class="n">parameters</span><span class="o">=</span><span class="p">{</span>
+                        <span class="s2">"__record__"</span><span class="p">:</span> <span class="s2">"Systematic"</span><span class="p">,</span>
+                        <span class="s2">"metadata"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"systematic"</span><span class="p">:</span> <span class="n">systematic</span><span class="p">},</span>
+                    <span class="p">},</span>
+                <span class="p">)</span>
+
+        <span class="c1"># handle any remaining unrecognized branches as singletons</span>
+        <span class="n">processed_branches</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">processed_branches</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">event_ids</span><span class="p">)</span>
+        <span class="n">processed_branches</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">singletons</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">collection_name</span> <span class="ow">in</span> <span class="n">collections</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">branch_name</span> <span class="ow">in</span> <span class="n">branch_arrays</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">branch_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">collection_name</span> <span class="o">+</span> <span class="s2">"_"</span><span class="p">):</span>
+                    <span class="n">processed_branches</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">branch_name</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">branch_name</span><span class="p">,</span> <span class="n">content</span> <span class="ow">in</span> <span class="n">branch_arrays</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">branch_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">processed_branches</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"I identified a branch that likely does not have any leaves: "</span>
+                    <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="n">branch_name</span><span class="si">}</span><span class="s2">'. I will treat this as a 'singleton'. To suppress this "</span>
+                    <span class="s2">"warning, add this branch to the singletons set. [singleton-undefined]"</span><span class="p">,</span>
+                    <span class="ne">RuntimeWarning</span><span class="p">,</span>
+                    <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">output</span><span class="p">[</span><span class="n">branch_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">to_layout</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+
+        <span class="n">discovered_systematics</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">all_systematics</span> <span class="k">if</span> <span class="n">s</span> <span class="o">!=</span> <span class="s2">"NOSYS"</span><span class="p">)</span>
+
+        <span class="c1"># final nanoevents (most outer) zip</span>
+        <span class="n">_content</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">output</span><span class="o">.</span><span class="n">values</span><span class="p">(),)</span>
+        <span class="n">_fields</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">output</span><span class="o">.</span><span class="n">keys</span><span class="p">(),)</span>
+        <span class="n">_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">num</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+        <span class="n">nanoevents</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span>
+            <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">(</span><span class="n">_content</span><span class="p">,</span> <span class="n">_fields</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">_length</span><span class="p">),</span>
+            <span class="n">behavior</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior</span><span class="p">(),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># fix virtual array shape generators by re-running from buffers</span>
+        <span class="n">nanoevents</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">_rewrap</span><span class="p">(</span><span class="n">nanoevents</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">"NtupleEvents"</span><span class="p">)</span>
+        <span class="n">nanoevents</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"metadata"</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">"version"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_version</span><span class="p">,</span>
+                    <span class="s2">"systematics"</span><span class="p">:</span> <span class="n">discovered_systematics</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="o">**</span><span class="n">array</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="c1"># add ref to itself in attrs</span>
+        <span class="n">nanoevents</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"@original_array"</span><span class="p">]</span> <span class="o">=</span> <span class="n">nanoevents</span>
+
+        <span class="k">return</span> <span class="n">nanoevents</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_discover_systematics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">branch_arrays</span><span class="p">,</span> <span class="n">collections</span><span class="p">,</span> <span class="n">subcollections</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Extract the systematic variation names from the branch names."""</span>
+        <span class="n">subcoll_patterns</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">subcoll</span><span class="si">}</span><span class="s2">_"</span> <span class="k">for</span> <span class="n">subcoll</span> <span class="ow">in</span> <span class="n">subcollections</span><span class="p">}</span>
+
+        <span class="n">all_systematics</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">branch_arrays</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="s2">"_"</span> <span class="ow">in</span> <span class="n">k</span> <span class="ow">and</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">singletons</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="c1"># handle the pattern collection_subcollection_systematic, where the</span>
+            <span class="c1"># systematic can itself contain double underscores such as</span>
+            <span class="c1"># "JET_EnergyResolution__1up"</span>
+            <span class="n">parts</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">collection</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">collection</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">collections</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">remaining</span> <span class="o">=</span> <span class="s2">"_"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">subcoll_patterns</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">remaining</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">pattern</span><span class="p">):</span>
+                    <span class="n">systematic</span> <span class="o">=</span> <span class="n">remaining</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span> <span class="p">:]</span>
+                    <span class="k">if</span> <span class="n">systematic</span> <span class="ow">and</span> <span class="n">systematic</span> <span class="o">!=</span> <span class="s2">"NOSYS"</span><span class="p">:</span>
+                        <span class="n">all_systematics</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">systematic</span><span class="p">)</span>
+                    <span class="k">break</span>
+
+        <span class="c1"># always include NOSYS as the nominal case</span>
+        <span class="n">all_systematics</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">"NOSYS"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">all_systematics</span>
+
+<div class="viewcode-block" id="Ntuple.behavior">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.Ntuple.behavior">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">behavior</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Behaviors necessary to implement this schema (dict)"""</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.behaviors</span><span class="w"> </span><span class="kn">import</span> <span class="n">atlas</span>
+
+        <span class="k">return</span> <span class="n">atlas</span><span class="o">.</span><span class="n">behavior</span></div>
+
+
+<div class="viewcode-block" id="Ntuple.suggested_behavior">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.Ntuple.suggested_behavior">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">suggested_behavior</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">0.4</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Suggest a behavior to use for a provided collection or branch name.</span>
+
+<span class="sd">        If `identify_closest_behavior` is ``False``, or nothing scores above *cutoff*,</span>
+<span class="sd">        this returns `default_behavior`.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">identify_closest_behavior</span><span class="p">:</span>
+            <span class="c1"># lowercase everything to do case-insensitive matching</span>
+            <span class="n">behaviors</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">behavior</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="nb">str</span><span class="p">)]</span>
+            <span class="n">behaviors_l</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">behaviors</span><span class="p">]</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="n">difflib</span><span class="o">.</span><span class="n">get_close_matches</span><span class="p">(</span>
+                <span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">behaviors_l</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="n">cutoff</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">results</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">default_behavior</span>
+
+            <span class="n">behavior</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># need to identify the index and return the unlowered version</span>
+            <span class="k">return</span> <span class="n">behaviors</span><span class="p">[</span><span class="n">behaviors_l</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">behavior</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">default_behavior</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Peter Fackeldey, Maxym Naumchyk.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

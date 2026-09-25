@@ -1,0 +1,919 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>awkward_zipper.behaviors.nanoaod &mdash; awkward-zipper 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/logo_unfilled_with_text.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            awkward-zipper
+              <img src="../../../_static/logo_unfilled_with_black_text.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">awkward-zipper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">awkward_zipper.behaviors.nanoaod</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for awkward_zipper.behaviors.nanoaod</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Mixins for the CMS NanoAOD schema"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">awkward</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.behaviors</span><span class="w"> </span><span class="kn">import</span> <span class="n">base</span><span class="p">,</span> <span class="n">candidate</span><span class="p">,</span> <span class="n">vector</span>
+
+<span class="n">behavior</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">behavior</span><span class="p">)</span>
+<span class="c1"># vector behavior is included in candidate behavior</span>
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">candidate</span><span class="o">.</span><span class="n">behavior</span><span class="p">)</span>
+
+<span class="n">_VERTEX_REQUIRED</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">})</span>
+<span class="n">_SECONDARY_VERTEX_REQUIRED</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">"pt"</span><span class="p">,</span> <span class="s2">"eta"</span><span class="p">,</span> <span class="s2">"phi"</span><span class="p">,</span> <span class="s2">"mass"</span><span class="p">})</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_NanoAODEvents</span><span class="p">(</span><span class="n">behavior</span><span class="p">[</span><span class="s2">"NanoEvents"</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">"&lt;NanoAOD event&gt;"</span>
+
+
+<span class="n">behavior</span><span class="p">[</span><span class="s2">"NanoEvents"</span><span class="p">]</span> <span class="o">=</span> <span class="n">_NanoAODEvents</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_set_repr_name</span><span class="p">(</span><span class="n">classname</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">namefcn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">classname</span>
+
+    <span class="n">behavior</span><span class="p">[</span><span class="n">classname</span><span class="p">]</span><span class="o">.</span><span class="fm">__repr__</span> <span class="o">=</span> <span class="n">namefcn</span>
+
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+    <span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span>
+        <span class="s2">"PtEtaPhiMLorentzVector"</span><span class="p">,</span> <span class="s2">"PtEtaPhiMCollection"</span><span class="p">,</span> <span class="n">behavior</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="PtEtaPhiMCollection">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.nanoaod.PtEtaPhiMCollection">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PtEtaPhiMCollection</span><span class="p">(</span><span class="n">vector</span><span class="o">.</span><span class="n">PtEtaPhiMLorentzVector</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Generic collection that has Lorentz vector properties"""</span></div>
+
+
+
+<span class="n">PtEtaPhiMCollectionArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PtEtaPhiMCollectionArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PtEtaPhiMCollectionArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">PtEtaPhiMCollectionArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PtEtaPhiMCollectionArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PtEtaPhiMCollectionRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PtEtaPhiMCollectionRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PtEtaPhiMCollectionRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">PtEtaPhiMCollectionRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PtEtaPhiMCollectionRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+    <span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span><span class="s2">"PtEtaPhiMLorentzVector"</span><span class="p">,</span> <span class="s2">"GenParticle"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">)</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="GenParticle">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.nanoaod.GenParticle">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GenParticle</span><span class="p">(</span><span class="n">vector</span><span class="o">.</span><span class="n">PtEtaPhiMLorentzVector</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""NanoAOD generator-level particle object, including parent and child self-references</span>
+
+<span class="sd">    Parent and child self-references are constructed from the ``genPartIdxMother`` column, where</span>
+<span class="sd">    for each entry, the mother entry index is recorded, or -1 if no mother exists.</span>
+<span class="sd">    """</span>
+
+    <span class="n">FLAGS</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">"isPrompt"</span><span class="p">,</span>
+        <span class="s2">"isDecayedLeptonHadron"</span><span class="p">,</span>
+        <span class="s2">"isTauDecayProduct"</span><span class="p">,</span>
+        <span class="s2">"isPromptTauDecayProduct"</span><span class="p">,</span>
+        <span class="s2">"isDirectTauDecayProduct"</span><span class="p">,</span>
+        <span class="s2">"isDirectPromptTauDecayProduct"</span><span class="p">,</span>
+        <span class="s2">"isDirectHadronDecayProduct"</span><span class="p">,</span>
+        <span class="s2">"isHardProcess"</span><span class="p">,</span>
+        <span class="s2">"fromHardProcess"</span><span class="p">,</span>
+        <span class="s2">"isHardProcessTauDecayProduct"</span><span class="p">,</span>
+        <span class="s2">"isDirectHardProcessTauDecayProduct"</span><span class="p">,</span>
+        <span class="s2">"fromHardProcessBeforeFSR"</span><span class="p">,</span>
+        <span class="s2">"isFirstCopy"</span><span class="p">,</span>
+        <span class="s2">"isLastCopy"</span><span class="p">,</span>
+        <span class="s2">"isLastCopyBeforeFSR"</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="w">    </span><span class="sd">"""bit-packed statusFlags interpretations.  Use `GenParticle.hasFlags` to query"""</span>
+
+<div class="viewcode-block" id="GenParticle.hasFlags">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.nanoaod.GenParticle.hasFlags">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hasFlags</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">flags</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Check if one or more status flags are set</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            flags : str or list</span>
+<span class="sd">                A list of flags that are required to be set true. If the first argument</span>
+<span class="sd">                is a list, it is expanded and subsequent arguments ignored.</span>
+<span class="sd">                Possible flags are enumerated in the `FLAGS` attribute</span>
+
+<span class="sd">        Returns a boolean array</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">flags</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">"No flags specified"</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">flags</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">flags</span> <span class="o">=</span> <span class="n">flags</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">flag</span> <span class="ow">in</span> <span class="n">flags</span><span class="p">:</span>
+            <span class="n">mask</span> <span class="o">|=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">FLAGS</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">statusFlags</span> <span class="o">&amp;</span> <span class="n">mask</span><span class="p">)</span> <span class="o">==</span> <span class="n">mask</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Accessor to the direct parent of this particle.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">GenPart</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genPartIdxMotherG</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">distinctParent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Accessor to distinct (different PDG id) parent particle.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">GenPart</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distinctParentIdxG</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">children</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Accessor to direct children of this particle (not grandchildren). Includes particles</span>
+<span class="sd">        with the same PDG ID as this particle.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">GenPart</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">childrenIdxG</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">distinctChildren</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Accessor to direct children of this particle which do not have the same PDG ID as</span>
+<span class="sd">        this particle. Note that this implies the summed four-momentum of the distinctChildren</span>
+<span class="sd">        may not sum to the four-momentum of this particle (for example, if this particle</span>
+<span class="sd">        radiates another particle type). If that behavior is desired, see `distinctChildrenDeep`.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">GenPart</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distinctChildrenIdxG</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">distinctChildrenDeep</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Accessor to distinct child particles with different PDG id, or last ones in the chain.</span>
+<span class="sd">        Note that this does not always find the correct children, since this sometimes depends</span>
+<span class="sd">        on the MC generator! See `here &lt;https://github.com/scikit-hep/coffea/pull/698&gt;`__ for more</span>
+<span class="sd">        information.</span>
+<span class="sd">        """</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">"distinctChildrenDeep may not give correct answers for all generators!"</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">GenPart</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distinctChildrenDeepIdxG</span><span class="p">)</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"GenParticle"</span><span class="p">)</span>
+
+<span class="n">GenParticleArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">GenParticleArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">GenParticleArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">GenParticleArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">GenParticleArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">GenParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">GenParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">GenParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">GenParticleRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">GenParticleRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+
+<div class="viewcode-block" id="GenVisTau">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.nanoaod.GenVisTau">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GenVisTau</span><span class="p">(</span><span class="n">candidate</span><span class="o">.</span><span class="n">PtEtaPhiMCandidate</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""NanoAOD visible tau object"""</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Accessor to the parent particle"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">GenPart</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genPartIdxMotherG</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># Fill in cross-class LorentzVector behaviors for GenVisTau without overwriting</span>
+<span class="c1"># the charge-propagating Candidate.add the decorator just registered. Running</span>
+<span class="c1"># ``copy_behaviors`` before the decorator would pre-seed</span>
+<span class="c1"># ``(add, GenVisTau, GenVisTau)`` -&gt; LorentzVector.add and silently drop charge</span>
+<span class="c1"># on ``GenVisTau + GenVisTau`` (see scikit-hep/coffea#1578).</span>
+<span class="k">for</span> <span class="n">_key</span><span class="p">,</span> <span class="n">_value</span> <span class="ow">in</span> <span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span>
+    <span class="s2">"PtEtaPhiMLorentzVector"</span><span class="p">,</span> <span class="s2">"GenVisTau"</span><span class="p">,</span> <span class="n">behavior</span>
+<span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">behavior</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">_key</span><span class="p">,</span> <span class="n">_value</span><span class="p">)</span>
+<span class="k">del</span> <span class="n">_key</span><span class="p">,</span> <span class="n">_value</span>
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"GenVisTau"</span><span class="p">)</span>
+
+<span class="n">GenVisTauArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">GenVisTauArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">GenVisTauArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">GenVisTauArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">GenVisTauArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">GenVisTauRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">GenVisTauRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">GenVisTauRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">GenVisTauRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">GenVisTauRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+    <span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span><span class="s2">"PtEtaPhiMCandidate"</span><span class="p">,</span> <span class="s2">"Electron"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">)</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="Electron">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.nanoaod.Electron">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Electron</span><span class="p">(</span><span class="n">candidate</span><span class="o">.</span><span class="n">PtEtaPhiMCandidate</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""NanoAOD electron object"""</span>
+
+    <span class="n">FAIL</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="s2">"cutBased selection minimum value"</span>
+    <span class="n">VETO</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="s2">"cutBased selection minimum value"</span>
+    <span class="n">LOOSE</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="s2">"cutBased selection minimum value"</span>
+    <span class="n">MEDIUM</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="s2">"cutBased selection minimum value"</span>
+    <span class="n">TIGHT</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="s2">"cutBased selection minimum value"</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">isVeto</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns a boolean array marking veto cut-based electrons"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cutBased</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">VETO</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">isLoose</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns a boolean array marking loose cut-based electrons"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cutBased</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">LOOSE</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">isMedium</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns a boolean array marking medium cut-based electrons"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cutBased</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MEDIUM</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">isTight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns a boolean array marking tight cut-based electrons"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cutBased</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TIGHT</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matched_gen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""The matched gen-level particle as determined by the NanoAOD branch genPartIdx"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">GenPart</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genPartIdxG</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matched_jet</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""The matched jet as determined by the NanoAOD branch jetIdx"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">Jet</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jetIdxG</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matched_photon</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""The associated photon as determined by the NanoAOD branch photonIdx"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">Photon</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">photonIdxG</span><span class="p">)</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Electron"</span><span class="p">)</span>
+
+<span class="n">ElectronArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ElectronArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ElectronArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">ElectronArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ElectronArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ElectronRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ElectronRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ElectronRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">ElectronRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ElectronRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+    <span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span><span class="s2">"PtEtaPhiMCandidate"</span><span class="p">,</span> <span class="s2">"LowPtElectron"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">)</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="LowPtElectron">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.nanoaod.LowPtElectron">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LowPtElectron</span><span class="p">(</span><span class="n">candidate</span><span class="o">.</span><span class="n">PtEtaPhiMCandidate</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""NanoAOD low-pt electron object"""</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matched_gen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""The matched gen-level particle as determined by the NanoAOD branch genPartIdx"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">GenPart</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genPartIdxG</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matched_electron</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""The matched gen-level electron as determined by the NanoAOD branch electronIdx"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">Electron</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electronIdxG</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matched_photon</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""The associated photon as determined by the NanoAOD branch photonIdx"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">Photon</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">photonIdxG</span><span class="p">)</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"LowPtElectron"</span><span class="p">)</span>
+
+<span class="n">LowPtElectronArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">LowPtElectronArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">LowPtElectronArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">LowPtElectronArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">LowPtElectronArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">LowPtElectronRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">LowPtElectronRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">LowPtElectronRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">LowPtElectronRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">LowPtElectronRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span><span class="s2">"PtEtaPhiMCandidate"</span><span class="p">,</span> <span class="s2">"Muon"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="Muon">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.nanoaod.Muon">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Muon</span><span class="p">(</span><span class="n">candidate</span><span class="o">.</span><span class="n">PtEtaPhiMCandidate</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""NanoAOD muon object"""</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matched_fsrPhoton</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""The matched FSR photon with the lowest dR/ET2. Accessed via the NanoAOD branch fsrPhotonIdx"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">FsrPhoton</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fsrPhotonIdxG</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matched_gen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""The matched gen-level particle as determined by the NanoAOD branch genPartIdx"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">GenPart</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genPartIdxG</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matched_jet</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""The matched jet as determined by the NanoAOD branch jetIdx"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">Jet</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jetIdxG</span><span class="p">)</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Muon"</span><span class="p">)</span>
+
+<span class="n">MuonArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MuonArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MuonArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">MuonArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MuonArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MuonRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MuonRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MuonRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">MuonRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MuonRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span><span class="s2">"PtEtaPhiMCandidate"</span><span class="p">,</span> <span class="s2">"Tau"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="Tau">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.nanoaod.Tau">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Tau</span><span class="p">(</span><span class="n">candidate</span><span class="o">.</span><span class="n">PtEtaPhiMCandidate</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""NanoAOD tau object"""</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matched_gen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""The matched gen-level particle as determined by the NanoAOD branch genPartIdx"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">GenPart</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genPartIdxG</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matched_jet</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""The matched jet as determined by the NanoAOD branch jetIdx"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">Jet</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jetIdxG</span><span class="p">)</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Tau"</span><span class="p">)</span>
+
+<span class="n">TauArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TauArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TauArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">TauArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TauArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TauRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TauRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TauRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">TauRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TauRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span><span class="s2">"PtEtaPhiMCandidate"</span><span class="p">,</span> <span class="s2">"Photon"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="Photon">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.nanoaod.Photon">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Photon</span><span class="p">(</span><span class="n">candidate</span><span class="o">.</span><span class="n">PtEtaPhiMCandidate</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""NanoAOD photon object"""</span>
+
+    <span class="n">FAIL</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="s2">"cutBased selection minimum value"</span>
+    <span class="n">LOOSE</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="s2">"cutBased selection minimum value"</span>
+    <span class="n">MEDIUM</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="s2">"cutBased selection minimum value"</span>
+    <span class="n">TIGHT</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="s2">"cutBased selection minimum value"</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">isLoose</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns a boolean array marking loose cut-based photons"""</span>
+        <span class="c1"># For NanoAOD v9+ the cutBasedBitmap was changed to a cutBased integer</span>
+        <span class="k">if</span> <span class="s2">"cutBased"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cutBased</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">LOOSE</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutBasedBitmap</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">LOOSE</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span> <span class="o">!=</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">isMedium</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns a boolean array marking medium cut-based photons"""</span>
+        <span class="c1"># For NanoAOD v9+ the cutBasedBitmap was changed to a cutBased integer</span>
+        <span class="k">if</span> <span class="s2">"cutBased"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cutBased</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MEDIUM</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutBasedBitmap</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MEDIUM</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span> <span class="o">!=</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">isTight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns a boolean array marking tight cut-based photons"""</span>
+        <span class="c1"># For NanoAOD v9+ the cutBasedBitmap was changed to a cutBased integer</span>
+        <span class="k">if</span> <span class="s2">"cutBased"</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cutBased</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TIGHT</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cutBasedBitmap</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TIGHT</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)))</span> <span class="o">!=</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matched_electron</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""The matched electron as determined by the NanoAOD branch electronIdx"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">Electron</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electronIdxG</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matched_gen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""The matched gen-level particle as determined by the NanoAOD branch genPartIdx"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">GenPart</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genPartIdxG</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matched_jet</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""The matched jet as determined by the NanoAOD branch jetIdx"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">Jet</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jetIdxG</span><span class="p">)</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Photon"</span><span class="p">)</span>
+
+<span class="n">PhotonArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PhotonArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PhotonArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">PhotonArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PhotonArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PhotonRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PhotonRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PhotonRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">PhotonRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PhotonRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+    <span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span><span class="s2">"PtEtaPhiMCandidate"</span><span class="p">,</span> <span class="s2">"FsrPhoton"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">)</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="FsrPhoton">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.nanoaod.FsrPhoton">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FsrPhoton</span><span class="p">(</span><span class="n">candidate</span><span class="o">.</span><span class="n">PtEtaPhiMCandidate</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""NanoAOD fsr photon object"""</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matched_muon</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""The matched muon as determined by the NanoAOD branch muonIdx"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">Muon</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">muonIdxG</span><span class="p">)</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"FsrPhoton"</span><span class="p">)</span>
+
+<span class="n">FsrPhotonArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">FsrPhotonArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">FsrPhotonArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">FsrPhotonArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">FsrPhotonArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">FsrPhotonRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">FsrPhotonRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">FsrPhotonRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">FsrPhotonRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">FsrPhotonRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span><span class="s2">"PtEtaPhiMCandidate"</span><span class="p">,</span> <span class="s2">"Jet"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="Jet">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.nanoaod.Jet">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Jet</span><span class="p">(</span><span class="n">candidate</span><span class="o">.</span><span class="n">PtEtaPhiMCandidate</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""NanoAOD narrow radius jet object"""</span>
+
+    <span class="n">LOOSE</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="s2">"jetId bit position"</span>
+    <span class="n">TIGHT</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="s2">"jetId bit position"</span>
+    <span class="n">TIGHTLEPVETO</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="s2">"jetId bit position"</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">isLoose</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns a boolean array marking loose jets according to jetId index"""</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jetId</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">LOOSE</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">isTight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns a boolean array marking tight jets according to jetId index"""</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jetId</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">TIGHT</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">isTightLeptonVeto</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns a boolean array marking tight jets with explicit lepton veto according to jetId index"""</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jetId</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">TIGHTLEPVETO</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matched_electrons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        The matched electrons as determined by the NanoAOD branch electronIdx. The resulting awkward</span>
+<span class="sd">        array has two entries per jet, where if there are fewer than 2 electrons matched to a jet, the</span>
+<span class="sd">        innermost dimensions are padded with None to be of size 2.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">Electron</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">electronIdxG</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matched_muons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        The matched muons as determined by the NanoAOD branch muonIdx. The resulting awkward</span>
+<span class="sd">        array has two entries per jet, where if there are fewer than 2 muons matched to a jet, the</span>
+<span class="sd">        innermost dimensions are padded with None to be of size 2.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">Muon</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">muonIdxG</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matched_gen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        AK4 jets made with visible genparticles, matched to this jet via the NanoAOD branch genJetIdx</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">GenJet</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genJetIdxG</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">constituents</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">"pFCandsIdxG"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">"PF candidates are only available for PFNano"</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">JetPFCands</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pFCandsIdxG</span><span class="p">)</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Jet"</span><span class="p">)</span>
+
+<span class="n">JetArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">JetArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">JetArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">JetArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">JetArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">JetRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">JetRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">JetRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">JetRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">JetRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span><span class="s2">"PtEtaPhiMCandidate"</span><span class="p">,</span> <span class="s2">"FatJet"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="FatJet">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.nanoaod.FatJet">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FatJet</span><span class="p">(</span><span class="n">candidate</span><span class="o">.</span><span class="n">PtEtaPhiMCandidate</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""NanoAOD large radius jet object"""</span>
+
+    <span class="n">LOOSE</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="s2">"jetId bit position"</span>
+    <span class="n">TIGHT</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="s2">"jetId bit position"</span>
+    <span class="n">TIGHTLEPVETO</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="s2">"jetId bit position"</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">isLoose</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns a boolean array marking loose jets according to jetId index"""</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jetId</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">LOOSE</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">isTight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns a boolean array marking tight jets according to jetId index"""</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jetId</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">TIGHT</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">isTightLeptonVeto</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns a boolean array marking tight jets with explicit lepton veto according to jetId index"""</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jetId</span> <span class="o">&amp;</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">TIGHTLEPVETO</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">subjets</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">SubJet</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subJetIdxG</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matched_gen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""AK8 jets made of visible genparticles, matched via the NanoAOD branch genJetAK8Idx"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">GenJetAK8</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">genJetAK8IdxG</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">constituents</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">"pFCandsIdxG"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">"PF candidates are only available for PFNano"</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">FatJetPFCands</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pFCandsIdxG</span><span class="p">)</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"FatJet"</span><span class="p">)</span>
+
+<span class="n">FatJetArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">FatJetArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">FatJetArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">FatJetArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">FatJetArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">FatJetRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">FatJetRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">FatJetRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">FatJetRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">FatJetRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span><span class="s2">"PolarTwoVector"</span><span class="p">,</span> <span class="s2">"MissingET"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="MissingET">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.nanoaod.MissingET">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MissingET</span><span class="p">(</span><span class="n">vector</span><span class="o">.</span><span class="n">PolarTwoVector</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""NanoAOD Missing transverse energy object"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"MissingET"</span><span class="p">)</span>
+
+<span class="n">MissingETArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">MissingETArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MissingETArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">SphericalThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MissingETArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MissingETArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">MissingETArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MissingETRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">MissingETRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MissingETRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">SphericalThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MissingETRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MissingETRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">MissingETRecord</span>  <span class="c1"># noqa: F821</span>
+
+
+<div class="viewcode-block" id="Vertex">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.nanoaod.Vertex">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Vertex</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""NanoAOD vertex object"""</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Vertex position as a three vector"""</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"x"</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s2">"x"</span><span class="p">],</span>
+                <span class="s2">"y"</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s2">"y"</span><span class="p">],</span>
+                <span class="s2">"z"</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s2">"z"</span><span class="p">],</span>
+            <span class="p">},</span>
+            <span class="n">with_name</span><span class="o">=</span><span class="s2">"ThreeVector"</span><span class="p">,</span>
+            <span class="n">behavior</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__awkward_validation__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="n">_VERTEX_REQUIRED</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> requires fields </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">_VERTEX_REQUIRED</span><span class="p">)</span><span class="si">}</span><span class="s2">; "</span>
+                <span class="sa">f</span><span class="s2">"missing: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Vertex"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="SecondaryVertex">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.nanoaod.SecondaryVertex">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SecondaryVertex</span><span class="p">(</span><span class="n">Vertex</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""NanoAOD secondary vertex object"""</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">p4</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""4-momentum vector of tracks associated to this SV"""</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"pt"</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s2">"pt"</span><span class="p">],</span>
+                <span class="s2">"eta"</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s2">"eta"</span><span class="p">],</span>
+                <span class="s2">"phi"</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s2">"phi"</span><span class="p">],</span>
+                <span class="s2">"mass"</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="s2">"mass"</span><span class="p">],</span>
+            <span class="p">},</span>
+            <span class="n">with_name</span><span class="o">=</span><span class="s2">"PtEtaPhiMLorentzVector"</span><span class="p">,</span>
+            <span class="n">behavior</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__awkward_validation__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="n">_SECONDARY_VERTEX_REQUIRED</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> requires fields </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">_SECONDARY_VERTEX_REQUIRED</span><span class="p">)</span><span class="si">}</span><span class="s2"> "</span>
+                <span class="sa">f</span><span class="s2">"(in addition to x/y/z); missing: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__awkward_validation__</span><span class="p">()</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"SecondaryVertex"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="AssociatedPFCand">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.nanoaod.AssociatedPFCand">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AssociatedPFCand</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""PFNano PF candidate to jet association object"""</span>
+
+    <span class="n">collection_map</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"JetPFCands"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"Jet"</span><span class="p">,</span> <span class="s2">"PFCands"</span><span class="p">),</span>
+        <span class="s2">"FatJetPFCands"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"FatJet"</span><span class="p">,</span> <span class="s2">"PFCands"</span><span class="p">),</span>
+        <span class="s2">"GenJetCands"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"GenJet"</span><span class="p">,</span> <span class="s2">"GenCands"</span><span class="p">),</span>
+        <span class="s2">"GenFatJetCands"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"GenJetAK8"</span><span class="p">,</span> <span class="s2">"GenCands"</span><span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">jet</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">collection_map</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_collection_name</span><span class="p">()][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()[</span><span class="n">collection</span><span class="p">]</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jetIdxG</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">collection_map</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_collection_name</span><span class="p">()][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()[</span><span class="n">collection</span><span class="p">]</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pFCandsIdxG</span><span class="p">)</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"AssociatedPFCand"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="AssociatedSV">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.nanoaod.AssociatedSV">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AssociatedSV</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""PFNano secondary vertex to jet association object"""</span>
+
+    <span class="n">collection_map</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"JetSVs"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"Jet"</span><span class="p">,</span> <span class="s2">"SV"</span><span class="p">),</span>
+        <span class="s2">"FatJetSVs"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"FatJet"</span><span class="p">,</span> <span class="s2">"SV"</span><span class="p">),</span>
+        <span class="c1"># these two are unclear</span>
+        <span class="s2">"GenJetSVs"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"GenJet"</span><span class="p">,</span> <span class="s2">"SV"</span><span class="p">),</span>
+        <span class="s2">"GenFatJetSVs"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"GenJetAK8"</span><span class="p">,</span> <span class="s2">"SV"</span><span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">jet</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">collection_map</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_collection_name</span><span class="p">()][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()[</span><span class="n">collection</span><span class="p">]</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">jetIdxG</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">collection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">collection_map</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_collection_name</span><span class="p">()][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()[</span><span class="n">collection</span><span class="p">]</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sVIdxG</span><span class="p">)</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"AssociatedSV"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="PFCand">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.nanoaod.PFCand">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PFCand</span><span class="p">(</span><span class="n">candidate</span><span class="o">.</span><span class="n">PtEtaPhiMCandidate</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""PFNano particle flow candidate object"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"PFCand"</span><span class="p">)</span>
+
+<span class="n">PFCandArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PFCandArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PFCandArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">PFCandArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PFCandArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PFCandRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PFCandRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PFCandRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">PFCandRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PFCandRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">"AssociatedPFCand"</span><span class="p">,</span>
+    <span class="s2">"AssociatedSV"</span><span class="p">,</span>
+    <span class="s2">"Electron"</span><span class="p">,</span>
+    <span class="s2">"FatJet"</span><span class="p">,</span>
+    <span class="s2">"FsrPhoton"</span><span class="p">,</span>
+    <span class="s2">"GenParticle"</span><span class="p">,</span>
+    <span class="s2">"GenVisTau"</span><span class="p">,</span>
+    <span class="s2">"Jet"</span><span class="p">,</span>
+    <span class="s2">"LowPtElectron"</span><span class="p">,</span>
+    <span class="s2">"MissingET"</span><span class="p">,</span>
+    <span class="s2">"Muon"</span><span class="p">,</span>
+    <span class="s2">"PFCand"</span><span class="p">,</span>
+    <span class="s2">"Photon"</span><span class="p">,</span>
+    <span class="s2">"PtEtaPhiMCollection"</span><span class="p">,</span>
+    <span class="s2">"SecondaryVertex"</span><span class="p">,</span>
+    <span class="s2">"Tau"</span><span class="p">,</span>
+    <span class="s2">"Vertex"</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Peter Fackeldey, Maxym Naumchyk.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

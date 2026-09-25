@@ -1,0 +1,612 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>awkward_zipper.behaviors.edm4hep &mdash; awkward-zipper 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/logo_unfilled_with_text.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            awkward-zipper
+              <img src="../../../_static/logo_unfilled_with_black_text.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">awkward-zipper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">awkward_zipper.behaviors.edm4hep</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for awkward_zipper.behaviors.edm4hep</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">awkward</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.behaviors</span><span class="w"> </span><span class="kn">import</span> <span class="n">base</span><span class="p">,</span> <span class="n">vector</span>
+
+<span class="n">behavior</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">behavior</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_copy_behaviors</span><span class="p">(</span><span class="n">from_name</span><span class="p">,</span> <span class="n">to_name</span><span class="p">,</span> <span class="n">behavior</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Copy cross-class behaviors from ``from_name`` onto ``to_name`` in place.</span>
+
+<span class="sd">    Uses ``setdefault`` rather than ``dict.update``: these copies run *after* the</span>
+<span class="sd">    target class is defined, and ``awkward.mixin_class`` registers a class's own</span>
+<span class="sd">    record via plain assignment (overwrite). A blanket ``update`` would therefore</span>
+<span class="sd">    clobber the subclass's own record/array registration with the parent's,</span>
+<span class="sd">    silently downcasting e.g. an ``MCParticle`` to a ``MomentumCandidate`` (which</span>
+<span class="sd">    then lacks methods like ``get_daughters``). ``setdefault`` fills in only the</span>
+<span class="sd">    genuinely-new cross-class keys and leaves the subclass's own entries intact.</span>
+<span class="sd">    See scikit-hep/coffea#1594.</span>
+<span class="sd">    """</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span>
+        <span class="n">from_name</span><span class="p">,</span> <span class="n">to_name</span><span class="p">,</span> <span class="n">behavior</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">behavior</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_EDM4HEPEvents</span><span class="p">(</span><span class="n">behavior</span><span class="p">[</span><span class="s2">"NanoEvents"</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Events"""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">"EDM4HEP-Event"</span>
+
+
+<span class="n">behavior</span><span class="p">[</span><span class="s2">"NanoEvents"</span><span class="p">]</span> <span class="o">=</span> <span class="n">_EDM4HEPEvents</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_set_repr_name</span><span class="p">(</span><span class="n">classname</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">namefcn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">classname</span>
+
+    <span class="n">behavior</span><span class="p">[</span><span class="n">classname</span><span class="p">]</span><span class="o">.</span><span class="fm">__repr__</span> <span class="o">=</span> <span class="n">namefcn</span>
+
+
+<div class="viewcode-block" id="edm4hep_nanocollection">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.edm4hep_nanocollection">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">edm4hep_nanocollection</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Modified NanoCollection for EDM4HEP"""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_nested_global_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Similar to _apply_global_index but the indexes are twice nested"""</span>
+        <span class="c1"># extract the shape of the index</span>
+        <span class="n">counts1</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">num</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">counts2</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">num</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">counts3</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">num</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+
+        <span class="c1"># Apply the flat index</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">index</span><span class="p">))</span>
+
+        <span class="c1"># Rebuild the shape of the index</span>
+        <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">unflatten</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">counts3</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">unflatten</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">counts2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">unflatten</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">counts1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">List_Relations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""List all the branches that are for OneToOneRelations or OneToManyRelations"""</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span> <span class="k">if</span> <span class="s2">"_idx_"</span> <span class="ow">in</span> <span class="n">name</span><span class="p">}</span>
+
+<div class="viewcode-block" id="edm4hep_nanocollection.Map_Relation">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.edm4hep_nanocollection.Map_Relation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Map_Relation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generic_name</span><span class="p">,</span> <span class="n">target_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Map a OneToOne or a OneToMany Relation to it's target collection</span>
+<span class="sd">        Options: generic_name | str | name of the relation in EDM4HEP.yaml</span>
+<span class="sd">                 target_name | str | name of the target collection</span>
+
+<span class="sd">        Note: All relation branches are named as,</span>
+<span class="sd">              genericname_idx_targetname_index</span>
+<span class="sd">                or</span>
+<span class="sd">              genericname_idx_targetname_index_Global</span>
+<span class="sd">                or</span>
+<span class="sd">              genericname_idx_targetname_collectionID</span>
+<span class="sd">            One can list out all such branches with the method List_Relations</span>
+<span class="sd">        """</span>
+        <span class="n">name_struct</span> <span class="o">=</span> <span class="n">generic_name</span> <span class="o">+</span> <span class="s2">"_idx_"</span> <span class="o">+</span> <span class="n">target_name</span> <span class="o">+</span> <span class="s2">"_index_Global"</span>
+        <span class="n">idx_field_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span> <span class="k">if</span> <span class="n">name_struct</span> <span class="ow">in</span> <span class="n">name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_field_names</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"*</span><span class="si">{</span><span class="n">name_struct</span><span class="si">}</span><span class="s2"> not found in the current collection"</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_field_names</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"More than one field available for *</span><span class="si">{</span><span class="n">name_struct</span><span class="si">}</span><span class="s2">!"</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">idx_field_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()[</span><span class="n">target_name</span><span class="p">]</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">or</span> <span class="n">index</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()[</span><span class="n">target_name</span><span class="p">]</span><span class="o">.</span><span class="n">_apply_nested_global_index</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Index is highly nested!</span><span class="se">\n</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">List_Links</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""List all the branches that are Links"""</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">name</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span>
+            <span class="k">if</span> <span class="p">((</span><span class="s2">"Link_from"</span> <span class="ow">in</span> <span class="n">name</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s2">"Link_to"</span> <span class="ow">in</span> <span class="n">name</span><span class="p">))</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="edm4hep_nanocollection.Map_Link">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.edm4hep_nanocollection.Map_Link">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">Map_Link</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generic_name</span><span class="p">,</span> <span class="n">target_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Map a Link to it's target collection</span>
+<span class="sd">        Note: This method only works when copy_links_to_target_datatype is set to true in the schema</span>
+<span class="sd">        Options: generic_name | str | name of the Link in EDM4HEP.yaml</span>
+<span class="sd">                 target_name | str | name of the target collection</span>
+
+<span class="sd">        Note: All link branches are named as,</span>
+<span class="sd">              Link_from_genericname_idx_targetname_index or Link_to_genericname_idx_targetname_index</span>
+<span class="sd">                or</span>
+<span class="sd">              Link_from_genericname_idx_targetname_index_Global or Link_to_genericname_idx_targetname_index_Global</span>
+<span class="sd">                or</span>
+<span class="sd">              Link_from_genericname_idx_targetname_collectionID or Link_to_genericname_idx_targetname_collectionID</span>
+<span class="sd">            One can list out all such branches with the method List_Links</span>
+<span class="sd">        """</span>
+        <span class="n">idx_field_name</span> <span class="o">=</span> <span class="s2">"Link_"</span> <span class="o">+</span> <span class="n">generic_name</span> <span class="o">+</span> <span class="s2">"_"</span> <span class="o">+</span> <span class="n">target_name</span>
+        <span class="k">if</span> <span class="n">idx_field_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">idx_field_name</span><span class="si">}</span><span class="s2"> not found in the current collection"</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()[</span><span class="n">target_name</span><span class="p">]</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">idx_field_name</span><span class="p">][</span><span class="s2">"index_Global"</span><span class="p">]</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<span class="n">_copy_behaviors</span><span class="p">(</span><span class="s2">"NanoCollection"</span><span class="p">,</span> <span class="s2">"edm4hep_nanocollection"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="MomentumCandidate">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.MomentumCandidate">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MomentumCandidate</span><span class="p">(</span><span class="n">vector</span><span class="o">.</span><span class="n">LorentzVector</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""A Lorentz vector with charge</span>
+
+<span class="sd">    This mixin class requires the parent class to provide the items ``px``, ``py``, ``pz``, `E`, and ``charge``.</span>
+<span class="sd">    """</span>
+
+<div class="viewcode-block" id="MomentumCandidate.add">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.MomentumCandidate.add">[docs]</a>
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="p">{</span><span class="s2">"MomentumCandidate"</span><span class="p">})</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Add two candidates together elementwise using ``px``, ``py``, ``pz``, `E`, and ``charge`` components"""</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"px"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">px</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">px</span><span class="p">,</span>
+                <span class="s2">"py"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">py</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">py</span><span class="p">,</span>
+                <span class="s2">"pz"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pz</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">pz</span><span class="p">,</span>
+                <span class="s2">"E"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">E</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">E</span><span class="p">,</span>
+                <span class="s2">"charge"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">charge</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">with_name</span><span class="o">=</span><span class="s2">"MomentumCandidate"</span><span class="p">,</span>
+            <span class="n">behavior</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MomentumCandidate.sum">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.MomentumCandidate.sum">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Sum an array of vectors elementwise using ``px``, ``py``, ``pz``, `E`, and ``charge`` components"""</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"px"</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">px</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">),</span>
+                <span class="s2">"py"</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">py</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">),</span>
+                <span class="s2">"pz"</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pz</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">),</span>
+                <span class="s2">"E"</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">),</span>
+                <span class="s2">"charge"</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">),</span>
+            <span class="p">},</span>
+            <span class="n">with_name</span><span class="o">=</span><span class="s2">"MomentumCandidate"</span><span class="p">,</span>
+            <span class="n">behavior</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">absolute_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""The absolute value of the mass"""</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mass2</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__awkward_validation__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">"charge"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> requires the 'charge' field"</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="s2">"__awkward_validation__"</span><span class="p">):</span>
+            <span class="n">parent</span><span class="o">.</span><span class="n">__awkward_validation__</span><span class="p">()</span></div>
+
+
+
+<span class="n">_copy_behaviors</span><span class="p">(</span><span class="s2">"LorentzVector"</span><span class="p">,</span> <span class="s2">"MomentumCandidate"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">)</span>
+<span class="n">MomentumCandidateArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MomentumCandidateArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MomentumCandidateArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MomentumCandidateArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">MomentumCandidateArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MomentumCandidateRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MomentumCandidateRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MomentumCandidateRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MomentumCandidateRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">MomentumCandidateRecord</span>  <span class="c1"># noqa: F821</span>
+
+
+<span class="c1">#########################################################################################</span>
+<span class="c1"># Selected Components #</span>
+<span class="c1">#########################################################################################</span>
+<div class="viewcode-block" id="TrackState">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.TrackState">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TrackState</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Component: TrackState"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"TrackState"</span><span class="p">)</span>
+<span class="n">TrackState</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>
+<span class="n">TrackState</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>
+<span class="n">TrackState</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">TrackState</span>
+<span class="n">TrackState</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>
+<span class="n">TrackStateRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TrackStateRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TrackStateRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">TrackStateRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TrackStateRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+
+<div class="viewcode-block" id="Quantity">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.Quantity">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Quantity</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Component: Quantity"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Quantity"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="covMatrix">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.covMatrix">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">covMatrix</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Component: covMatrix"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"covMatrix"</span><span class="p">)</span>
+
+
+<span class="c1">#########################################################################################</span>
+<span class="c1"># Datatypes #</span>
+<span class="c1">#########################################################################################</span>
+<div class="viewcode-block" id="EventHeader">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.EventHeader">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EventHeader</span><span class="p">(</span><span class="n">edm4hep_nanocollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Datatype: EventHeader"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"EventHeader"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="MCParticle">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.MCParticle">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MCParticle</span><span class="p">(</span><span class="n">MomentumCandidate</span><span class="p">,</span> <span class="n">edm4hep_nanocollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Datatype: MCParticle"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"MCParticle"</span><span class="p">)</span>
+<span class="n">_copy_behaviors</span><span class="p">(</span><span class="s2">"MomentumCandidate"</span><span class="p">,</span> <span class="s2">"MCParticle"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">)</span>
+<span class="n">MCParticleArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MCParticleArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MCParticleArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">MCParticleArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MCParticleArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MCParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MCParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MCParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">MCParticleRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MCParticleRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+
+<div class="viewcode-block" id="SimTrackerHit">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.SimTrackerHit">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SimTrackerHit</span><span class="p">(</span><span class="n">edm4hep_nanocollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Datatype: SimTrackerHit"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"SimTrackerHit"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CaloHitContribution">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.CaloHitContribution">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CaloHitContribution</span><span class="p">(</span><span class="n">edm4hep_nanocollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Datatype: CaloHitContribution"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"CaloHitContribution"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="SimCalorimeterHit">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.SimCalorimeterHit">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SimCalorimeterHit</span><span class="p">(</span><span class="n">edm4hep_nanocollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Datatype: SimCalorimeterHit"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"SimCalorimeterHit"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="RawCalorimeterHit">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.RawCalorimeterHit">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RawCalorimeterHit</span><span class="p">(</span><span class="n">edm4hep_nanocollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Datatype: RawCalorimeterHit"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"RawCalorimeterHit"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CalorimeterHit">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.CalorimeterHit">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CalorimeterHit</span><span class="p">(</span><span class="n">edm4hep_nanocollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Datatype: CalorimeterHit"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"CalorimeterHit"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ParticleID">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.ParticleID">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ParticleID</span><span class="p">(</span><span class="n">edm4hep_nanocollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Datatype: ParticleID"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"ParticleID"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Cluster">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.Cluster">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Cluster</span><span class="p">(</span><span class="n">edm4hep_nanocollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Datatype: Cluster"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Cluster"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="TrackerHit3D">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.TrackerHit3D">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TrackerHit3D</span><span class="p">(</span><span class="n">edm4hep_nanocollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Datatype: TrackerHit3D"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"TrackerHit3D"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="TrackerHitPlane">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.TrackerHitPlane">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TrackerHitPlane</span><span class="p">(</span><span class="n">edm4hep_nanocollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Datatype: TrackerHitPlane"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"TrackerHitPlane"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="RawTimeSeries">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.RawTimeSeries">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RawTimeSeries</span><span class="p">(</span><span class="n">edm4hep_nanocollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Datatype: RawTimeSeries"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"RawTimeSeries"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Track">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.Track">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Track</span><span class="p">(</span><span class="n">edm4hep_nanocollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Datatype: Track"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Track"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Vertex">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.Vertex">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Vertex</span><span class="p">(</span><span class="n">edm4hep_nanocollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Datatype: Vertex"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Vertex"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ReconstructedParticle">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.ReconstructedParticle">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ReconstructedParticle</span><span class="p">(</span><span class="n">MomentumCandidate</span><span class="p">,</span> <span class="n">edm4hep_nanocollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Datatype: Reconstructed particle"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"ReconstructedParticle"</span><span class="p">)</span>
+<span class="n">_copy_behaviors</span><span class="p">(</span><span class="s2">"MomentumCandidate"</span><span class="p">,</span> <span class="s2">"ReconstructedParticle"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">)</span>
+<span class="n">ReconstructedParticleArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ReconstructedParticleArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ReconstructedParticleArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">ReconstructedParticleArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ReconstructedParticleArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ReconstructedParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ReconstructedParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ReconstructedParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="p">(</span>  <span class="c1"># noqa: F821</span>
+    <span class="n">ReconstructedParticleRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="p">)</span>
+<span class="n">ReconstructedParticleRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+
+<div class="viewcode-block" id="TimeSeries">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.TimeSeries">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TimeSeries</span><span class="p">(</span><span class="n">edm4hep_nanocollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Datatype: TimeSeries"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"TimeSeries"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="RecDqdx">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.RecDqdx">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RecDqdx</span><span class="p">(</span><span class="n">edm4hep_nanocollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Datatype: RecDqdx"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"RecDqdx"</span><span class="p">)</span>
+
+
+<span class="c1">#########################################################################################</span>
+<span class="c1"># Selected Links #</span>
+<span class="c1">#########################################################################################</span>
+<div class="viewcode-block" id="RecoMCParticleLink">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.RecoMCParticleLink">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RecoMCParticleLink</span><span class="p">(</span><span class="n">edm4hep_nanocollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Link: MCRecoParticleLink"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"RecoMCParticleLink"</span><span class="p">)</span>
+<span class="n">RecoMCParticleLinkArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">RecoMCParticleLinkArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">RecoMCParticleLinkArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">RecoMCParticleLinkArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">RecoMCParticleLinkArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">RecoMCParticleLinkRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">RecoMCParticleLinkRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">RecoMCParticleLinkRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">RecoMCParticleLinkRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">RecoMCParticleLinkRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+
+<span class="c1">#########################################################################################</span>
+<span class="c1"># Extras #</span>
+<span class="c1">#########################################################################################</span>
+<div class="viewcode-block" id="ObjectID">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.edm4hep.ObjectID">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ObjectID</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Generic Object ID storage, pointing to another collection.</span>
+<span class="sd">    Usually has the &lt;podio::ObjectID&gt; type</span>
+<span class="sd">    """</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"ObjectID"</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Peter Fackeldey, Maxym Naumchyk.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
