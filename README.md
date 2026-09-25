@@ -9,7 +9,7 @@ Most of this code has been originally been written by the [coffea](https://githu
 For installation using [`uv`](https://github.com/astral-sh/uv):
 
 ```bash
-git clone https://github.com/maxymnaumchyk/awkward-zipper.git
+git clone https://github.com/CoffeaTeam/awkward-zipper.git
 cd awkward-zipper
 
 uv venv
