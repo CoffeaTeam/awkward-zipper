@@ -19,7 +19,7 @@ For installation using `uv <https://github.com/astral-sh/uv>`_:
 
 .. code:: bash
 
-   git clone https://github.com/maxymnaumchyk/awkward-zipper.git
+   git clone https://github.com/CoffeaTeam/awkward-zipper.git
    cd awkward-zipper
 
    uv venv

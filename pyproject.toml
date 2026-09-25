@@ -37,6 +37,12 @@ classifiers = [
 ]
 dynamic = ["version"]
 
+[project.urls]
+Homepage = "https://github.com/CoffeaTeam/awkward-zipper"
+Documentation = "https://coffeateam.github.io/awkward-zipper/"
+Source = "https://github.com/CoffeaTeam/awkward-zipper"
+Issues = "https://github.com/CoffeaTeam/awkward-zipper/issues"
+
 [dependency-groups]
 test = ["pytest >=7", "pytest-cov >=3"]
 dev = [
