@@ -1,0 +1,1023 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>awkward_zipper.behaviors.vector &mdash; awkward-zipper 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/logo_unfilled_with_text.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            awkward-zipper
+              <img src="../../../_static/logo_unfilled_with_black_text.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">awkward-zipper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">awkward_zipper.behaviors.vector</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for awkward_zipper.behaviors.vector</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""2D, 3D, and Lorentz vector class mixins</span>
+
+<span class="sd">These mixins will eventually be superseded by the `vector &lt;https://github.com/scikit-hep/vector&gt;`__ library,</span>
+<span class="sd">which will hopefully be feature-compatible. The 2D vector provides cartesian and polar coordinate attributes,</span>
+<span class="sd">where ``r`` represents the polar distance from the origin. The 3D vector provides cartesian and spherical coordinates,</span>
+<span class="sd">where ``rho`` represents the 3D distance from the origin and ``r`` is the axial distance from the z axis, so that it can</span>
+<span class="sd">subclass the 2D vector. The Lorentz vector also subclasses the 3D vector, adding ``t`` as the fourth</span>
+<span class="sd">cartesian coordinate. Aliases typical of momentum vectors are also provided.</span>
+
+<span class="sd">A small example::</span>
+
+<span class="sd">    import numpy as np</span>
+<span class="sd">    import awkward as ak</span>
+<span class="sd">    from awkward_zipper.behaviors import vector</span>
+
+<span class="sd">    n = 1000</span>
+
+<span class="sd">    vec = ak.zip(</span>
+<span class="sd">        {</span>
+<span class="sd">            "x": np.random.normal(size=n),</span>
+<span class="sd">            "y": np.random.normal(size=n),</span>
+<span class="sd">            "z": np.random.normal(size=n),</span>
+<span class="sd">        },</span>
+<span class="sd">        with_name="ThreeVector",</span>
+<span class="sd">        behavior=vector.behavior,</span>
+<span class="sd">    )</span>
+
+<span class="sd">    vec4 = ak.zip(</span>
+<span class="sd">        {</span>
+<span class="sd">            "pt": vec.r,</span>
+<span class="sd">            "eta": -np.log(np.tan(vec.theta/2)),</span>
+<span class="sd">            "phi": vec.phi,</span>
+<span class="sd">            "mass": np.full(n, 1.),</span>
+<span class="sd">        },</span>
+<span class="sd">        with_name="PtEtaPhiMLorentzVector",</span>
+<span class="sd">        behavior=vector.behavior,</span>
+<span class="sd">    )</span>
+
+<span class="sd">    assert np.allclose(np.array(vec4.x), np.array(vec.x))</span>
+<span class="sd">    assert np.allclose(np.array(vec4.y), np.array(vec.y))</span>
+<span class="sd">    assert np.allclose(np.array(vec4.z), np.array(vec.z))</span>
+<span class="sd">    assert np.allclose(np.array(abs(2*vec + vec4) / abs(vec)), 3)</span>
+
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numbers</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">awkward</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numba</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">vector</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">vector.backends.awkward</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MomentumAwkward2D</span><span class="p">,</span>
+    <span class="n">MomentumAwkward3D</span><span class="p">,</span>
+    <span class="n">MomentumAwkward4D</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="n">numba</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">numba</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">numba</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">numba</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">numba</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+        <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_mass2_kernel</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">t</span> <span class="o">*</span> <span class="n">t</span> <span class="o">-</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span> <span class="o">-</span> <span class="n">y</span> <span class="o">*</span> <span class="n">y</span> <span class="o">-</span> <span class="n">z</span> <span class="o">*</span> <span class="n">z</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="n">numba</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">numba</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">numba</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+        <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">delta_phi</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Compute difference in angle given two angles a and b</span>
+
+<span class="sd">    Returns a value within [-pi, pi)</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">a</span> <span class="o">-</span> <span class="n">b</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+
+
+<span class="nd">@numba</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="n">numba</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">numba</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">numba</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">numba</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">numba</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+        <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">numba</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">delta_r</span><span class="p">(</span><span class="n">eta1</span><span class="p">,</span> <span class="n">phi1</span><span class="p">,</span> <span class="n">eta2</span><span class="p">,</span> <span class="n">phi2</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""Distance in (eta,phi) plane given two pairs of (eta,phi)</span>
+
+<span class="sd">    :math:`\sqrt{\Delta\eta^2 + \Delta\phi^2}`</span>
+<span class="sd">    """</span>
+    <span class="n">deta</span> <span class="o">=</span> <span class="n">eta1</span> <span class="o">-</span> <span class="n">eta2</span>
+    <span class="n">dphi</span> <span class="o">=</span> <span class="n">delta_phi</span><span class="p">(</span><span class="n">phi1</span><span class="p">,</span> <span class="n">phi2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hypot</span><span class="p">(</span><span class="n">deta</span><span class="p">,</span> <span class="n">dphi</span><span class="p">)</span>
+
+
+<span class="n">behavior</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">vector</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">awkward</span><span class="o">.</span><span class="n">behavior</span><span class="p">)</span>
+
+<span class="c1"># Scikit-hep vector maps each coordinate to a single internal slot, so if</span>
+<span class="c1"># a record carries two aliases from the same group (e.g. both ``x`` and</span>
+<span class="c1"># ``px``) one is silently ignored. Flag that at validation time.</span>
+<span class="n">_X_COMPONENT</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"px"</span><span class="p">})</span>
+<span class="n">_Y_COMPONENT</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">"y"</span><span class="p">,</span> <span class="s2">"py"</span><span class="p">})</span>
+<span class="n">_Z_COMPONENT</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">"z"</span><span class="p">,</span> <span class="s2">"pz"</span><span class="p">})</span>
+<span class="n">_AZIMUTHAL_RADIAL</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">"rho"</span><span class="p">,</span> <span class="s2">"pt"</span><span class="p">})</span>
+<span class="n">_TEMPORAL</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">"t"</span><span class="p">,</span> <span class="s2">"tau"</span><span class="p">,</span> <span class="s2">"E"</span><span class="p">,</span> <span class="s2">"e"</span><span class="p">,</span> <span class="s2">"energy"</span><span class="p">,</span> <span class="s2">"M"</span><span class="p">,</span> <span class="s2">"m"</span><span class="p">,</span> <span class="s2">"mass"</span><span class="p">})</span>
+<span class="n">_AZIMUTHAL_POLAR</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">"rho"</span><span class="p">,</span> <span class="s2">"pt"</span><span class="p">,</span> <span class="s2">"phi"</span><span class="p">})</span>
+<span class="n">_AZIMUTHAL_CARTESIAN</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">({</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"px"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"py"</span><span class="p">})</span>
+
+<span class="n">_ALIAS_GROUPS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"x-component"</span><span class="p">:</span> <span class="n">_X_COMPONENT</span><span class="p">,</span>
+    <span class="s2">"y-component"</span><span class="p">:</span> <span class="n">_Y_COMPONENT</span><span class="p">,</span>
+    <span class="s2">"z-component"</span><span class="p">:</span> <span class="n">_Z_COMPONENT</span><span class="p">,</span>
+    <span class="s2">"azimuthal radial"</span><span class="p">:</span> <span class="n">_AZIMUTHAL_RADIAL</span><span class="p">,</span>
+    <span class="s2">"temporal"</span><span class="p">:</span> <span class="n">_TEMPORAL</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="nd">@functools</span><span class="o">.</span><span class="n">lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">4096</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_coordinate_validation</span><span class="p">(</span><span class="n">fields</span><span class="p">):</span>
+    <span class="n">fields</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">fields</span><span class="p">)</span>
+    <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">aliases</span> <span class="ow">in</span> <span class="n">_ALIAS_GROUPS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">overlap</span> <span class="o">=</span> <span class="n">fields</span> <span class="o">&amp;</span> <span class="n">aliases</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">overlap</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"multiple </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> aliases present: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">overlap</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="n">has_xy</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">fields</span> <span class="o">&amp;</span> <span class="n">_X_COMPONENT</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">bool</span><span class="p">(</span><span class="n">fields</span> <span class="o">&amp;</span> <span class="n">_Y_COMPONENT</span><span class="p">)</span>
+    <span class="n">has_rhophi</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">fields</span> <span class="o">&amp;</span> <span class="n">_AZIMUTHAL_RADIAL</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">"phi"</span> <span class="ow">in</span> <span class="n">fields</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">has_xy</span> <span class="ow">and</span> <span class="n">fields</span> <span class="o">&amp;</span> <span class="n">_AZIMUTHAL_POLAR</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
+        <span class="n">has_rhophi</span> <span class="ow">and</span> <span class="n">fields</span> <span class="o">&amp;</span> <span class="n">_AZIMUTHAL_CARTESIAN</span>
+    <span class="p">):</span>
+        <span class="n">cartesian</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">fields</span> <span class="o">&amp;</span> <span class="n">_AZIMUTHAL_CARTESIAN</span><span class="p">)</span>
+        <span class="n">polar</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">fields</span> <span class="o">&amp;</span> <span class="n">_AZIMUTHAL_POLAR</span><span class="p">)</span>
+        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="s2">"conflicting azimuthal coordinate representations present: "</span>
+            <span class="sa">f</span><span class="s2">"cartesian=</span><span class="si">{</span><span class="n">cartesian</span><span class="si">}</span><span class="s2">, polar=</span><span class="si">{</span><span class="n">polar</span><span class="si">}</span><span class="s2">"</span>
+        <span class="p">)</span>
+
+    <span class="n">has_z</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">fields</span> <span class="o">&amp;</span> <span class="n">_Z_COMPONENT</span><span class="p">)</span>
+    <span class="n">has_theta</span> <span class="o">=</span> <span class="s2">"theta"</span> <span class="ow">in</span> <span class="n">fields</span>
+    <span class="n">has_eta</span> <span class="o">=</span> <span class="s2">"eta"</span> <span class="ow">in</span> <span class="n">fields</span>
+    <span class="k">if</span> <span class="nb">sum</span><span class="p">((</span><span class="n">has_z</span><span class="p">,</span> <span class="n">has_theta</span><span class="p">,</span> <span class="n">has_eta</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">present_longitudinal</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">has_z</span><span class="p">:</span>
+            <span class="n">present_longitudinal</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"z/pz=</span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">fields</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="n">_Z_COMPONENT</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">has_theta</span><span class="p">:</span>
+            <span class="n">present_longitudinal</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"theta=['theta']"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">has_eta</span><span class="p">:</span>
+            <span class="n">present_longitudinal</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"eta=['eta']"</span><span class="p">)</span>
+        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="s2">"conflicting longitudinal coordinate representations present: "</span>
+            <span class="o">+</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">present_longitudinal</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="nb">tuple</span><span class="p">(</span><span class="n">errors</span><span class="p">),</span>
+        <span class="n">has_xy</span><span class="p">,</span>
+        <span class="n">has_rhophi</span><span class="p">,</span>
+        <span class="n">has_z</span> <span class="ow">or</span> <span class="n">has_theta</span> <span class="ow">or</span> <span class="n">has_eta</span><span class="p">,</span>
+        <span class="nb">bool</span><span class="p">(</span><span class="n">fields</span> <span class="o">&amp;</span> <span class="n">_TEMPORAL</span><span class="p">),</span>
+    <span class="p">)</span>
+
+
+<span class="c1"># awkward looks up reducer overloads by record name only, so the ones vector</span>
+<span class="c1"># registers for Momentum{2,3,4}D never reach our collections. Forward those that</span>
+<span class="c1"># don't rebuild a record. Sum has to go through our own, which keeps the charge</span>
+<span class="c1"># field and names the result after what it actually built.</span>
+<span class="n">_count_reducer</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">awkward</span><span class="o">.</span><span class="n">behavior</span><span class="p">[</span><span class="n">awkward</span><span class="o">.</span><span class="n">count</span><span class="p">,</span> <span class="s2">"Momentum4D"</span><span class="p">]</span>
+<span class="n">_count_nonzero_reducer</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">awkward</span><span class="o">.</span><span class="n">behavior</span><span class="p">[</span>
+    <span class="n">awkward</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">,</span> <span class="s2">"Momentum4D"</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="TwoVector">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.TwoVector">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TwoVector</span><span class="p">(</span><span class="n">MomentumAwkward2D</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""A cartesian 2-dimensional vector</span>
+
+<span class="sd">    A heavy emphasis towards a momentum vector interpretation is assumed, hence</span>
+<span class="sd">    properties like ``px`` and ``py`` are provided in addition to ``x`` and ``y``.</span>
+
+<span class="sd">    This mixin class requires the parent class to provide items ``x`` and ``y``.</span>
+<span class="sd">    """</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">r</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Distance from origin in XY plane</span>
+
+<span class="sd">        :math:`\sqrt{x^2+y^2}`</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rho</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">r2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Squared ``r``"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rho2</span>
+
+<div class="viewcode-block" id="TwoVector.absolute">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.TwoVector.absolute">[docs]</a>
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">absolute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns magnitude of the 2D vector</span>
+
+<span class="sd">        Alias for ``r``</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">r</span></div>
+
+
+<div class="viewcode-block" id="TwoVector.negative">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.TwoVector.negative">[docs]</a>
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">negative</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">negative</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns the negative of the vector"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TwoVector.sum">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.TwoVector.sum">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Sum an array of vectors elementwise using ``x`` and ``y`` components"""</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"x"</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">),</span>
+                <span class="s2">"y"</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">),</span>
+            <span class="p">},</span>
+            <span class="n">with_name</span><span class="o">=</span><span class="s2">"TwoVector"</span><span class="p">,</span>
+            <span class="n">behavior</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">sum</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reduce_sum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_identity</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">count</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reduce_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_identity</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_count_reducer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_identity</span><span class="p">)</span>
+
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reduce_count_nonzero</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_identity</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_count_nonzero_reducer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_identity</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TwoVector.multiply">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.TwoVector.multiply">[docs]</a>
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">,</span> <span class="p">{</span><span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">})</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">multiply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Multiply this vector by a scalar elementwise using ``x`` and ``y`` components"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TwoVector.divide">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.TwoVector.divide">[docs]</a>
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">,</span> <span class="p">{</span><span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">})</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">divide</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Divide this vector by a scalar elementwise using its cartesian components</span>
+
+<span class="sd">        This is realized by using the multiplication functionality"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">other</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TwoVector.delta_phi">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.TwoVector.delta_phi">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delta_phi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Compute difference in angle between two vectors</span>
+
+<span class="sd">        Returns a value within [-pi, pi)</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">deltaphi</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__awkward_validation__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">errors</span><span class="p">,</span> <span class="n">has_cart</span><span class="p">,</span> <span class="n">has_polar</span><span class="p">,</span> <span class="n">has_longitudinal</span><span class="p">,</span> <span class="n">has_temporal</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">_coordinate_validation</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">))</span>
+        <span class="p">)</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">has_cart</span> <span class="ow">or</span> <span class="n">has_polar</span><span class="p">):</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">"missing azimuthal coordinates: need x/px and y/py, or rho/pt and phi"</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">has_longitudinal</span> <span class="ow">or</span> <span class="n">has_temporal</span><span class="p">:</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">"2D vectors cannot include longitudinal or temporal coordinates"</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">errors</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: "</span> <span class="o">+</span> <span class="s2">"; "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">errors</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="PolarTwoVector">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.PolarTwoVector">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PolarTwoVector</span><span class="p">(</span><span class="n">TwoVector</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""A polar coordinate 2-dimensional vector</span>
+
+<span class="sd">    This mixin class requires the parent class to provide items ``rho`` and ``phi``.</span>
+<span class="sd">    Some additional properties are overridden for performance</span>
+<span class="sd">    """</span>
+
+<div class="viewcode-block" id="PolarTwoVector.multiply">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.PolarTwoVector.multiply">[docs]</a>
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">,</span> <span class="p">{</span><span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">})</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">multiply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Multiply this vector by a scalar elementwise using using ``x`` and ``y`` components</span>
+
+<span class="sd">        In reality, this directly adjusts ``r`` and ``phi`` for performance</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PolarTwoVector.negative">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.PolarTwoVector.negative">[docs]</a>
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">negative</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">negative</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns the negative of the vector"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ThreeVector">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.ThreeVector">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ThreeVector</span><span class="p">(</span><span class="n">MomentumAwkward3D</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""A cartesian 3-dimensional vector</span>
+
+<span class="sd">    A heavy emphasis towards a momentum vector interpretation is assumed.</span>
+<span class="sd">    This mixin class requires the parent class to provide items ``x``, ``y``, and ``z``.</span>
+<span class="sd">    """</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">r</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Distance from origin in XY plane</span>
+
+<span class="sd">        :math:`\sqrt{x^2+y^2}`</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rho</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">r2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Squared ``r``"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rho2</span>
+
+<div class="viewcode-block" id="ThreeVector.absolute">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.ThreeVector.absolute">[docs]</a>
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">absolute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns magnitude of the 3D vector</span>
+
+<span class="sd">        Alias for ``rho``</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">p</span></div>
+
+
+<div class="viewcode-block" id="ThreeVector.negative">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.ThreeVector.negative">[docs]</a>
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">negative</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">negative</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns the negative of the vector"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ThreeVector.divide">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.ThreeVector.divide">[docs]</a>
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">,</span> <span class="p">{</span><span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">})</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">divide</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Divide this vector by a scalar elementwise using its cartesian components</span>
+<span class="sd">        This is realized by using the multiplication functionality"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">other</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ThreeVector.sum">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.ThreeVector.sum">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Sum an array of vectors elementwise using ``x``, ``y``, and ``z`` components"""</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"x"</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">),</span>
+                <span class="s2">"y"</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">),</span>
+                <span class="s2">"z"</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">),</span>
+            <span class="p">},</span>
+            <span class="n">with_name</span><span class="o">=</span><span class="s2">"ThreeVector"</span><span class="p">,</span>
+            <span class="n">behavior</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">sum</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reduce_sum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_identity</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">count</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reduce_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_identity</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_count_reducer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_identity</span><span class="p">)</span>
+
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reduce_count_nonzero</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_identity</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_count_nonzero_reducer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_identity</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ThreeVector.multiply">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.ThreeVector.multiply">[docs]</a>
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">,</span> <span class="p">{</span><span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">})</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">multiply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Multiply this vector by a scalar elementwise using ``x``, ``y``, and ``z`` components"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ThreeVector.delta_phi">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.ThreeVector.delta_phi">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delta_phi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Compute difference in angle between two vectors</span>
+
+<span class="sd">        Returns a value within [-pi, pi)</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">deltaphi</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__awkward_validation__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">errors</span><span class="p">,</span> <span class="n">has_cart</span><span class="p">,</span> <span class="n">has_polar</span><span class="p">,</span> <span class="n">has_longitudinal</span><span class="p">,</span> <span class="n">has_temporal</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">_coordinate_validation</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">))</span>
+        <span class="p">)</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">has_cart</span> <span class="ow">or</span> <span class="n">has_polar</span><span class="p">):</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">"missing azimuthal coordinates: need x/px and y/py, or rho/pt and phi"</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">has_longitudinal</span><span class="p">:</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"missing longitudinal coordinate: need z/pz, theta, or eta"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">has_temporal</span><span class="p">:</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"3D vectors cannot include temporal coordinates"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">errors</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: "</span> <span class="o">+</span> <span class="s2">"; "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">errors</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="SphericalThreeVector">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.SphericalThreeVector">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SphericalThreeVector</span><span class="p">(</span><span class="n">ThreeVector</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""A spherical coordinate 3-dimensional vector</span>
+
+<span class="sd">    This mixin class requires the parent class to provide items ``rho``, ``theta``, and ``phi``.</span>
+<span class="sd">    Some additional properties are overridden for performance</span>
+<span class="sd">    """</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">r</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Distance from origin in XY plane</span>
+
+<span class="sd">        :math:`\sqrt{x^2+y^2} = \rho \sin(\theta)`</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rho</span>
+
+<div class="viewcode-block" id="SphericalThreeVector.multiply">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.SphericalThreeVector.multiply">[docs]</a>
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">,</span> <span class="p">{</span><span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">})</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">multiply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Multiply this vector by a scalar elementwise using ``x``, ``y``, and ``z`` components</span>
+
+<span class="sd">        In reality, this directly adjusts ``r``, ``theta`` and ``phi`` for performance</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SphericalThreeVector.negative">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.SphericalThreeVector.negative">[docs]</a>
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">negative</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">negative</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns the negative of the vector"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_metric_table_core</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">return_combinations</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">axis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">unzip</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">cartesian</span><span class="p">([</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span> <span class="n">nested</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="n">mval</span> <span class="o">=</span> <span class="n">metric</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">return_combinations</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">mval</span><span class="p">,</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mval</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_nearest_core</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">return_metric</span><span class="p">,</span> <span class="n">threshold</span><span class="p">):</span>
+    <span class="n">mval</span><span class="p">,</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">metric_table</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">return_combinations</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">axis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># NotImplementedError: awkward.firsts with axis=-1</span>
+        <span class="n">axis</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">purelist_depth</span> <span class="o">-</span> <span class="mi">2</span>
+    <span class="n">mmin</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">mval</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">firsts</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">mmin</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">metric</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">firsts</span><span class="p">(</span><span class="n">mval</span><span class="p">[</span><span class="n">mmin</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">threshold</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">mask</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">metric</span> <span class="o">&lt;=</span> <span class="n">threshold</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">return_metric</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">metric</span>
+    <span class="k">return</span> <span class="n">out</span>
+
+
+<div class="viewcode-block" id="LorentzVector">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.LorentzVector">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LorentzVector</span><span class="p">(</span><span class="n">MomentumAwkward4D</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""A cartesian Lorentz vector</span>
+
+<span class="sd">    A heavy emphasis towards a momentum vector interpretation is assumed.</span>
+<span class="sd">    (+, -, -, -) metric</span>
+<span class="sd">    This mixin class requires the parent class to provide items ``x``, ``y``, ``z``, and ``t``.</span>
+<span class="sd">    """</span>
+
+<div class="viewcode-block" id="LorentzVector.absolute">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.LorentzVector.absolute">[docs]</a>
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">absolute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Magnitude of this Lorentz vector</span>
+
+<span class="sd">        Alias for ``mass``</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span></div>
+
+
+<div class="viewcode-block" id="LorentzVector.sum">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.LorentzVector.sum">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Sum an array of vectors elementwise using ``x``, ``y``, ``z``, and ``t`` components"""</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"x"</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">),</span>
+                <span class="s2">"y"</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">),</span>
+                <span class="s2">"z"</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">),</span>
+                <span class="s2">"t"</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">t</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">),</span>
+            <span class="p">},</span>
+            <span class="n">with_name</span><span class="o">=</span><span class="s2">"LorentzVector"</span><span class="p">,</span>
+            <span class="n">behavior</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">sum</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reduce_sum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_identity</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">count</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reduce_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_identity</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_count_reducer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_identity</span><span class="p">)</span>
+
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reduce_count_nonzero</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_identity</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_count_nonzero_reducer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_identity</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LorentzVector.multiply">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.LorentzVector.multiply">[docs]</a>
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">,</span> <span class="p">{</span><span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">})</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">multiply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Multiply this vector by a scalar elementwise using ``x``, ``y``, ``z``, and ``t`` components"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LorentzVector.divide">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.LorentzVector.divide">[docs]</a>
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">,</span> <span class="p">{</span><span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">})</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">divide</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Divide this vector by a scalar elementwise using its cartesian components</span>
+<span class="sd">        This is realized by using the multiplication functionality"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">other</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LorentzVector.delta_r2">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.LorentzVector.delta_r2">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delta_r2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Squared `delta_r`"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">deltaR2</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LorentzVector.delta_r">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.LorentzVector.delta_r">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delta_r</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sa">r</span><span class="sd">"""Distance between two Lorentz vectors in (eta,phi) plane</span>
+
+<span class="sd">        :math:`\sqrt{\Delta\eta^2 + \Delta\phi^2}`</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">deltaR</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LorentzVector.delta_phi">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.LorentzVector.delta_phi">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delta_phi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Compute difference in angle between two vectors</span>
+
+<span class="sd">        Returns a value within [-pi, pi)</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">deltaphi</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LorentzVector.negative">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.LorentzVector.negative">[docs]</a>
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">negative</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">negative</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns the negative of the vector"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pvec</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""The ``x``, ``y`` and ``z`` components as a `ThreeVector`"""</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span>
+            <span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">},</span>
+            <span class="n">with_name</span><span class="o">=</span><span class="s2">"ThreeVector"</span><span class="p">,</span>
+            <span class="n">behavior</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">boostvec</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""The ``x``, ``y`` and ``z`` components divided by ``t`` as a `ThreeVector`</span>
+
+<span class="sd">        This can be used for boosting. For cases where ``|t| &lt;= r``, this</span>
+<span class="sd">        returns the unit vector.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_beta3</span><span class="p">()</span>
+
+<div class="viewcode-block" id="LorentzVector.metric_table">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.LorentzVector.metric_table">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">metric_table</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">other</span><span class="p">,</span>
+        <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">metric</span><span class="o">=</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">delta_r</span><span class="p">(</span><span class="n">b</span><span class="p">),</span>
+        <span class="n">return_combinations</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Return a list of a metric evaluated between this object and another.</span>
+
+<span class="sd">        The two arrays should be broadcast-compatible on all axes other than the specified</span>
+<span class="sd">        axis, which will be used to form a cartesian product. If axis=None, broadcast arrays directly.</span>
+<span class="sd">        The return shape will be that of ``self`` with a new axis with shape of ``other`` appended</span>
+<span class="sd">        at the specified axis depths.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            other : awkward.Array</span>
+<span class="sd">                Another array with same shape in all but ``axis``</span>
+<span class="sd">            axis : int, optional</span>
+<span class="sd">                The axis to form the cartesian product (default 1). If None, the metric</span>
+<span class="sd">                is directly evaluated on the input arrays (i.e. they should broadcast)</span>
+<span class="sd">            metric : callable</span>
+<span class="sd">                A function of two arguments, returning a scalar. The default metric is `delta_r`.</span>
+<span class="sd">            return_combinations : bool</span>
+<span class="sd">                If True return the combinations of inputs as well as an unzipped tuple</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">_metric_table_core</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">return_combinations</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LorentzVector.nearest">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.LorentzVector.nearest">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">nearest</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">other</span><span class="p">,</span>
+        <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">metric</span><span class="o">=</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">delta_r</span><span class="p">(</span><span class="n">b</span><span class="p">),</span>
+        <span class="n">return_metric</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Return nearest object to this one</span>
+
+<span class="sd">        Finds item in ``other`` satisfying ``min(metric(self, other))``.</span>
+<span class="sd">        The two arrays should be broadcast-compatible on all axes other than the specified</span>
+<span class="sd">        axis, which will be used to form a cartesian product. If axis=None, broadcast arrays directly.</span>
+<span class="sd">        The return shape will be that of ``self``.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            other : awkward.Array</span>
+<span class="sd">                Another array with same shape in all but ``axis``</span>
+<span class="sd">            axis : int, optional</span>
+<span class="sd">                The axis to form the cartesian product (default 1). If None, the metric</span>
+<span class="sd">                is directly evaluated on the input arrays (i.e. they should broadcast)</span>
+<span class="sd">            metric : callable</span>
+<span class="sd">                A function of two arguments, returning a scalar. The default metric is `delta_r`.</span>
+<span class="sd">            return_metric : bool, optional</span>
+<span class="sd">                If true, return both the closest object and its metric (default false)</span>
+<span class="sd">            threshold : Number, optional</span>
+<span class="sd">                If set, any objects with ``metric &gt; threshold`` will be masked from the result</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">_nearest_core</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">return_metric</span><span class="p">,</span> <span class="n">threshold</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__awkward_validation__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">errors</span><span class="p">,</span> <span class="n">has_cart</span><span class="p">,</span> <span class="n">has_polar</span><span class="p">,</span> <span class="n">has_longitudinal</span><span class="p">,</span> <span class="n">has_temporal</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">_coordinate_validation</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">))</span>
+        <span class="p">)</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">has_cart</span> <span class="ow">or</span> <span class="n">has_polar</span><span class="p">):</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">"missing azimuthal coordinates: need x/px and y/py, or rho/pt and phi"</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">has_longitudinal</span><span class="p">:</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"missing longitudinal coordinate: need z/pz, theta, or eta"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">has_temporal</span><span class="p">:</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">"missing temporal coordinate: need t/E/e/energy or tau/M/m/mass"</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">errors</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: "</span> <span class="o">+</span> <span class="s2">"; "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">errors</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="PtEtaPhiMLorentzVector">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.PtEtaPhiMLorentzVector">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PtEtaPhiMLorentzVector</span><span class="p">(</span><span class="n">LorentzVector</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""A Lorentz vector using pseudorapidity and mass</span>
+
+<span class="sd">    This mixin class requires the parent class to provide items ``pt``, ``eta``, ``phi``, and ``mass``.</span>
+<span class="sd">    Some additional properties are overridden for performance</span>
+<span class="sd">    """</span>
+
+<div class="viewcode-block" id="PtEtaPhiMLorentzVector.multiply">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.PtEtaPhiMLorentzVector.multiply">[docs]</a>
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">,</span> <span class="p">{</span><span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">})</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">multiply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Multiply this vector by a scalar elementwise using ``x``, ``y``, ``z``, and ``t`` components</span>
+
+<span class="sd">        For a non-negative scalar this directly adjusts ``pt``, ``eta``, ``phi`` and ``mass``</span>
+<span class="sd">        for performance and returns a `PtEtaPhiMLorentzVector`. Any other multiplier</span>
+<span class="sd">        (negative, or an array whose sign is not known ahead of time) returns a cartesian</span>
+<span class="sd">        `LorentzVector`, since (pt, eta, phi, mass) cannot represent ``t &lt; 0``.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Real</span><span class="p">)</span> <span class="ow">and</span> <span class="n">other</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">"pt"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pt</span> <span class="o">*</span> <span class="n">other</span><span class="p">,</span>
+                    <span class="s2">"eta"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="p">,</span>
+                    <span class="s2">"phi"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">phi</span><span class="p">,</span>
+                    <span class="s2">"mass"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass</span> <span class="o">*</span> <span class="n">other</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="n">with_name</span><span class="o">=</span><span class="s2">"PtEtaPhiMLorentzVector"</span><span class="p">,</span>
+                <span class="n">behavior</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"x"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="n">other</span><span class="p">,</span>
+                <span class="s2">"y"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="n">other</span><span class="p">,</span>
+                <span class="s2">"z"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">*</span> <span class="n">other</span><span class="p">,</span>
+                <span class="s2">"t"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">t</span> <span class="o">*</span> <span class="n">other</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">with_name</span><span class="o">=</span><span class="s2">"LorentzVector"</span><span class="p">,</span>
+            <span class="n">behavior</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PtEtaPhiMLorentzVector.negative">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.PtEtaPhiMLorentzVector.negative">[docs]</a>
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">negative</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">negative</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns the negative of the vector"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PtEtaPhiMLorentzVector.divide">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.PtEtaPhiMLorentzVector.divide">[docs]</a>
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">,</span> <span class="p">{</span><span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">})</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">divide</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Divide this vector by a scalar elementwise using its cartesian components</span>
+<span class="sd">        This is realized by using the multiplication functionality"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">other</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="PtEtaPhiELorentzVector">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.PtEtaPhiELorentzVector">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PtEtaPhiELorentzVector</span><span class="p">(</span><span class="n">LorentzVector</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""A Lorentz vector using pseudorapidity and energy</span>
+
+<span class="sd">    This mixin class requires the parent class to provide items ``pt``, ``eta``, ``phi``, and ``energy``.</span>
+<span class="sd">    Some additional properties are overridden for performance</span>
+<span class="sd">    """</span>
+
+<div class="viewcode-block" id="PtEtaPhiELorentzVector.multiply">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.PtEtaPhiELorentzVector.multiply">[docs]</a>
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">,</span> <span class="p">{</span><span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">})</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">multiply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Multiply this vector by a scalar elementwise using ``x``, ``y``, ``z``, and ``t`` components</span>
+
+<span class="sd">        In reality, this directly adjusts ``pt``, ``eta``, ``phi`` and ``energy`` for performance</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"pt"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pt</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">other</span><span class="p">),</span>
+                <span class="s2">"eta"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">eta</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">other</span><span class="p">),</span>
+                <span class="s2">"phi"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">phi</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">other</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)),</span>
+                <span class="s2">"energy"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="o">*</span> <span class="n">other</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">with_name</span><span class="o">=</span><span class="s2">"PtEtaPhiELorentzVector"</span><span class="p">,</span>
+            <span class="n">behavior</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PtEtaPhiELorentzVector.negative">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.PtEtaPhiELorentzVector.negative">[docs]</a>
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">negative</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">negative</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns the negative of the vector"""</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"pt"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pt</span><span class="p">,</span>
+                <span class="s2">"eta"</span><span class="p">:</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">eta</span><span class="p">,</span>
+                <span class="s2">"phi"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">phi</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span>
+                <span class="s2">"energy"</span><span class="p">:</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">energy</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">with_name</span><span class="o">=</span><span class="s2">"PtEtaPhiELorentzVector"</span><span class="p">,</span>
+            <span class="n">behavior</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PtEtaPhiELorentzVector.divide">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.atlas.PtEtaPhiELorentzVector.divide">[docs]</a>
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">,</span> <span class="p">{</span><span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">})</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">divide</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Divide this vector by a scalar elementwise using its cartesian components</span>
+<span class="sd">        This is realized by using the multiplication functionality"""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">other</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="n">_binary_dispatch_cls</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"TwoVector"</span><span class="p">:</span> <span class="n">TwoVector</span><span class="p">,</span>
+    <span class="s2">"PolarTwoVector"</span><span class="p">:</span> <span class="n">TwoVector</span><span class="p">,</span>
+    <span class="s2">"ThreeVector"</span><span class="p">:</span> <span class="n">ThreeVector</span><span class="p">,</span>
+    <span class="s2">"SphericalThreeVector"</span><span class="p">:</span> <span class="n">ThreeVector</span><span class="p">,</span>
+    <span class="s2">"LorentzVector"</span><span class="p">:</span> <span class="n">LorentzVector</span><span class="p">,</span>
+    <span class="s2">"PtEtaPhiMLorentzVector"</span><span class="p">:</span> <span class="n">LorentzVector</span><span class="p">,</span>
+    <span class="s2">"PtEtaPhiELorentzVector"</span><span class="p">:</span> <span class="n">LorentzVector</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="n">_rank</span> <span class="o">=</span> <span class="p">[</span><span class="n">TwoVector</span><span class="p">,</span> <span class="n">ThreeVector</span><span class="p">,</span> <span class="n">LorentzVector</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">lhs_to</span> <span class="ow">in</span> <span class="n">_binary_dispatch_cls</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">rhs_to</span> <span class="ow">in</span> <span class="n">_binary_dispatch_cls</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">out_to</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">lhs_to</span><span class="p">,</span> <span class="n">rhs_to</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">_rank</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="n">behavior</span><span class="p">[(</span><span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)]</span> <span class="o">=</span> <span class="n">out_to</span><span class="o">.</span><span class="n">add</span>
+        <span class="n">behavior</span><span class="p">[(</span><span class="n">np</span><span class="o">.</span><span class="n">subtract</span><span class="p">,</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)]</span> <span class="o">=</span> <span class="n">out_to</span><span class="o">.</span><span class="n">subtract</span>
+
+
+<span class="n">TwoVectorArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TwoVectorArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TwoVectorArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TwoVectorArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">PolarTwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TwoVectorRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TwoVectorRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TwoVectorRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TwoVectorRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">PolarTwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">PolarTwoVectorArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">PolarTwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PolarTwoVectorArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">SphericalThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PolarTwoVectorArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PolarTwoVectorArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">PolarTwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PolarTwoVectorRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">PolarTwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PolarTwoVectorRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">SphericalThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PolarTwoVectorRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PolarTwoVectorRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">PolarTwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">ThreeVectorArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ThreeVectorArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ThreeVectorArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ThreeVectorArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">SphericalThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ThreeVectorRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ThreeVectorRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ThreeVectorRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ThreeVectorRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">SphericalThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">SphericalThreeVectorArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">PolarTwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">SphericalThreeVectorArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">SphericalThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">SphericalThreeVectorArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">SphericalThreeVectorArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">SphericalThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">SphericalThreeVectorRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">PolarTwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">SphericalThreeVectorRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">SphericalThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">SphericalThreeVectorRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">SphericalThreeVectorRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">SphericalThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">LorentzVectorArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">LorentzVectorArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">LorentzVectorArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">LorentzVectorArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">LorentzVectorRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">LorentzVectorRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">LorentzVectorRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">LorentzVectorRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">PtEtaPhiMLorentzVectorArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PtEtaPhiMLorentzVectorArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PtEtaPhiMLorentzVectorArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PtEtaPhiMLorentzVectorArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PtEtaPhiMLorentzVectorRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PtEtaPhiMLorentzVectorRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PtEtaPhiMLorentzVectorRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PtEtaPhiMLorentzVectorRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">PtEtaPhiELorentzVectorArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PtEtaPhiELorentzVectorArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PtEtaPhiELorentzVectorArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PtEtaPhiELorentzVectorArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PtEtaPhiELorentzVectorRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PtEtaPhiELorentzVectorRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PtEtaPhiELorentzVectorRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PtEtaPhiELorentzVectorRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">"LorentzVector"</span><span class="p">,</span>
+    <span class="s2">"PolarTwoVector"</span><span class="p">,</span>
+    <span class="s2">"PtEtaPhiELorentzVector"</span><span class="p">,</span>
+    <span class="s2">"PtEtaPhiMLorentzVector"</span><span class="p">,</span>
+    <span class="s2">"SphericalThreeVector"</span><span class="p">,</span>
+    <span class="s2">"ThreeVector"</span><span class="p">,</span>
+    <span class="s2">"TwoVector"</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Peter Fackeldey, Maxym Naumchyk.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

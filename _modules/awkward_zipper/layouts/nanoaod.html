@@ -1,0 +1,801 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>awkward_zipper.layouts.nanoaod &mdash; awkward-zipper 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/logo_unfilled_with_text.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            awkward-zipper
+              <img src="../../../_static/logo_unfilled_with_black_text.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">awkward-zipper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">awkward_zipper.layouts.nanoaod</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for awkward_zipper.layouts.nanoaod</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">awkward</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.awkward_util</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_check_equal_lengths</span><span class="p">,</span>
+    <span class="n">_non_materializing_get_field</span><span class="p">,</span>
+    <span class="n">_rewrap</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">children</span><span class="p">,</span>
+    <span class="n">counts2nestedindex</span><span class="p">,</span>
+    <span class="n">counts2offsets</span><span class="p">,</span>
+    <span class="n">distinct_children_deep</span><span class="p">,</span>
+    <span class="n">distinct_parent</span><span class="p">,</span>
+    <span class="n">full_like_from_counts</span><span class="p">,</span>
+    <span class="n">local2globalindex</span><span class="p">,</span>
+    <span class="n">nestedindex</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.layouts.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseLayoutBuilder</span>
+
+
+<div class="viewcode-block" id="NanoAOD">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.NanoAOD">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NanoAOD</span><span class="p">(</span><span class="n">BaseLayoutBuilder</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""NanoAOD layout builder</span>
+
+<span class="sd">    The NanoAOD layout is built from all branches found in the supplied file, based on</span>
+<span class="sd">    the naming pattern of the branches. The following additional arrays are constructed:</span>
+
+<span class="sd">    - Any branches named ``n{name}`` are assumed to be counts branches and converted to offsets ``o{name}``</span>
+<span class="sd">    - Any local index branches with names matching ``{source}_{target}Idx*`` are converted to global indexes for the event chunk (postfix ``G``)</span>
+<span class="sd">    - Any `nested_items` are constructed, if the necessary branches are available</span>
+<span class="sd">    - Any `special_items` are constructed, if the necessary branches are available</span>
+
+<span class="sd">    From those arrays, NanoAOD collections are formed as collections of branches grouped by name, where:</span>
+
+<span class="sd">    - one branch exists named ``name`` and no branches start with ``name_``, interpreted as a single flat array;</span>
+<span class="sd">    - one branch exists named ``name``, one named ``n{name}``, and no branches start with ``name_``, interpreted as a single jagged array;</span>
+<span class="sd">    - no branch exists named ``{name}`` and many branches start with ``name_*``, interpreted as a flat table; or</span>
+<span class="sd">    - one branch exists named ``n{name}`` and many branches start with ``name_*``, interpreted as a jagged table.</span>
+
+<span class="sd">    Collections are assigned mixin types according to the `mixins` mapping.</span>
+<span class="sd">    All collections are then zipped into one `base.NanoEvents` record and returned.</span>
+
+<span class="sd">    There is a class-level variable ``warn_missing_crossrefs`` which will alter the behavior of</span>
+<span class="sd">    NanoAOD. If warn_missing_crossrefs is true then when a missing global index cross-ref</span>
+<span class="sd">    target is encountered a warning will be issued. Regardless, the cross-reference is dropped.</span>
+
+<span class="sd">    The same holds for ``error_missing_events_id``. If error_missing_events_id is true, then when the 'run', 'event',</span>
+<span class="sd">    or 'luminosityBlock' fields are missing, an exception will be thrown; if it is false, just a warning will be issued.</span>
+<span class="sd">    """</span>
+
+    <span class="n">warn_missing_crossrefs</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># If True, issues a warning when a missing global index cross-ref target is encountered</span>
+    <span class="n">error_missing_event_ids</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># If True, raises an exception when 'run', 'event', or 'luminosityBlock' fields are missing</span>
+
+    <span class="n">event_ids</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"run"</span><span class="p">,</span> <span class="s2">"luminosityBlock"</span><span class="p">,</span> <span class="s2">"event"</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">"""List of NanoAOD event IDs</span>
+<span class="sd">    """</span>
+
+    <span class="n">mixins</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"CaloMET"</span><span class="p">:</span> <span class="s2">"MissingET"</span><span class="p">,</span>
+        <span class="s2">"ChsMET"</span><span class="p">:</span> <span class="s2">"MissingET"</span><span class="p">,</span>
+        <span class="s2">"GenMET"</span><span class="p">:</span> <span class="s2">"MissingET"</span><span class="p">,</span>
+        <span class="s2">"MET"</span><span class="p">:</span> <span class="s2">"MissingET"</span><span class="p">,</span>
+        <span class="s2">"METFixEE2017"</span><span class="p">:</span> <span class="s2">"MissingET"</span><span class="p">,</span>
+        <span class="s2">"PuppiMET"</span><span class="p">:</span> <span class="s2">"MissingET"</span><span class="p">,</span>
+        <span class="s2">"RawMET"</span><span class="p">:</span> <span class="s2">"MissingET"</span><span class="p">,</span>
+        <span class="s2">"RawPuppiMET"</span><span class="p">:</span> <span class="s2">"MissingET"</span><span class="p">,</span>
+        <span class="s2">"TkMET"</span><span class="p">:</span> <span class="s2">"MissingET"</span><span class="p">,</span>
+        <span class="c1"># pseudo-lorentz: pt, eta, phi, mass=0</span>
+        <span class="s2">"IsoTrack"</span><span class="p">:</span> <span class="s2">"PtEtaPhiMCollection"</span><span class="p">,</span>
+        <span class="s2">"SoftActivityJet"</span><span class="p">:</span> <span class="s2">"PtEtaPhiMCollection"</span><span class="p">,</span>
+        <span class="s2">"TrigObj"</span><span class="p">:</span> <span class="s2">"PtEtaPhiMCollection"</span><span class="p">,</span>
+        <span class="c1"># True lorentz: pt, eta, phi, mass</span>
+        <span class="s2">"FatJet"</span><span class="p">:</span> <span class="s2">"FatJet"</span><span class="p">,</span>
+        <span class="s2">"GenDressedLepton"</span><span class="p">:</span> <span class="s2">"PtEtaPhiMCollection"</span><span class="p">,</span>
+        <span class="s2">"GenIsolatedPhoton"</span><span class="p">:</span> <span class="s2">"PtEtaPhiMCollection"</span><span class="p">,</span>
+        <span class="s2">"GenJet"</span><span class="p">:</span> <span class="s2">"PtEtaPhiMCollection"</span><span class="p">,</span>
+        <span class="s2">"GenJetAK8"</span><span class="p">:</span> <span class="s2">"PtEtaPhiMCollection"</span><span class="p">,</span>
+        <span class="s2">"Jet"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"LHEPart"</span><span class="p">:</span> <span class="s2">"PtEtaPhiMCollection"</span><span class="p">,</span>
+        <span class="s2">"SubGenJetAK8"</span><span class="p">:</span> <span class="s2">"PtEtaPhiMCollection"</span><span class="p">,</span>
+        <span class="s2">"SubJet"</span><span class="p">:</span> <span class="s2">"PtEtaPhiMCollection"</span><span class="p">,</span>
+        <span class="s2">"CorrT1METJet"</span><span class="p">:</span> <span class="s2">"PtEtaPhiMCollection"</span><span class="p">,</span>
+        <span class="c1"># Candidate: lorentz + charge</span>
+        <span class="s2">"Electron"</span><span class="p">:</span> <span class="s2">"Electron"</span><span class="p">,</span>
+        <span class="s2">"LowPtElectron"</span><span class="p">:</span> <span class="s2">"LowPtElectron"</span><span class="p">,</span>
+        <span class="s2">"Muon"</span><span class="p">:</span> <span class="s2">"Muon"</span><span class="p">,</span>
+        <span class="s2">"Photon"</span><span class="p">:</span> <span class="s2">"Photon"</span><span class="p">,</span>
+        <span class="s2">"FsrPhoton"</span><span class="p">:</span> <span class="s2">"FsrPhoton"</span><span class="p">,</span>
+        <span class="s2">"Tau"</span><span class="p">:</span> <span class="s2">"Tau"</span><span class="p">,</span>
+        <span class="s2">"GenVisTau"</span><span class="p">:</span> <span class="s2">"GenVisTau"</span><span class="p">,</span>
+        <span class="c1"># special</span>
+        <span class="s2">"GenPart"</span><span class="p">:</span> <span class="s2">"GenParticle"</span><span class="p">,</span>
+        <span class="s2">"PV"</span><span class="p">:</span> <span class="s2">"Vertex"</span><span class="p">,</span>
+        <span class="s2">"SV"</span><span class="p">:</span> <span class="s2">"SecondaryVertex"</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="w">    </span><span class="sd">"""Default configuration for mixin types, based on the collection name.</span>
+
+<span class="sd">    The types are implemented in the `awkward_zipper.behaviors.nanoaod` module.</span>
+<span class="sd">    """</span>
+    <span class="n">all_cross_references</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"Electron_genPartIdx"</span><span class="p">:</span> <span class="s2">"GenPart"</span><span class="p">,</span>
+        <span class="s2">"Electron_jetIdx"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"Electron_photonIdx"</span><span class="p">:</span> <span class="s2">"Photon"</span><span class="p">,</span>
+        <span class="s2">"LowPtElectron_electronIdx"</span><span class="p">:</span> <span class="s2">"Electron"</span><span class="p">,</span>
+        <span class="s2">"LowPtElectron_genPartIdx"</span><span class="p">:</span> <span class="s2">"GenPart"</span><span class="p">,</span>
+        <span class="s2">"LowPtElectron_photonIdx"</span><span class="p">:</span> <span class="s2">"Photon"</span><span class="p">,</span>
+        <span class="s2">"FatJet_genJetAK8Idx"</span><span class="p">:</span> <span class="s2">"GenJetAK8"</span><span class="p">,</span>
+        <span class="s2">"FatJet_subJetIdx1"</span><span class="p">:</span> <span class="s2">"SubJet"</span><span class="p">,</span>
+        <span class="s2">"FatJet_subJetIdx2"</span><span class="p">:</span> <span class="s2">"SubJet"</span><span class="p">,</span>
+        <span class="s2">"FsrPhoton_muonIdx"</span><span class="p">:</span> <span class="s2">"Muon"</span><span class="p">,</span>
+        <span class="s2">"GenPart_genPartIdxMother"</span><span class="p">:</span> <span class="s2">"GenPart"</span><span class="p">,</span>
+        <span class="s2">"GenVisTau_genPartIdxMother"</span><span class="p">:</span> <span class="s2">"GenPart"</span><span class="p">,</span>
+        <span class="s2">"Jet_electronIdx1"</span><span class="p">:</span> <span class="s2">"Electron"</span><span class="p">,</span>
+        <span class="s2">"Jet_electronIdx2"</span><span class="p">:</span> <span class="s2">"Electron"</span><span class="p">,</span>
+        <span class="s2">"Jet_genJetIdx"</span><span class="p">:</span> <span class="s2">"GenJet"</span><span class="p">,</span>
+        <span class="s2">"Jet_muonIdx1"</span><span class="p">:</span> <span class="s2">"Muon"</span><span class="p">,</span>
+        <span class="s2">"Jet_muonIdx2"</span><span class="p">:</span> <span class="s2">"Muon"</span><span class="p">,</span>
+        <span class="s2">"Muon_fsrPhotonIdx"</span><span class="p">:</span> <span class="s2">"FsrPhoton"</span><span class="p">,</span>
+        <span class="s2">"Muon_genPartIdx"</span><span class="p">:</span> <span class="s2">"GenPart"</span><span class="p">,</span>
+        <span class="s2">"Muon_jetIdx"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"Photon_electronIdx"</span><span class="p">:</span> <span class="s2">"Electron"</span><span class="p">,</span>
+        <span class="s2">"Photon_genPartIdx"</span><span class="p">:</span> <span class="s2">"GenPart"</span><span class="p">,</span>
+        <span class="s2">"Photon_jetIdx"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"Tau_genPartIdx"</span><span class="p">:</span> <span class="s2">"GenPart"</span><span class="p">,</span>
+        <span class="s2">"Tau_jetIdx"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="w">    </span><span class="sd">"""Cross-references, where an index is to be interpreted with respect to another collection</span>
+
+<span class="sd">    Each such cross-reference will be converted to a global indexer, so that arbitrarily sliced events</span>
+<span class="sd">    can still resolve the indirection back the parent events</span>
+<span class="sd">    """</span>
+    <span class="n">nested_items</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"FatJet_subJetIdxG"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"FatJet_subJetIdx1G"</span><span class="p">,</span> <span class="s2">"FatJet_subJetIdx2G"</span><span class="p">],</span>
+        <span class="s2">"Jet_muonIdxG"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"Jet_muonIdx1G"</span><span class="p">,</span> <span class="s2">"Jet_muonIdx2G"</span><span class="p">],</span>
+        <span class="s2">"Jet_electronIdxG"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"Jet_electronIdx1G"</span><span class="p">,</span> <span class="s2">"Jet_electronIdx2G"</span><span class="p">],</span>
+    <span class="p">}</span>
+<span class="w">    </span><span class="sd">"""Nested collections, where nesting is accomplished by a fixed-length set of indexers"""</span>
+    <span class="n">nested_index_items</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"Jet_pFCandsIdxG"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"Jet_nConstituents"</span><span class="p">,</span> <span class="s2">"JetPFCands"</span><span class="p">),</span>
+        <span class="s2">"FatJet_pFCandsIdxG"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"FatJet_nConstituents"</span><span class="p">,</span> <span class="s2">"FatJetPFCands"</span><span class="p">),</span>
+        <span class="s2">"GenJet_pFCandsIdxG"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"GenJet_nConstituents"</span><span class="p">,</span> <span class="s2">"GenJetCands"</span><span class="p">),</span>
+        <span class="s2">"GenFatJet_pFCandsIdxG"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"GenJetAK8_nConstituents"</span><span class="p">,</span> <span class="s2">"GenFatJetCands"</span><span class="p">),</span>
+    <span class="p">}</span>
+<span class="w">    </span><span class="sd">"""Nested collections, where nesting is accomplished by assuming the target can be unflattened according to a source counts"""</span>
+    <span class="n">special_items</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"GenPart_distinctParentIdxG"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">distinct_parent</span><span class="p">,</span>
+            <span class="p">(</span><span class="s2">"GenPart_genPartIdxMotherG"</span><span class="p">,</span> <span class="s2">"GenPart_pdgId"</span><span class="p">),</span>
+        <span class="p">),</span>
+        <span class="s2">"GenPart_childrenIdxG"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">children</span><span class="p">,</span>
+            <span class="p">(</span>
+                <span class="s2">"nGenPart"</span><span class="p">,</span>
+                <span class="s2">"GenPart_genPartIdxMotherG"</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+        <span class="s2">"GenPart_distinctChildrenIdxG"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">children</span><span class="p">,</span>
+            <span class="p">(</span>
+                <span class="s2">"nGenPart"</span><span class="p">,</span>
+                <span class="s2">"GenPart_distinctParentIdxG"</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+        <span class="s2">"GenPart_distinctChildrenDeepIdxG"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="n">distinct_children_deep</span><span class="p">,</span>
+            <span class="p">(</span>
+                <span class="s2">"nGenPart"</span><span class="p">,</span>
+                <span class="s2">"GenPart_genPartIdxMotherG"</span><span class="p">,</span>
+                <span class="s2">"GenPart_pdgId"</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+    <span class="p">}</span>
+<span class="w">    </span><span class="sd">"""Special arrays, where the callable and input arrays are specified in the value"""</span>
+    <span class="n">full_like_items</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"Photon_mass"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"nPhoton"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+        <span class="s2">"Photon_charge"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"nPhoton"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+        <span class="s2">"Jet_charge"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"nJet"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+        <span class="s2">"FatJet_charge"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"nFatJet"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+        <span class="s2">"TrigObj_mass"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"nTrigObj"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+        <span class="s2">"FsrPhoton_mass"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"nFsrPhoton"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+        <span class="s2">"FsrPhoton_charge"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"nFsrPhoton"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+        <span class="s2">"CorrT1METJet_mass"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"nCorrT1METJet"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+        <span class="s2">"IsoTrack_mass"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"nIsoTrack"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+        <span class="s2">"SoftActivityJet_mass"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"nSoftActivityJet"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+    <span class="p">}</span>
+<span class="w">    </span><span class="sd">"""Arrays that should be filled with constant values if not present to satisfy 4-vector requirements.</span>
+
+<span class="sd">    Each value is a ``(counts_branch, fill_value)`` pair; the array is built jagged</span>
+<span class="sd">    from the ``n{collection}`` counts branch (mirrors coffea's ``full_like_items``,</span>
+<span class="sd">    which uses the ``o{collection}`` offsets branch).</span>
+<span class="sd">    """</span>
+    <span class="n">rename_items</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"Electron_regrEnergy"</span><span class="p">:</span> <span class="s2">"Electron_energy"</span><span class="p">,</span>
+        <span class="s2">"Photon_regrEnergy"</span><span class="p">:</span> <span class="s2">"Photon_energy"</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="w">    </span><span class="sd">"""Arrays that should be renamed to ensure proper 4-vector behavior"""</span>
+    <span class="n">alias_items</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"CorrT1METJet_pt"</span><span class="p">:</span> <span class="s2">"CorrT1METJet_rawPt"</span><span class="p">,</span>
+        <span class="s2">"CorrT1METJet_mass"</span><span class="p">:</span> <span class="s2">"CorrT1METJet_rawMass"</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="w">    </span><span class="sd">"""Arrays that should be aliased to ensure proper 4-vector behavior"""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">"latest"</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_version</span> <span class="o">=</span> <span class="n">version</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cross_references</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_cross_references</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">version</span> <span class="o">==</span> <span class="s2">"latest"</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">version</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">7</span><span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">cross_references</span><span class="p">[</span><span class="s2">"FatJet_genJetAK8Idx"</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">version</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">6</span><span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">cross_references</span><span class="p">[</span><span class="s2">"FsrPhoton_muonIdx"</span><span class="p">]</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">cross_references</span><span class="p">[</span><span class="s2">"Muon_fsrPhotonIdx"</span><span class="p">]</span>
+
+<div class="viewcode-block" id="NanoAOD.v7">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.NanoAOD.v7">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">v7</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Build the NanoEvents assuming NanoAODv7</span>
+
+<span class="sd">        For example, one can use ``NanoEventsFactory.from_root("file.root", schemaclass=NanoAOD.v7)``</span>
+<span class="sd">        to ensure NanoAODv7 compatibility.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            out: NanoAOD</span>
+<span class="sd">                Schema assuming NanoAODv7</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="s2">"7"</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NanoAOD.v6">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.NanoAOD.v6">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">v6</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Build the NanoEvents assuming NanoAODv6</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            out: NanoAOD</span>
+<span class="sd">                Schema assuming NanoAODv6</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="s2">"6"</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NanoAOD.v5">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.NanoAOD.v5">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">v5</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Build the NanoEvents assuming NanoAODv5</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">            out: NanoAOD</span>
+<span class="sd">                Schema assuming NanoAODv5</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="s2">"5"</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">fields</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_get_collection_fields</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">collection</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="n">collection</span><span class="p">))</span>
+
+        <span class="c1"># branches that start with "n"</span>
+        <span class="n">counter_fields</span> <span class="o">=</span> <span class="n">_get_collection_fields</span><span class="p">(</span><span class="s2">"n"</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
+
+        <span class="c1"># parse into high-level records (collections, list collections, and singletons)</span>
+        <span class="c1"># Split on the first _ to get the collection prefix — e.g. "Electron_pt" → "Electron"</span>
+        <span class="c1"># If that index is empty (field starts with _, like "_collection0"), use "_collection0" instead</span>
+        <span class="n">collections</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"_"</span><span class="p">,</span> <span class="n">maxsplit</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fields</span> <span class="o">-</span> <span class="n">counter_fields</span>
+        <span class="p">}</span>
+
+        <span class="c1"># handles collections with underscore in their names</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_special_collections</span><span class="p">(</span><span class="n">collections</span><span class="p">,</span> <span class="n">fields</span><span class="p">):</span>
+            <span class="n">additional_collections</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">collections_to_remove</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">collections</span><span class="p">:</span>
+                <span class="c1"># check collections that have only one instance in each event</span>
+                <span class="k">if</span> <span class="s2">"n"</span> <span class="o">+</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+                    <span class="n">collection_counts</span> <span class="o">=</span> <span class="n">_get_collection_fields</span><span class="p">(</span><span class="s2">"n"</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">"_"</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
+                    <span class="c1"># if however, the fields of this collection have multiple instances in each event</span>
+                    <span class="c1"># then we use these fields as collections instead</span>
+                    <span class="c1"># Example: 'nProton_multiRP' and 'nProton_singleRP' fields are present but no 'nProton' field</span>
+                    <span class="c1"># Then we add new 'Proton_multiRP' and 'Proton_singleRP' collections and delete 'Proton' collection</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">collection_counts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">additional_collections</span> <span class="o">+=</span> <span class="p">[</span>
+                            <span class="n">counts</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">"n"</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">counts</span> <span class="ow">in</span> <span class="n">collection_counts</span>
+                            <span class="k">if</span> <span class="n">counts</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+                        <span class="p">]</span>
+                        <span class="n">collections_to_remove</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+            <span class="n">collections</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">additional_collections</span><span class="p">)</span>
+            <span class="n">collections</span> <span class="o">-=</span> <span class="n">collections_to_remove</span>
+            <span class="k">return</span> <span class="n">collections</span>
+
+        <span class="n">collections</span> <span class="o">=</span> <span class="n">_special_collections</span><span class="p">(</span><span class="n">collections</span><span class="p">,</span> <span class="n">fields</span><span class="p">)</span>
+
+        <span class="c1"># check if data or simulation</span>
+        <span class="n">is_data</span> <span class="o">=</span> <span class="s2">"GenPart"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">collections</span>
+
+        <span class="n">new_fields</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># # Create offsets virtual arrays</span>
+        <span class="c1"># for name in counter_fields:</span>
+        <span class="c1">#     arr = _non_materializing_get_field(array, name)</span>
+        <span class="c1">#     new_fields[name.replace("n", "o", 1)] = counts2offsets(arr)</span>
+
+        <span class="c1"># Check the presence of the event_ids</span>
+        <span class="n">missing_event_ids</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">event_id</span> <span class="k">for</span> <span class="n">event_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_ids</span> <span class="k">if</span> <span class="n">event_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_event_ids</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_missing_event_ids</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"There are missing event ID fields: </span><span class="si">{</span><span class="n">missing_event_ids</span><span class="si">}</span><span class="s2"> </span><span class="se">\n\n\</span>
+<span class="s2">                    The event ID fields </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">event_ids</span><span class="si">}</span><span class="s2"> are necessary to perform sub-run identification </span><span class="se">\</span>
+<span class="s2">                    (e.g. for corrections and sub-dividing data during different detector conditions),</span><span class="se">\</span>
+<span class="s2">                    to cross-validate MC and Data (i.e. matching events for comparison), and to generate event displays. </span><span class="se">\</span>
+<span class="s2">                    It's advised to never drop these branches from the dataformat.</span><span class="se">\n\n\</span>
+<span class="s2">                    This error can be demoted to a warning by setting the class level variable error_missing_event_ids to False."</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Missing event_ids : </span><span class="si">{</span><span class="n">missing_event_ids</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                <span class="ne">RuntimeWarning</span><span class="p">,</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Create global index virtual arrays for indirection</span>
+        <span class="k">for</span> <span class="n">indexer</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_cross_references</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">target</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"Gen"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">is_data</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">indexer</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">warn_missing_crossrefs</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">"Missing cross-reference index for </span><span class="si">{</span><span class="n">indexer</span><span class="si">}</span><span class="s2"> =&gt; </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                        <span class="ne">RuntimeWarning</span><span class="p">,</span>
+                        <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="s2">"n"</span> <span class="o">+</span> <span class="n">target</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">warn_missing_crossrefs</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">"Missing cross-reference target for </span><span class="si">{</span><span class="n">indexer</span><span class="si">}</span><span class="s2"> =&gt; </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                        <span class="ne">RuntimeWarning</span><span class="p">,</span>
+                        <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="c1"># convert nWhatever to a global index</span>
+            <span class="c1"># this used to be transforms.counts2offsets_form + transforms.local2global_form in coffea</span>
+            <span class="n">arr_indexer</span> <span class="o">=</span> <span class="n">_non_materializing_get_field</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">indexer</span><span class="p">)</span>
+            <span class="n">arr_target</span> <span class="o">=</span> <span class="n">_non_materializing_get_field</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="s2">"n"</span> <span class="o">+</span> <span class="n">target</span><span class="p">)</span>
+            <span class="n">new_fields</span><span class="p">[</span><span class="n">indexer</span> <span class="o">+</span> <span class="s2">"G"</span><span class="p">]</span> <span class="o">=</span> <span class="n">local2globalindex</span><span class="p">(</span><span class="n">arr_indexer</span><span class="p">,</span> <span class="n">arr_target</span><span class="p">)</span>
+
+        <span class="c1"># Create nested indexer from Idx1, Idx2, ... arrays</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">indexers</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nested_items</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">idx</span> <span class="ow">in</span> <span class="n">new_fields</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">indexers</span><span class="p">):</span>
+                <span class="n">new_fields</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">nestedindex</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">_non_materializing_get_field</span><span class="p">(</span><span class="n">new_fields</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">indexers</span><span class="p">]</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Create nested indexer from n* counts arrays</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="n">local_counts</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nested_index_items</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">local_counts</span> <span class="ow">in</span> <span class="n">fields</span> <span class="ow">and</span> <span class="s2">"n"</span> <span class="o">+</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+                <span class="n">arr_local_counts</span> <span class="o">=</span> <span class="n">_non_materializing_get_field</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">local_counts</span><span class="p">)</span>
+                <span class="n">arr_target</span> <span class="o">=</span> <span class="n">_non_materializing_get_field</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="s2">"n"</span> <span class="o">+</span> <span class="n">target</span><span class="p">)</span>
+                <span class="c1"># this used to be transforms.counts2nestedindex_form + transforms.local2global_form in coffea</span>
+                <span class="n">new_fields</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">counts2nestedindex</span><span class="p">(</span><span class="n">arr_local_counts</span><span class="p">,</span> <span class="n">arr_target</span><span class="p">)</span>
+
+        <span class="c1"># Create any special arrays</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="n">fcn</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">special_items</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">((</span><span class="n">k</span> <span class="ow">in</span> <span class="n">new_fields</span> <span class="ow">or</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">args</span><span class="p">):</span>
+                <span class="c1"># shortened code: (_non_materializing_get_field(new_fields if k in new_fields else array, k) for k in args)</span>
+                <span class="n">input_arrays</span> <span class="o">=</span> <span class="p">()</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+                    <span class="n">input_arrays</span> <span class="o">+=</span> <span class="p">(</span>
+                        <span class="n">_non_materializing_get_field</span><span class="p">(</span>
+                            <span class="n">new_fields</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">new_fields</span> <span class="k">else</span> <span class="n">array</span><span class="p">,</span> <span class="n">k</span>
+                        <span class="p">),</span>
+                    <span class="p">)</span>
+                <span class="n">new_fields</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">fcn</span><span class="p">(</span><span class="o">*</span><span class="n">input_arrays</span><span class="p">)</span>
+
+        <span class="c1"># Create full-like arrays (constant-valued branches needed by 4-vectors)</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="n">counts_branch</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">full_like_items</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">counts_branch</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">fields</span> <span class="ow">or</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">new_fields</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">"Branch </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> already exists but its values will be replaced with </span><span class="si">{</span><span class="n">fill_value</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                        <span class="ne">RuntimeWarning</span><span class="p">,</span>
+                        <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="n">new_fields</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">full_like_from_counts</span><span class="p">(</span>
+                    <span class="n">_non_materializing_get_field</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">counts_branch</span><span class="p">),</span> <span class="n">fill_value</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Rename arrays (e.g. to avoid clashing with a mixin-provided field)</span>
+        <span class="k">for</span> <span class="n">new_name</span><span class="p">,</span> <span class="n">old_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rename_items</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">old_name</span> <span class="ow">in</span> <span class="n">fields</span> <span class="ow">or</span> <span class="n">old_name</span> <span class="ow">in</span> <span class="n">new_fields</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">new_name</span> <span class="ow">in</span> <span class="n">fields</span> <span class="ow">or</span> <span class="n">new_name</span> <span class="ow">in</span> <span class="n">new_fields</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">"Branch </span><span class="si">{</span><span class="n">new_name</span><span class="si">}</span><span class="s2"> already exists but it will be replaced with </span><span class="si">{</span><span class="n">old_name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                        <span class="ne">RuntimeWarning</span><span class="p">,</span>
+                        <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">if</span> <span class="n">old_name</span> <span class="ow">in</span> <span class="n">new_fields</span><span class="p">:</span>
+                    <span class="n">new_fields</span><span class="p">[</span><span class="n">new_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_fields</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">old_name</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">new_fields</span><span class="p">[</span><span class="n">new_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">_non_materializing_get_field</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">old_name</span><span class="p">)</span>
+                    <span class="n">fields</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">old_name</span><span class="p">)</span>
+
+        <span class="c1"># Alias arrays (make a branch available under another name)</span>
+        <span class="k">for</span> <span class="n">alias_name</span><span class="p">,</span> <span class="n">original_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alias_items</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">original_name</span> <span class="ow">in</span> <span class="n">fields</span> <span class="ow">or</span> <span class="n">original_name</span> <span class="ow">in</span> <span class="n">new_fields</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">alias_name</span> <span class="ow">in</span> <span class="n">fields</span> <span class="ow">or</span> <span class="n">alias_name</span> <span class="ow">in</span> <span class="n">new_fields</span>
+                <span class="p">)</span> <span class="ow">and</span> <span class="n">alias_name</span> <span class="o">!=</span> <span class="s2">"CorrT1METJet_mass"</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">"Branch </span><span class="si">{</span><span class="n">alias_name</span><span class="si">}</span><span class="s2"> already exists but it will be replaced with </span><span class="si">{</span><span class="n">original_name</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                        <span class="ne">RuntimeWarning</span><span class="p">,</span>
+                        <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">if</span> <span class="n">original_name</span> <span class="ow">in</span> <span class="n">new_fields</span><span class="p">:</span>
+                    <span class="n">new_fields</span><span class="p">[</span><span class="n">alias_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_fields</span><span class="p">[</span><span class="n">original_name</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">new_fields</span><span class="p">[</span><span class="n">alias_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">_non_materializing_get_field</span><span class="p">(</span>
+                        <span class="n">array</span><span class="p">,</span> <span class="n">original_name</span>
+                    <span class="p">)</span>
+
+        <span class="n">output</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">collections</span><span class="p">:</span>
+            <span class="n">name_with_underscore</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">"_"</span>
+            <span class="n">mixin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixins</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">"NanoCollection"</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">"n"</span> <span class="o">+</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">fields</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+                <span class="n">content</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="c1"># buffers in `array`</span>
+                <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">_get_collection_fields</span><span class="p">(</span><span class="n">name_with_underscore</span><span class="p">,</span> <span class="n">fields</span><span class="p">):</span>
+                    <span class="n">arr</span> <span class="o">=</span> <span class="n">_non_materializing_get_field</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
+
+                    <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="n">buffers</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">to_buffers</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+                    <span class="k">assert</span> <span class="p">{</span><span class="s2">"node0-offsets"</span><span class="p">,</span> <span class="s2">"node1-data"</span><span class="p">}</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">buffers</span><span class="p">)</span>
+                    <span class="c1"># take flat data</span>
+                    <span class="n">content</span><span class="p">[</span><span class="n">field</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="n">name_with_underscore</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">NumpyArray</span><span class="p">(</span>
+                            <span class="n">buffers</span><span class="p">[</span><span class="s2">"node1-data"</span><span class="p">],</span>
+                            <span class="n">parameters</span><span class="o">=</span><span class="n">arr</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+
+                <span class="c1"># new buffers in `new_fields`</span>
+                <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">_get_collection_fields</span><span class="p">(</span><span class="n">name_with_underscore</span><span class="p">,</span> <span class="n">new_fields</span><span class="p">):</span>
+                    <span class="n">arr</span> <span class="o">=</span> <span class="n">_non_materializing_get_field</span><span class="p">(</span><span class="n">new_fields</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
+                    <span class="n">parameters</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">parameters</span>
+                    <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="n">buffers</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">to_buffers</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">field</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nested_items</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">nested_index_items</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">(</span>
+                        <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">special_items</span><span class="o">.</span><span class="n">items</span><span class="p">())[</span><span class="mi">1</span><span class="p">:]</span>
+                    <span class="p">):</span>
+                        <span class="c1"># doubly-jagged case</span>
+                        <span class="k">assert</span> <span class="p">{</span><span class="s2">"node0-offsets"</span><span class="p">,</span> <span class="s2">"node1-offsets"</span><span class="p">,</span> <span class="s2">"node2-data"</span><span class="p">}</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span>
+                            <span class="n">buffers</span>
+                        <span class="p">)</span>
+                        <span class="c1"># take singly jagged array</span>
+                        <span class="n">content</span><span class="p">[</span><span class="n">field</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="n">name_with_underscore</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+                                <span class="n">offsets</span><span class="o">=</span><span class="n">awkward</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">buffers</span><span class="p">[</span><span class="s2">"node1-offsets"</span><span class="p">]),</span>
+                                <span class="n">content</span><span class="o">=</span><span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">NumpyArray</span><span class="p">(</span>
+                                    <span class="n">buffers</span><span class="p">[</span><span class="s2">"node2-data"</span><span class="p">]</span>
+                                <span class="p">),</span>
+                                <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">assert</span> <span class="p">{</span><span class="s2">"node0-offsets"</span><span class="p">,</span> <span class="s2">"node1-data"</span><span class="p">}</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">buffers</span><span class="p">)</span>
+                        <span class="c1"># take flat data</span>
+                        <span class="n">content</span><span class="p">[</span><span class="n">field</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="n">name_with_underscore</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">NumpyArray</span><span class="p">(</span>
+                                <span class="n">buffers</span><span class="p">[</span><span class="s2">"node1-data"</span><span class="p">],</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+
+                <span class="n">_content</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">content</span><span class="o">.</span><span class="n">values</span><span class="p">(),)</span>
+                <span class="n">_fields</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">content</span><span class="o">.</span><span class="n">keys</span><span class="p">(),)</span>
+                <span class="n">_length</span> <span class="o">=</span> <span class="n">_check_equal_lengths</span><span class="p">(</span><span class="n">_content</span><span class="p">)</span>
+
+                <span class="c1"># combine contents in a RecordArray</span>
+                <span class="n">record</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">(</span>
+                    <span class="n">_content</span><span class="p">,</span> <span class="n">_fields</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">_length</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="p">{}</span>
+                <span class="p">)</span>
+                <span class="c1"># update parameters</span>
+                <span class="n">counts</span> <span class="o">=</span> <span class="n">_non_materializing_get_field</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="s2">"n"</span> <span class="o">+</span> <span class="n">name</span><span class="p">)</span>
+                <span class="n">record</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">"collection_name"</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+                        <span class="s2">"__record__"</span><span class="p">:</span> <span class="n">mixin</span><span class="p">,</span>
+                        <span class="s2">"__doc__"</span><span class="p">:</span> <span class="n">counts</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"__doc__"</span><span class="p">),</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+
+                <span class="c1"># wrap as jagged array</span>
+                <span class="n">offsets</span> <span class="o">=</span> <span class="n">counts2offsets</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
+                <span class="n">offsets</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">offsets</span><span class="p">)</span>
+                <span class="n">output</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+                    <span class="n">offsets</span><span class="o">=</span><span class="n">offsets</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">record</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="s2">"n"</span> <span class="o">+</span> <span class="n">name</span><span class="p">)</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+                <span class="c1"># list singleton (can use branch's own offsets)</span>
+                <span class="n">arr</span> <span class="o">=</span> <span class="n">_non_materializing_get_field</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+                <span class="n">output</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">to_layout</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+                <span class="n">output</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="p">{</span><span class="s2">"__array__"</span><span class="p">:</span> <span class="n">mixin</span><span class="p">,</span> <span class="s2">"collection_name"</span><span class="p">:</span> <span class="n">name</span><span class="p">}</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+                <span class="c1"># singleton</span>
+                <span class="n">arr</span> <span class="o">=</span> <span class="n">_non_materializing_get_field</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+                <span class="n">output</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">to_layout</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># simple collection</span>
+                <span class="n">content</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">offsets</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">_get_collection_fields</span><span class="p">(</span><span class="n">name_with_underscore</span><span class="p">,</span> <span class="n">fields</span><span class="p">):</span>
+                    <span class="n">arr</span> <span class="o">=</span> <span class="n">_non_materializing_get_field</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span>
+
+                    <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="n">buffers</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">to_buffers</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="p">{</span><span class="s2">"node0-offsets"</span><span class="p">,</span> <span class="s2">"node1-data"</span><span class="p">}</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">buffers</span><span class="p">):</span>
+                        <span class="c1"># RNTuple: fields are already jagged (ListOffsetArray)</span>
+                        <span class="k">if</span> <span class="n">offsets</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">offsets</span> <span class="o">=</span> <span class="n">buffers</span><span class="p">[</span><span class="s2">"node0-offsets"</span><span class="p">]</span>
+                        <span class="n">content</span><span class="p">[</span><span class="n">field</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="n">name_with_underscore</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">NumpyArray</span><span class="p">(</span>
+                                <span class="n">buffers</span><span class="p">[</span><span class="s2">"node1-data"</span><span class="p">],</span>
+                                <span class="n">parameters</span><span class="o">=</span><span class="n">arr</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">assert</span> <span class="p">{</span><span class="s2">"node0-data"</span><span class="p">}</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">buffers</span><span class="p">)</span>
+                        <span class="c1"># take flat data</span>
+                        <span class="n">content</span><span class="p">[</span><span class="n">field</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="n">name_with_underscore</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">NumpyArray</span><span class="p">(</span>
+                                <span class="n">buffers</span><span class="p">[</span><span class="s2">"node0-data"</span><span class="p">],</span>
+                                <span class="n">parameters</span><span class="o">=</span><span class="n">arr</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+
+                <span class="n">_content</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">content</span><span class="o">.</span><span class="n">values</span><span class="p">(),)</span>
+                <span class="n">_fields</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">content</span><span class="o">.</span><span class="n">keys</span><span class="p">(),)</span>
+                <span class="n">_length</span> <span class="o">=</span> <span class="n">_check_equal_lengths</span><span class="p">(</span><span class="n">_content</span><span class="p">)</span>
+
+                <span class="n">record</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">(</span>
+                    <span class="n">_content</span><span class="p">,</span> <span class="n">_fields</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">_length</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="p">{}</span>
+                <span class="p">)</span>
+                <span class="n">record</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">"collection_name"</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+                        <span class="s2">"__record__"</span><span class="p">:</span> <span class="n">mixin</span><span class="p">,</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">offsets</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">output</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+                        <span class="n">offsets</span><span class="o">=</span><span class="n">awkward</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">offsets</span><span class="p">),</span>
+                        <span class="n">content</span><span class="o">=</span><span class="n">record</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">output</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">record</span>
+
+        <span class="c1"># final nanoevents (most outer) zip</span>
+        <span class="n">_content</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">output</span><span class="o">.</span><span class="n">values</span><span class="p">(),)</span>
+        <span class="n">_fields</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">output</span><span class="o">.</span><span class="n">keys</span><span class="p">(),)</span>
+        <span class="n">_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">num</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+        <span class="n">nanoevents</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span>
+            <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">(</span><span class="n">_content</span><span class="p">,</span> <span class="n">_fields</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">_length</span><span class="p">),</span>
+            <span class="n">behavior</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior</span><span class="p">(),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># fix virtual array shape generators by re-running from buffers:</span>
+        <span class="n">nanoevents</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span>
+            <span class="n">_rewrap</span><span class="p">(</span><span class="n">nanoevents</span><span class="p">),</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">"NanoEvents"</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># add aditional parameters</span>
+        <span class="n">nanoevents</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"metadata"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"version"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_version</span><span class="p">},</span>
+                <span class="o">**</span><span class="n">array</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="c1"># add ref to itself in attrs</span>
+        <span class="n">nanoevents</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"@original_array"</span><span class="p">]</span> <span class="o">=</span> <span class="n">nanoevents</span>
+
+        <span class="k">return</span> <span class="n">nanoevents</span>
+
+<div class="viewcode-block" id="NanoAOD.behavior">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.NanoAOD.behavior">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">behavior</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Behaviors necessary to implement this schema (dict)"""</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.behaviors</span><span class="w"> </span><span class="kn">import</span> <span class="n">nanoaod</span>
+
+        <span class="k">return</span> <span class="n">nanoaod</span><span class="o">.</span><span class="n">behavior</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="PFNanoAOD">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.PFNanoAOD">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PFNanoAOD</span><span class="p">(</span><span class="n">NanoAOD</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""PFNano schema builder</span>
+
+<span class="sd">    PFNano is an extended NanoAOD format that includes PF candidates and secondary vertices</span>
+<span class="sd">    More info at https://github.com/cms-jet/PFNano</span>
+<span class="sd">    """</span>
+
+    <span class="n">mixins</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="o">**</span><span class="n">NanoAOD</span><span class="o">.</span><span class="n">mixins</span><span class="p">,</span>
+        <span class="s2">"JetSVs"</span><span class="p">:</span> <span class="s2">"AssociatedSV"</span><span class="p">,</span>
+        <span class="s2">"FatJetSVs"</span><span class="p">:</span> <span class="s2">"AssociatedSV"</span><span class="p">,</span>
+        <span class="s2">"GenJetSVs"</span><span class="p">:</span> <span class="s2">"AssociatedSV"</span><span class="p">,</span>
+        <span class="s2">"GenFatJetSVs"</span><span class="p">:</span> <span class="s2">"AssociatedSV"</span><span class="p">,</span>
+        <span class="s2">"JetPFCands"</span><span class="p">:</span> <span class="s2">"AssociatedPFCand"</span><span class="p">,</span>
+        <span class="s2">"FatJetPFCands"</span><span class="p">:</span> <span class="s2">"AssociatedPFCand"</span><span class="p">,</span>
+        <span class="s2">"GenJetCands"</span><span class="p">:</span> <span class="s2">"AssociatedPFCand"</span><span class="p">,</span>
+        <span class="s2">"GenFatJetCands"</span><span class="p">:</span> <span class="s2">"AssociatedPFCand"</span><span class="p">,</span>
+        <span class="s2">"PFCands"</span><span class="p">:</span> <span class="s2">"PFCand"</span><span class="p">,</span>
+        <span class="s2">"GenCands"</span><span class="p">:</span> <span class="s2">"PFCand"</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">all_cross_references</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="o">**</span><span class="n">NanoAOD</span><span class="o">.</span><span class="n">all_cross_references</span><span class="p">,</span>
+        <span class="s2">"FatJetPFCands_jetIdx"</span><span class="p">:</span> <span class="s2">"FatJet"</span><span class="p">,</span>  <span class="c1"># breaks pattern</span>
+        <span class="s2">"FatJetPFCands_pFCandsIdx"</span><span class="p">:</span> <span class="s2">"PFCands"</span><span class="p">,</span>
+        <span class="s2">"FatJetSVs_jetIdx"</span><span class="p">:</span> <span class="s2">"FatJet"</span><span class="p">,</span>  <span class="c1"># breaks pattern</span>
+        <span class="s2">"FatJetSVs_sVIdx"</span><span class="p">:</span> <span class="s2">"SV"</span><span class="p">,</span>
+        <span class="s2">"FatJet_electronIdx3SJ"</span><span class="p">:</span> <span class="s2">"Electron"</span><span class="p">,</span>
+        <span class="s2">"FatJet_muonIdx3SJ"</span><span class="p">:</span> <span class="s2">"Muon"</span><span class="p">,</span>
+        <span class="s2">"GenFatJetCands_jetIdx"</span><span class="p">:</span> <span class="s2">"GenJetAK8"</span><span class="p">,</span>  <span class="c1"># breaks pattern</span>
+        <span class="s2">"GenFatJetCands_pFCandsIdx"</span><span class="p">:</span> <span class="s2">"GenCands"</span><span class="p">,</span>  <span class="c1"># breaks pattern</span>
+        <span class="s2">"GenFatJetSVs_jetIdx"</span><span class="p">:</span> <span class="s2">"GenJetAK8"</span><span class="p">,</span>  <span class="c1"># breaks pattern</span>
+        <span class="s2">"GenFatJetSVs_sVIdx"</span><span class="p">:</span> <span class="s2">"SV"</span><span class="p">,</span>
+        <span class="s2">"GenJetCands_jetIdx"</span><span class="p">:</span> <span class="s2">"GenJet"</span><span class="p">,</span>  <span class="c1"># breaks pattern</span>
+        <span class="s2">"GenJetCands_pFCandsIdx"</span><span class="p">:</span> <span class="s2">"GenCands"</span><span class="p">,</span>  <span class="c1"># breaks pattern</span>
+        <span class="s2">"GenJetSVs_jetIdx"</span><span class="p">:</span> <span class="s2">"GenJet"</span><span class="p">,</span>  <span class="c1"># breaks pattern</span>
+        <span class="s2">"GenJetSVs_sVIdx"</span><span class="p">:</span> <span class="s2">"SV"</span><span class="p">,</span>
+        <span class="s2">"JetPFCands_jetIdx"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"JetPFCands_pFCandsIdx"</span><span class="p">:</span> <span class="s2">"PFCands"</span><span class="p">,</span>
+        <span class="s2">"JetSVs_jetIdx"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"JetSVs_sVIdx"</span><span class="p">:</span> <span class="s2">"SV"</span><span class="p">,</span>
+        <span class="s2">"SubJet_subGenJetAK8Idx"</span><span class="p">:</span> <span class="s2">"SubGenJetAK8"</span><span class="p">,</span>
+    <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="ScoutingNanoAOD">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.ScoutingNanoAOD">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ScoutingNanoAOD</span><span class="p">(</span><span class="n">NanoAOD</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""ScoutingNano schema builder</span>
+
+<span class="sd">    ScoutingNano is a NanoAOD format that includes Scouting objects</span>
+<span class="sd">    """</span>
+
+    <span class="n">mixins</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="o">**</span><span class="n">NanoAOD</span><span class="o">.</span><span class="n">mixins</span><span class="p">,</span>
+        <span class="s2">"ScoutingJet"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"ScoutingFatJet"</span><span class="p">:</span> <span class="s2">"FatJet"</span><span class="p">,</span>
+        <span class="s2">"ScoutingMET"</span><span class="p">:</span> <span class="s2">"MissingET"</span><span class="p">,</span>
+        <span class="s2">"ScoutingMuonNoVtxDisplacedVertex"</span><span class="p">:</span> <span class="s2">"Vertex"</span><span class="p">,</span>
+        <span class="s2">"ScoutingMuonVtxDisplacedVertex"</span><span class="p">:</span> <span class="s2">"Vertex"</span><span class="p">,</span>
+        <span class="s2">"ScoutingPrimaryVertex"</span><span class="p">:</span> <span class="s2">"Vertex"</span><span class="p">,</span>
+        <span class="s2">"ScoutingElectron"</span><span class="p">:</span> <span class="s2">"Electron"</span><span class="p">,</span>
+        <span class="s2">"ScoutingPhoton"</span><span class="p">:</span> <span class="s2">"Photon"</span><span class="p">,</span>
+        <span class="s2">"ScoutingMuonNoVtx"</span><span class="p">:</span> <span class="s2">"Muon"</span><span class="p">,</span>
+        <span class="s2">"ScoutingMuonVtx"</span><span class="p">:</span> <span class="s2">"Muon"</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="n">all_cross_references</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">NanoAOD</span><span class="o">.</span><span class="n">all_cross_references</span><span class="p">}</span>
+
+    <span class="n">full_like_items</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="o">**</span><span class="n">NanoAOD</span><span class="o">.</span><span class="n">full_like_items</span><span class="p">,</span>
+        <span class="s2">"ScoutingJet_charge"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"nScoutingJet"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+        <span class="s2">"ScoutingFatJet_charge"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"nScoutingFatJet"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+        <span class="s2">"ScoutingPhoton_m"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"nScoutingPhoton"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+        <span class="s2">"ScoutingPhoton_charge"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"nScoutingPhoton"</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="n">alias_items</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="o">**</span><span class="n">NanoAOD</span><span class="o">.</span><span class="n">alias_items</span><span class="p">,</span>
+        <span class="s2">"MET_pt"</span><span class="p">:</span> <span class="s2">"MET_fiducialGenPt"</span><span class="p">,</span>
+        <span class="s2">"MET_phi"</span><span class="p">:</span> <span class="s2">"MET_fiducialGenPhi"</span><span class="p">,</span>
+    <span class="p">}</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Peter Fackeldey, Maxym Naumchyk.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

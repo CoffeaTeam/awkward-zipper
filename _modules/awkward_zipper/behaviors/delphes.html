@@ -1,0 +1,473 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>awkward_zipper.behaviors.delphes &mdash; awkward-zipper 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/logo_unfilled_with_text.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            awkward-zipper
+              <img src="../../../_static/logo_unfilled_with_black_text.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">awkward-zipper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">awkward_zipper.behaviors.delphes</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for awkward_zipper.behaviors.delphes</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Mixins for the Delphes schema</span>
+
+<span class="sd">See https://delphes.github.io/workbook/root-tree-description/ for details.</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">awkward</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.behaviors</span><span class="w"> </span><span class="kn">import</span> <span class="n">base</span><span class="p">,</span> <span class="n">candidate</span><span class="p">,</span> <span class="n">vector</span>
+
+<span class="n">behavior</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">behavior</span><span class="p">)</span>
+<span class="c1"># vector behavior is included in candidate behavior</span>
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">candidate</span><span class="o">.</span><span class="n">behavior</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="DelphesEvents">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.delphes.DelphesEvents">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DelphesEvents</span><span class="p">(</span><span class="n">behavior</span><span class="p">[</span><span class="s2">"NanoEvents"</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"&lt;Delphes event </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">Event</span><span class="o">.</span><span class="n">Number</span><span class="si">}</span><span class="s2">&gt;"</span></div>
+
+
+
+<span class="n">behavior</span><span class="p">[</span><span class="s2">"NanoEvents"</span><span class="p">]</span> <span class="o">=</span> <span class="n">DelphesEvents</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_set_repr_name</span><span class="p">(</span><span class="n">classname</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">namefcn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">classname</span>
+
+    <span class="n">behavior</span><span class="p">[(</span><span class="s2">"__typestr__"</span><span class="p">,</span> <span class="n">classname</span><span class="p">)]</span> <span class="o">=</span> <span class="n">classname</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">+</span> <span class="n">classname</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="n">behavior</span><span class="p">[</span><span class="n">classname</span><span class="p">]</span><span class="o">.</span><span class="fm">__repr__</span> <span class="o">=</span> <span class="n">namefcn</span>
+
+
+<div class="viewcode-block" id="Event">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.delphes.Event">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Event</span><span class="p">:</span> <span class="o">...</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Event"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="LHEFEvent">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.delphes.LHEFEvent">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LHEFEvent</span><span class="p">(</span><span class="n">Event</span><span class="p">):</span> <span class="o">...</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"LHEFEvent"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="HepMCEvent">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.delphes.HepMCEvent">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HepMCEvent</span><span class="p">(</span><span class="n">Event</span><span class="p">):</span> <span class="o">...</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"HepMCEvent"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="LHCOEvent">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.delphes.LHCOEvent">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LHCOEvent</span><span class="p">(</span><span class="n">Event</span><span class="p">):</span> <span class="o">...</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"LHCOEvent"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Weight">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.delphes.Weight">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Weight</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span> <span class="o">...</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Weight"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="WeightLHEF">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.delphes.WeightLHEF">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">WeightLHEF</span><span class="p">(</span><span class="n">Event</span><span class="p">):</span> <span class="o">...</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"WeightLHEF"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Rho">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.delphes.Rho">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Rho</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span> <span class="o">...</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Rho"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ScalarHT">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.delphes.ScalarHT">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ScalarHT</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span> <span class="o">...</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"ScalarHT"</span><span class="p">)</span>
+
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+    <span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span><span class="s2">"SphericalThreeVector"</span><span class="p">,</span> <span class="s2">"MissingET"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">)</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="MissingET">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.delphes.MissingET">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MissingET</span><span class="p">(</span><span class="n">vector</span><span class="o">.</span><span class="n">SphericalThreeVector</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span> <span class="o">...</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"MissingET"</span><span class="p">)</span>
+
+
+<span class="n">MissingETArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">PolarTwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MissingETArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">MissingETArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MissingETArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MissingETArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">MissingETArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MissingETRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">PolarTwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MissingETRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">MissingETRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MissingETRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MissingETRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">MissingETRecord</span>  <span class="c1"># noqa: F821</span>
+
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span><span class="s2">"LorentzVector"</span><span class="p">,</span> <span class="s2">"Vertex"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="Vertex">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.delphes.Vertex">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Vertex</span><span class="p">(</span><span class="n">vector</span><span class="o">.</span><span class="n">LorentzVector</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Generic vertex collection that has Lorentz vector properties"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Vertex"</span><span class="p">)</span>
+
+<span class="n">VertexArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">VertexArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">VertexArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">VertexArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">VertexArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">VertexRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">VertexRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">VertexRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">VertexRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">VertexRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+    <span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span><span class="s2">"PtEtaPhiMLorentzVector"</span><span class="p">,</span> <span class="s2">"Particle"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">)</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="Particle">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.delphes.Particle">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Particle</span><span class="p">(</span><span class="n">vector</span><span class="o">.</span><span class="n">PtEtaPhiMLorentzVector</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Generic particle collection that has Lorentz vector properties</span>
+
+<span class="sd">    The following branches are not used:</span>
+
+<span class="sd">     - E: particle energy</span>
+<span class="sd">     - Px: particle momentum vector (x component)</span>
+<span class="sd">     - Py: particle momentum vector (y component)</span>
+<span class="sd">     - Pz: particle momentum vector (z component)</span>
+
+<span class="sd">     - P: particle momentum</span>
+<span class="sd">     - Rapidity: particle rapidity</span>
+
+<span class="sd">     - T: particle vertex position (t component)</span>
+<span class="sd">     - X: particle vertex position (x component)</span>
+<span class="sd">     - Y: particle vertex position (y component)</span>
+<span class="sd">     - Z: particle vertex position (z component)</span>
+<span class="sd">    """</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Particle"</span><span class="p">)</span>
+
+<span class="n">ParticleArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ParticleArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ParticleArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">ParticleArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ParticleArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">ParticleRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ParticleRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span><span class="s2">"Particle"</span><span class="p">,</span> <span class="s2">"MasslessParticle"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">))</span>
+
+
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MasslessParticle</span><span class="p">(</span><span class="n">Particle</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span> <span class="o">...</span>
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"MasslessParticle"</span><span class="p">)</span>
+
+<span class="n">MasslessParticleArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MasslessParticleArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MasslessParticleArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">MasslessParticleArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MasslessParticleArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MasslessParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MasslessParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MasslessParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">MasslessParticleRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MasslessParticleRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span><span class="s2">"MasslessParticle"</span><span class="p">,</span> <span class="s2">"Photon"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="Photon">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.delphes.Photon">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Photon</span><span class="p">(</span><span class="n">MasslessParticle</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span> <span class="o">...</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Photon"</span><span class="p">)</span>
+
+<span class="n">PhotonArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PhotonArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PhotonArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">PhotonArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PhotonArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PhotonRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PhotonRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PhotonRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">PhotonRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">PhotonRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span><span class="s2">"MasslessParticle"</span><span class="p">,</span> <span class="s2">"Electron"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="Electron">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.delphes.Electron">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Electron</span><span class="p">(</span><span class="n">MasslessParticle</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span> <span class="o">...</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Electron"</span><span class="p">)</span>
+
+<span class="n">ElectronArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ElectronArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ElectronArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">ElectronArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ElectronArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ElectronRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ElectronRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ElectronRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">ElectronRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ElectronRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span><span class="s2">"MasslessParticle"</span><span class="p">,</span> <span class="s2">"Muon"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="Muon">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.delphes.Muon">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Muon</span><span class="p">(</span><span class="n">MasslessParticle</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span> <span class="o">...</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Muon"</span><span class="p">)</span>
+
+<span class="n">MuonArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MuonArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MuonArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">MuonArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MuonArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MuonRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MuonRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MuonRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">MuonRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MuonRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span><span class="s2">"Particle"</span><span class="p">,</span> <span class="s2">"Jet"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="Jet">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.delphes.Jet">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Jet</span><span class="p">(</span><span class="n">Particle</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span> <span class="o">...</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Jet"</span><span class="p">)</span>
+
+<span class="n">JetArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">JetArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">JetArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">JetArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">JetArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">JetRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">JetRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">JetRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">JetRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">JetRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span><span class="s2">"Particle"</span><span class="p">,</span> <span class="s2">"Track"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="Track">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.delphes.Track">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Track</span><span class="p">(</span><span class="n">Particle</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span> <span class="o">...</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Track"</span><span class="p">)</span>
+
+<span class="n">TrackArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TrackArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TrackArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">TrackArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TrackArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TrackRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TrackRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TrackRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">TrackRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TrackRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span><span class="s2">"MasslessParticle"</span><span class="p">,</span> <span class="s2">"Tower"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="Tower">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.delphes.Tower">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Tower</span><span class="p">(</span><span class="n">MasslessParticle</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span> <span class="o">...</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Tower"</span><span class="p">)</span>
+
+<span class="n">TowerArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TowerArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TowerArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">TowerArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TowerArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TowerRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TowerRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TowerRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">TowerRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TowerRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">"DelphesEvents"</span><span class="p">,</span>
+    <span class="s2">"Electron"</span><span class="p">,</span>
+    <span class="s2">"Event"</span><span class="p">,</span>
+    <span class="s2">"HepMCEvent"</span><span class="p">,</span>
+    <span class="s2">"Jet"</span><span class="p">,</span>
+    <span class="s2">"LHCOEvent"</span><span class="p">,</span>
+    <span class="s2">"LHEFEvent"</span><span class="p">,</span>
+    <span class="s2">"MissingET"</span><span class="p">,</span>
+    <span class="s2">"Muon"</span><span class="p">,</span>
+    <span class="s2">"Particle"</span><span class="p">,</span>
+    <span class="s2">"Photon"</span><span class="p">,</span>
+    <span class="s2">"Rho"</span><span class="p">,</span>
+    <span class="s2">"ScalarHT"</span><span class="p">,</span>
+    <span class="s2">"Tower"</span><span class="p">,</span>
+    <span class="s2">"Track"</span><span class="p">,</span>
+    <span class="s2">"Vertex"</span><span class="p">,</span>
+    <span class="s2">"Weight"</span><span class="p">,</span>
+    <span class="s2">"WeightLHEF"</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Peter Fackeldey, Maxym Naumchyk.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

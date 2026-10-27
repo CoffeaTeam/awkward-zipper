@@ -1,0 +1,398 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>awkward_zipper.layouts.delphes &mdash; awkward-zipper 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/logo_unfilled_with_text.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            awkward-zipper
+              <img src="../../../_static/logo_unfilled_with_black_text.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">awkward-zipper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">awkward_zipper.layouts.delphes</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for awkward_zipper.layouts.delphes</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tp</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">awkward</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.awkward_util</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_jagged_content</span><span class="p">,</span>
+    <span class="n">_non_materializing_get_field</span><span class="p">,</span>
+    <span class="n">_rewrap</span><span class="p">,</span>
+    <span class="n">_total_items</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="n">counts2offsets</span><span class="p">,</span> <span class="n">full_like_from_counts</span><span class="p">,</span> <span class="n">met_to_rho</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.layouts.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseLayoutBuilder</span>
+
+<span class="n">_LIST_LIKE</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">,</span>
+    <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListArray</span><span class="p">,</span>
+    <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RegularArray</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_maybe_unknown_length</span><span class="p">(</span><span class="n">contents</span><span class="p">,</span> <span class="n">eager_length_fn</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Length for a ``RecordArray``: ``unknown_length`` while any content is</span>
+<span class="sd">    virtual (a concrete length would slice the contents and materialize their</span>
+<span class="sd">    shape generators), else the concrete length from ``eager_length_fn()``.</span>
+
+<span class="sd">    ``eager_length_fn`` is a callable so the concrete length (which itself can</span>
+<span class="sd">    materialize) is only computed once everything is already materialized.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">is_all_materialized</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">eager_length_fn</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">_nplikes</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">unknown_length</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_lorentz_from_tlv</span><span class="p">(</span><span class="n">content</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Convert a ROOT ``TLorentzVector`` record content to a ``LorentzVector``.</span>
+
+<span class="sd">    Matches a ``RecordArray`` with ``fE`` and ``fP`` (a ``TVector3`` with</span>
+<span class="sd">    ``fX``/``fY``/``fZ``) and returns ``{x, y, z, t}``. Recurses through</span>
+<span class="sd">    list-like wrappers. Returns ``None`` when nothing is converted, so callers</span>
+<span class="sd">    can leave unrelated leaves untouched.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">)</span> <span class="ow">and</span> <span class="p">{</span><span class="s2">"fE"</span><span class="p">,</span> <span class="s2">"fP"</span><span class="p">}</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span>
+        <span class="n">content</span><span class="o">.</span><span class="n">fields</span>
+    <span class="p">):</span>
+        <span class="n">fP</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="n">content</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">"fP"</span><span class="p">)]</span>
+        <span class="n">fE</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="n">content</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">"fE"</span><span class="p">)]</span>
+        <span class="n">fX</span> <span class="o">=</span> <span class="n">fP</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="n">fP</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">"fX"</span><span class="p">)]</span>
+        <span class="n">fY</span> <span class="o">=</span> <span class="n">fP</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="n">fP</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">"fY"</span><span class="p">)]</span>
+        <span class="n">fZ</span> <span class="o">=</span> <span class="n">fP</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="n">fP</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">"fZ"</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">fX</span><span class="p">,</span> <span class="n">fY</span><span class="p">,</span> <span class="n">fZ</span><span class="p">,</span> <span class="n">fE</span><span class="p">],</span>
+            <span class="p">[</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">,</span> <span class="s2">"t"</span><span class="p">],</span>
+            <span class="n">length</span><span class="o">=</span><span class="n">_maybe_unknown_length</span><span class="p">([</span><span class="n">fX</span><span class="p">,</span> <span class="n">fY</span><span class="p">,</span> <span class="n">fZ</span><span class="p">,</span> <span class="n">fE</span><span class="p">],</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">content</span><span class="o">.</span><span class="n">length</span><span class="p">),</span>
+            <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">"__record__"</span><span class="p">:</span> <span class="s2">"LorentzVector"</span><span class="p">},</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">_LIST_LIKE</span><span class="p">):</span>
+        <span class="n">inner</span> <span class="o">=</span> <span class="n">_lorentz_from_tlv</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">inner</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">content</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">inner</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_strip_tref</span><span class="p">(</span><span class="n">content</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Drop the ``@other*`` members of a ROOT ``TRef`` record, keeping only ``ref``.</span>
+
+<span class="sd">    uproot's eager reader already reduces a ``TRef`` to ``{ref}`` (as does</span>
+<span class="sd">    coffea), but the ``virtual=True`` reader keeps the full</span>
+<span class="sd">    ``{ref, @other1, @other2}`` whose ``@other`` buffers cannot be materialized.</span>
+<span class="sd">    Returns ``None`` when there is nothing to strip.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">):</span>
+        <span class="n">keep</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">content</span><span class="o">.</span><span class="n">fields</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">f</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"@"</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">keep</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">fields</span><span class="p">):</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">content</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">keep</span><span class="p">]</span>
+            <span class="n">kept</span> <span class="o">=</span> <span class="p">[</span><span class="n">content</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">(</span>
+                <span class="n">kept</span><span class="p">,</span>
+                <span class="n">keep</span><span class="p">,</span>
+                <span class="n">length</span><span class="o">=</span><span class="n">_maybe_unknown_length</span><span class="p">(</span><span class="n">kept</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">content</span><span class="o">.</span><span class="n">length</span><span class="p">),</span>
+                <span class="n">parameters</span><span class="o">=</span><span class="n">content</span><span class="o">.</span><span class="n">parameters</span><span class="p">,</span>
+            <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">_LIST_LIKE</span><span class="p">):</span>
+        <span class="n">inner</span> <span class="o">=</span> <span class="n">_strip_tref</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">inner</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">content</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">content</span><span class="o">=</span><span class="n">inner</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="Delphes">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.Delphes">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Delphes</span><span class="p">(</span><span class="n">BaseLayoutBuilder</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Delphes layout builder</span>
+
+<span class="sd">    The Delphes layout is built from all branches found in the supplied file,</span>
+<span class="sd">    based on the naming pattern of the branches. Any branches named</span>
+<span class="sd">    ``{name}_size`` are counts branches, converted to offsets. Every Delphes</span>
+<span class="sd">    object collection is a jagged list of records; the split leaf branches</span>
+<span class="sd">    (``{name}.{var}``) are grouped under the collection ``{name}`` and given the</span>
+<span class="sd">    aliases required by the vector/candidate behaviors (``pt``, ``eta``, ``phi``,</span>
+<span class="sd">    ``mass``, ``rho``).</span>
+
+<span class="sd">    A companion ``{name}.offsets`` field is emitted for each collection (matching</span>
+<span class="sd">    coffea). Collections stored as length-1 vectors (see ``singletons``) are</span>
+<span class="sd">    flattened, removing an unnecessary level of nesting.</span>
+<span class="sd">    """</span>
+
+    <span class="n">mixins</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"CaloJet02"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"CaloJet04"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"CaloJet08"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"CaloJet15"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"EFlowNeutralHadron"</span><span class="p">:</span> <span class="s2">"Tower"</span><span class="p">,</span>
+        <span class="s2">"EFlowPhoton"</span><span class="p">:</span> <span class="s2">"Photon"</span><span class="p">,</span>
+        <span class="s2">"EFlowTrack"</span><span class="p">:</span> <span class="s2">"Track"</span><span class="p">,</span>
+        <span class="s2">"Electron"</span><span class="p">:</span> <span class="s2">"Electron"</span><span class="p">,</span>
+        <span class="s2">"ElectronCHS"</span><span class="p">:</span> <span class="s2">"Electron"</span><span class="p">,</span>
+        <span class="s2">"GenJet"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"GenJet02"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"GenJet04"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"GenJet08"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"GenJetAK8"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"GenJet15"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"GenMissingET"</span><span class="p">:</span> <span class="s2">"MissingET"</span><span class="p">,</span>
+        <span class="s2">"GenPileUpMissingET"</span><span class="p">:</span> <span class="s2">"MissingET"</span><span class="p">,</span>
+        <span class="s2">"Jet"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"JetAK8"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"JetPUPPI"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"FatJet"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"JetPUPPIAK8"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"MissingET"</span><span class="p">:</span> <span class="s2">"MissingET"</span><span class="p">,</span>
+        <span class="s2">"PuppiMissingET"</span><span class="p">:</span> <span class="s2">"MissingET"</span><span class="p">,</span>
+        <span class="s2">"Muon"</span><span class="p">:</span> <span class="s2">"Muon"</span><span class="p">,</span>
+        <span class="s2">"MuonTight"</span><span class="p">:</span> <span class="s2">"Muon"</span><span class="p">,</span>
+        <span class="s2">"MuonLoose"</span><span class="p">:</span> <span class="s2">"Muon"</span><span class="p">,</span>
+        <span class="s2">"MuonTightCHS"</span><span class="p">:</span> <span class="s2">"Muon"</span><span class="p">,</span>
+        <span class="s2">"MuonLooseCHS"</span><span class="p">:</span> <span class="s2">"Muon"</span><span class="p">,</span>
+        <span class="s2">"Particle"</span><span class="p">:</span> <span class="s2">"Particle"</span><span class="p">,</span>
+        <span class="s2">"ParticleFlowJet02"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"ParticleFlowJet04"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"ParticleFlowJet08"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"ParticleFlowJet15"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"Photon"</span><span class="p">:</span> <span class="s2">"Photon"</span><span class="p">,</span>
+        <span class="s2">"PhotonCHS"</span><span class="p">:</span> <span class="s2">"Photon"</span><span class="p">,</span>
+        <span class="s2">"Tower"</span><span class="p">:</span> <span class="s2">"Tower"</span><span class="p">,</span>
+        <span class="s2">"Track"</span><span class="p">:</span> <span class="s2">"Track"</span><span class="p">,</span>
+        <span class="s2">"TrackJet02"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"TrackJet04"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"TrackJet08"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"TrackJet15"</span><span class="p">:</span> <span class="s2">"Jet"</span><span class="p">,</span>
+        <span class="s2">"Weight"</span><span class="p">:</span> <span class="s2">"Weight"</span><span class="p">,</span>
+        <span class="s2">"WeightLHEF"</span><span class="p">:</span> <span class="s2">"WeightLHEF"</span><span class="p">,</span>
+        <span class="c1"># the following are also singletons</span>
+        <span class="s2">"Event"</span><span class="p">:</span> <span class="s2">"Event"</span><span class="p">,</span>
+        <span class="s2">"EventLHEF"</span><span class="p">:</span> <span class="s2">"EventLHEF"</span><span class="p">,</span>
+        <span class="s2">"HepMCEvent"</span><span class="p">:</span> <span class="s2">"HepMCEvent"</span><span class="p">,</span>
+        <span class="s2">"LHCOEvent"</span><span class="p">:</span> <span class="s2">"LHCOEvent"</span><span class="p">,</span>
+        <span class="s2">"Rho"</span><span class="p">:</span> <span class="s2">"Rho"</span><span class="p">,</span>
+        <span class="s2">"ScalarHT"</span><span class="p">:</span> <span class="s2">"ScalarHT"</span><span class="p">,</span>
+    <span class="p">}</span>
+<span class="w">    </span><span class="sd">"""Default configuration for mixin types, based on the collection name."""</span>
+
+    <span class="c1"># These are stored as length-1 vectors unnecessarily</span>
+    <span class="n">singletons</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">"Event"</span><span class="p">,</span>
+        <span class="s2">"EventLHEF"</span><span class="p">,</span>
+        <span class="s2">"HepMCEvent"</span><span class="p">,</span>
+        <span class="s2">"LHCOEvent"</span><span class="p">,</span>
+        <span class="s2">"Rho"</span><span class="p">,</span>
+        <span class="s2">"ScalarHT"</span><span class="p">,</span>
+        <span class="s2">"MissingET"</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="w">    </span><span class="sd">"""Fields stored as length-1 vectors in Delphes, flattened out in nanoevents."""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">"latest"</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_version</span> <span class="o">=</span> <span class="n">version</span>
+
+<div class="viewcode-block" id="Delphes.v1">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.Delphes.v1">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">v1</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Build the DelphesEvents for version 1 (``DelphesSchema.v1`` in coffea)"""</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="s2">"1"</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">fields</span><span class="p">)</span>
+        <span class="n">n_events</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">num</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+        <span class="n">forms</span> <span class="o">=</span> <span class="p">{</span><span class="n">f</span><span class="p">:</span> <span class="n">_non_materializing_get_field</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">}</span>
+
+        <span class="c1"># collections are the branch prefixes, excluding the counts branches</span>
+        <span class="n">collections</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">}</span>
+        <span class="n">collections</span> <span class="o">-=</span> <span class="p">{</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">collections</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"_size"</span><span class="p">)}</span>
+        <span class="c1"># every real collection has a matching counts branch</span>
+        <span class="n">collections</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">collections</span> <span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">+</span> <span class="s2">"_size"</span><span class="p">)</span> <span class="ow">in</span> <span class="n">forms</span><span class="p">}</span>
+
+        <span class="n">output</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">collections</span><span class="p">):</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="n">forms</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s2">"_size"</span><span class="p">]</span>
+            <span class="n">offsets</span> <span class="o">=</span> <span class="n">counts2offsets</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+            <span class="n">mixin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixins</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">"NanoCollection"</span><span class="p">)</span>
+
+            <span class="n">content</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">name</span> <span class="o">+</span> <span class="s2">"."</span><span class="p">):</span>
+                    <span class="n">c</span> <span class="o">=</span> <span class="n">_jagged_content</span><span class="p">(</span><span class="n">forms</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+                    <span class="c1"># convert ROOT TLorentzVector leaves to LorentzVector records</span>
+                    <span class="n">converted</span> <span class="o">=</span> <span class="n">_lorentz_from_tlv</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">converted</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">c</span> <span class="o">=</span> <span class="n">converted</span>
+                    <span class="c1"># reduce ROOT TRef leaves to just their ``ref`` member</span>
+                    <span class="n">stripped</span> <span class="o">=</span> <span class="n">_strip_tref</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">stripped</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">c</span> <span class="o">=</span> <span class="n">stripped</span>
+                    <span class="n">content</span><span class="p">[</span><span class="n">k</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]]</span> <span class="o">=</span> <span class="n">c</span>
+
+            <span class="c1"># add aliases expected by the vector/candidate behaviors</span>
+            <span class="k">if</span> <span class="n">mixin</span> <span class="o">==</span> <span class="s2">"MissingET"</span><span class="p">:</span>
+                <span class="n">content</span><span class="p">[</span><span class="s2">"rho"</span><span class="p">]</span> <span class="o">=</span> <span class="n">met_to_rho</span><span class="p">(</span><span class="n">content</span><span class="p">[</span><span class="s2">"MET"</span><span class="p">],</span> <span class="n">content</span><span class="p">[</span><span class="s2">"Eta"</span><span class="p">])</span>
+                <span class="n">content</span><span class="p">[</span><span class="s2">"eta"</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="s2">"Eta"</span><span class="p">]</span>
+                <span class="n">content</span><span class="p">[</span><span class="s2">"phi"</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="s2">"Phi"</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">mixin</span> <span class="o">==</span> <span class="s2">"Vertex"</span><span class="p">:</span>
+                <span class="n">content</span><span class="p">[</span><span class="s2">"t"</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="s2">"T"</span><span class="p">]</span>
+                <span class="n">content</span><span class="p">[</span><span class="s2">"x"</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="s2">"X"</span><span class="p">]</span>
+                <span class="n">content</span><span class="p">[</span><span class="s2">"y"</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="s2">"Y"</span><span class="p">]</span>
+                <span class="n">content</span><span class="p">[</span><span class="s2">"z"</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="s2">"Z"</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">mixin</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"Particle"</span><span class="p">,</span> <span class="s2">"Jet"</span><span class="p">,</span> <span class="s2">"Track"</span><span class="p">):</span>
+                <span class="n">content</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"E"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">content</span><span class="p">[</span><span class="s2">"pt"</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="s2">"PT"</span><span class="p">]</span>
+                <span class="n">content</span><span class="p">[</span><span class="s2">"eta"</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="s2">"Eta"</span><span class="p">]</span>
+                <span class="n">content</span><span class="p">[</span><span class="s2">"phi"</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="s2">"Phi"</span><span class="p">]</span>
+                <span class="n">content</span><span class="p">[</span><span class="s2">"mass"</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="s2">"Mass"</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">mixin</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"MasslessParticle"</span><span class="p">,</span> <span class="s2">"Photon"</span><span class="p">,</span> <span class="s2">"Electron"</span><span class="p">,</span> <span class="s2">"Muon"</span><span class="p">,</span> <span class="s2">"Tower"</span><span class="p">):</span>
+                <span class="n">content</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"E"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s2">"PT"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">content</span> <span class="ow">and</span> <span class="s2">"ET"</span> <span class="ow">in</span> <span class="n">content</span><span class="p">:</span>
+                    <span class="n">content</span><span class="p">[</span><span class="s2">"PT"</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="s2">"ET"</span><span class="p">]</span>
+                <span class="n">content</span><span class="p">[</span><span class="s2">"pt"</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="s2">"PT"</span><span class="p">]</span>
+                <span class="n">content</span><span class="p">[</span><span class="s2">"eta"</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="s2">"Eta"</span><span class="p">]</span>
+                <span class="n">content</span><span class="p">[</span><span class="s2">"phi"</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="s2">"Phi"</span><span class="p">]</span>
+                <span class="n">content</span><span class="p">[</span><span class="s2">"mass"</span><span class="p">]</span> <span class="o">=</span> <span class="n">full_like_from_counts</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">content</span>
+
+            <span class="c1"># handle branch names like Edges[4] and Tau[5]</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">k</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"["</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"]"</span><span class="p">,</span> <span class="s2">""</span><span class="p">):</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">content</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span>
+
+            <span class="n">_content</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+            <span class="n">_fields</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="c1"># some ROOT leaves (e.g. fBits) carry an over-sized data buffer; the</span>
+            <span class="c1"># collection offsets define the real item count, so set the record</span>
+            <span class="c1"># length from offsets[-1] and let longer contents be truncated</span>
+            <span class="n">record</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">(</span>
+                <span class="n">_content</span><span class="p">,</span>
+                <span class="n">_fields</span><span class="p">,</span>
+                <span class="n">length</span><span class="o">=</span><span class="n">_maybe_unknown_length</span><span class="p">(</span>
+                    <span class="n">_content</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">offsets</span><span class="o">=</span><span class="n">offsets</span><span class="p">:</span> <span class="n">_total_items</span><span class="p">(</span><span class="n">offsets</span><span class="p">)</span>
+                <span class="p">),</span>
+                <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">"__record__"</span><span class="p">:</span> <span class="n">mixin</span><span class="p">,</span> <span class="s2">"collection_name"</span><span class="p">:</span> <span class="n">name</span><span class="p">},</span>
+            <span class="p">)</span>
+
+            <span class="c1"># companion offsets field (matches coffea; truncated to n_events)</span>
+            <span class="n">output</span><span class="p">[</span><span class="n">name</span> <span class="o">+</span> <span class="s2">".offsets"</span><span class="p">]</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">NumpyArray</span><span class="p">(</span><span class="n">offsets</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">singletons</span><span class="p">:</span>
+                <span class="c1"># flatten: promote the (length-1) inner record up one level</span>
+                <span class="n">output</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">record</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">output</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+                    <span class="n">offsets</span><span class="o">=</span><span class="n">awkward</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">offsets</span><span class="p">),</span> <span class="n">content</span><span class="o">=</span><span class="n">record</span>
+                <span class="p">)</span>
+
+        <span class="n">contents</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">nanoevents</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span>
+            <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">(</span><span class="n">contents</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">n_events</span><span class="p">),</span>
+            <span class="n">behavior</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior</span><span class="p">(),</span>
+        <span class="p">)</span>
+        <span class="n">nanoevents</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">_rewrap</span><span class="p">(</span><span class="n">nanoevents</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">"NanoEvents"</span><span class="p">)</span>
+        <span class="n">nanoevents</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">"metadata"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"version"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_version</span><span class="p">}})</span>
+        <span class="n">nanoevents</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"@original_array"</span><span class="p">]</span> <span class="o">=</span> <span class="n">nanoevents</span>
+        <span class="k">return</span> <span class="n">nanoevents</span>
+
+<div class="viewcode-block" id="Delphes.behavior">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.Delphes.behavior">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">behavior</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Behaviors necessary to implement this schema (dict)"""</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.behaviors</span><span class="w"> </span><span class="kn">import</span> <span class="n">delphes</span>
+
+        <span class="k">return</span> <span class="n">delphes</span><span class="o">.</span><span class="n">behavior</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Peter Fackeldey, Maxym Naumchyk.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

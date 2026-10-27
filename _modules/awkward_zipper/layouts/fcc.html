@@ -1,0 +1,533 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>awkward_zipper.layouts.fcc &mdash; awkward-zipper 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/logo_unfilled_with_text.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            awkward-zipper
+              <img src="../../../_static/logo_unfilled_with_black_text.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">awkward-zipper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">awkward_zipper.layouts.fcc</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for awkward_zipper.layouts.fcc</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tp</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">awkward</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.awkward_util</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_non_materializing_get_field</span><span class="p">,</span>
+    <span class="n">_rewrap</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">begin_end_mapping</span><span class="p">,</span>
+    <span class="n">grow_local_index_to_target_shape</span><span class="p">,</span>
+    <span class="n">local2global</span><span class="p">,</span>
+    <span class="n">nested_local2global</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.layouts.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseLayoutBuilder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.layouts.edm4hep</span><span class="w"> </span><span class="kn">import</span> <span class="n">EDM4HEP</span><span class="p">,</span> <span class="n">_zip_shared_offsets</span><span class="p">,</span> <span class="n">sort_dict</span>
+
+<span class="n">_idxs</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">".*[#]+[0-9]+"</span><span class="p">)</span>
+<span class="n">_trailing_under</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">".*_[0-9]"</span><span class="p">)</span>
+<span class="n">_square_braces</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">".*\[.*\]"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="FCCSchema">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.FCCSchema">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FCCSchema</span><span class="p">(</span><span class="n">BaseLayoutBuilder</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""FCC (pre-edm4hep1) layout builder.</span>
+
+<span class="sd">    Array-based re-implementation of coffea's ``FCCSchema``, tested against the</span>
+<span class="sd">    Spring2021/Winter2023 pregenerated FCC samples (https://fcc-physics-events.web.cern.ch/).</span>
+<span class="sd">    These follow the edm4hep structure:</span>
+
+<span class="sd">    - vector components (``X.referencePoint.{x,y,z}``) are zipped into</span>
+<span class="sd">      ``X.referencePoint`` sub-collections,</span>
+<span class="sd">    - ``*_begin``/``*_end`` range pairs are zipped, and MC parent/daughter relations</span>
+<span class="sd">      get ``*_ranges`` plus global (``G``) indexers,</span>
+<span class="sd">    - ObjectID branches (``X#0.index``/``X#0.collectionID``) become ``Xidx0``</span>
+<span class="sd">      collections,</span>
+<span class="sd">    - ``*_[0-9]`` trailing-underscore branches form their own collections,</span>
+<span class="sd">    - the remaining ``X.*`` branches are zipped into the ``X`` collection, using</span>
+<span class="sd">      ``momentum.{x,y,z}`` (+ ``energy``) for the LorentzVector behavior.</span>
+<span class="sd">    """</span>
+
+    <span class="n">extra_mixins</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"*idx"</span><span class="p">:</span> <span class="s2">"ObjectID"</span><span class="p">}</span>
+
+    <span class="n">_momentum_fields_e</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"energy"</span><span class="p">:</span> <span class="s2">"E"</span><span class="p">,</span>
+        <span class="s2">"momentum.x"</span><span class="p">:</span> <span class="s2">"px"</span><span class="p">,</span>
+        <span class="s2">"momentum.y"</span><span class="p">:</span> <span class="s2">"py"</span><span class="p">,</span>
+        <span class="s2">"momentum.z"</span><span class="p">:</span> <span class="s2">"pz"</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">_replacement</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">_momentum_fields_e</span><span class="p">}</span>
+
+    <span class="n">_threevec_fields</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"position"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"position.x"</span><span class="p">,</span> <span class="s2">"position.y"</span><span class="p">,</span> <span class="s2">"position.z"</span><span class="p">],</span>
+        <span class="s2">"directionError"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"directionError.x"</span><span class="p">,</span> <span class="s2">"directionError.y"</span><span class="p">,</span> <span class="s2">"directionError.z"</span><span class="p">],</span>
+        <span class="s2">"vertex"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"vertex.x"</span><span class="p">,</span> <span class="s2">"vertex.y"</span><span class="p">,</span> <span class="s2">"vertex.z"</span><span class="p">],</span>
+        <span class="s2">"endpoint"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"endpoint.x"</span><span class="p">,</span> <span class="s2">"endpoint.y"</span><span class="p">,</span> <span class="s2">"endpoint.z"</span><span class="p">],</span>
+        <span class="s2">"referencePoint"</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">"referencePoint.x"</span><span class="p">,</span>
+            <span class="s2">"referencePoint.y"</span><span class="p">,</span>
+            <span class="s2">"referencePoint.z"</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="s2">"momentumAtEndpoint"</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">"momentumAtEndpoint.x"</span><span class="p">,</span>
+            <span class="s2">"momentumAtEndpoint.y"</span><span class="p">,</span>
+            <span class="s2">"momentumAtEndpoint.z"</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="s2">"spin"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"spin.x"</span><span class="p">,</span> <span class="s2">"spin.y"</span><span class="p">,</span> <span class="s2">"spin.z"</span><span class="p">],</span>
+    <span class="p">}</span>
+
+    <span class="n">all_cross_references</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"MCRecoAssociations#1.index"</span><span class="p">:</span> <span class="s2">"Particle"</span><span class="p">,</span>
+        <span class="s2">"MCRecoAssociations#0.index"</span><span class="p">:</span> <span class="s2">"ReconstructedParticles"</span><span class="p">,</span>
+        <span class="s2">"Muon#0.index"</span><span class="p">:</span> <span class="s2">"ReconstructedParticles"</span><span class="p">,</span>
+        <span class="s2">"Electron#0.index"</span><span class="p">:</span> <span class="s2">"ReconstructedParticles"</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="n">mc_relations</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"parents"</span><span class="p">:</span> <span class="s2">"Particle#0.index"</span><span class="p">,</span>
+        <span class="s2">"daughters"</span><span class="p">:</span> <span class="s2">"Particle#1.index"</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">typenames</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
+        <span class="n">n_events</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">num</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+        <span class="n">forms</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">array</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+            <span class="n">layout</span> <span class="o">=</span> <span class="n">_non_materializing_get_field</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span><span class="o">.</span><span class="n">layout</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">field</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'.'</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="s2">"."</span> <span class="ow">in</span> <span class="n">field</span> <span class="k">else</span> <span class="n">field</span>
+            <span class="n">forms</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">layout</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_mixin</span><span class="p">(</span><span class="n">forms</span><span class="p">,</span> <span class="n">typenames</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_collections</span><span class="p">(</span><span class="n">forms</span><span class="p">)</span>
+
+        <span class="n">contents</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">nanoevents</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span>
+            <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">(</span><span class="n">contents</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">n_events</span><span class="p">),</span>
+            <span class="n">behavior</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior</span><span class="p">(),</span>
+        <span class="p">)</span>
+        <span class="n">nanoevents</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">_rewrap</span><span class="p">(</span><span class="n">nanoevents</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">"NanoEvents"</span><span class="p">)</span>
+        <span class="n">nanoevents</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"@original_array"</span><span class="p">]</span> <span class="o">=</span> <span class="n">nanoevents</span>
+        <span class="k">return</span> <span class="n">nanoevents</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_mixin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forms</span><span class="p">,</span> <span class="n">typenames</span><span class="p">):</span>
+        <span class="n">all_collections</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">forms</span> <span class="k">if</span> <span class="s2">"/"</span> <span class="ow">in</span> <span class="n">key</span><span class="p">}</span>
+        <span class="n">collections</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">name</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">all_collections</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">_idxs</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_trailing_under</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="n">mixins</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">collections</span><span class="p">:</span>
+            <span class="n">datatype</span> <span class="o">=</span> <span class="p">(</span><span class="n">typenames</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">datatype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">mixins</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"NanoCollection"</span>
+            <span class="k">elif</span> <span class="n">datatype</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">r</span><span class="s2">"vector&lt;edm4hep::"</span><span class="p">):</span>
+                <span class="n">mixins</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">datatype</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"::"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">5</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">datatype</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"Data&gt;"</span><span class="p">)</span>
+                    <span class="k">else</span> <span class="s2">"NanoCollection"</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">datatype</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">r</span><span class="s2">"vector&lt;podio::"</span><span class="p">):</span>
+                <span class="n">mixins</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">datatype</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"::"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">mixins</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">datatype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mixins_dictionary</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">mixins</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">extra_mixins</span><span class="p">}</span>
+
+    <span class="c1"># ---------------- processors ----------------</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_subcollections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forms</span><span class="p">,</span> <span class="n">all_collections</span><span class="p">):</span>
+        <span class="n">field_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">forms</span><span class="p">)</span>
+
+        <span class="c1"># python-friendly names for square-braced branches</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">field_names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">_square_braces</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+                <span class="n">forms</span><span class="p">[</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"["</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"]"</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">)]</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="n">field_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">forms</span><span class="p">)</span>
+
+        <span class="c1"># zip *_begin / *_end pairs, adding MC parent/daughter range indexers</span>
+        <span class="n">begin_end</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">fullname</span> <span class="ow">in</span> <span class="n">field_names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">fullname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"_begin"</span><span class="p">):</span>
+                <span class="n">begin_end</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">fullname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"_begin"</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">fullname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"_end"</span><span class="p">):</span>
+                <span class="n">begin_end</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">fullname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"_end"</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">begin_end</span><span class="p">:</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">k</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]:</span> <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">field_names</span>
+                <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="ow">and</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">forms</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">content</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">offsets</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span><span class="o">.</span><span class="n">offsets</span>
+            <span class="n">begin</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">content</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"begin"</span><span class="p">)),</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">content</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"end"</span><span class="p">)),</span> <span class="kc">None</span><span class="p">)</span>
+
+            <span class="n">ranges</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="n">begin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mc_relations</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">col_name</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">target_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">col_name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">"</span>
+                    <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="ow">and</span> <span class="n">target_key</span> <span class="ow">in</span> <span class="n">forms</span><span class="p">:</span>
+                        <span class="n">range_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">col_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'#'</span><span class="p">,</span><span class="w"> </span><span class="s1">'idx'</span><span class="p">)</span><span class="si">}</span><span class="s2">_ranges"</span>
+                        <span class="n">mapped</span> <span class="o">=</span> <span class="n">begin_end_mapping</span><span class="p">(</span>
+                            <span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">forms</span><span class="p">[</span><span class="n">target_key</span><span class="p">]</span><span class="o">.</span><span class="n">content</span>
+                        <span class="p">)</span>
+                        <span class="n">ranges</span><span class="p">[</span><span class="n">range_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">mapped</span>
+                        <span class="n">ranges</span><span class="p">[</span><span class="n">range_name</span> <span class="o">+</span> <span class="s2">"G"</span><span class="p">]</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+                            <span class="n">mapped</span><span class="o">.</span><span class="n">offsets</span><span class="p">,</span>
+                            <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+                                <span class="n">mapped</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">offsets</span><span class="p">,</span>
+                                <span class="n">nested_local2global</span><span class="p">(</span><span class="n">mapped</span><span class="p">,</span> <span class="n">offsets</span><span class="p">),</span>
+                            <span class="p">),</span>
+                        <span class="p">)</span>
+            <span class="n">forms</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">_zip_shared_offsets</span><span class="p">(</span>
+                <span class="n">sort_dict</span><span class="p">({</span><span class="o">**</span><span class="n">content</span><span class="p">,</span> <span class="o">**</span><span class="n">ranges</span><span class="p">}),</span> <span class="n">offsets</span><span class="o">=</span><span class="n">offsets</span>
+            <span class="p">)</span>
+
+        <span class="c1"># zip colorFlow.a / colorFlow.b</span>
+        <span class="n">field_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">forms</span><span class="p">)</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">field_names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"colorFlow.a"</span><span class="p">):</span>
+                <span class="n">color</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">".a"</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"colorFlow.b"</span><span class="p">):</span>
+                <span class="n">color</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">".b"</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">color</span><span class="p">:</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">k</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]:</span> <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">field_names</span>
+                <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="ow">and</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">forms</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="n">content</span><span class="p">:</span>
+                <span class="n">forms</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">_zip_shared_offsets</span><span class="p">(</span><span class="n">sort_dict</span><span class="p">(</span><span class="n">content</span><span class="p">))</span>
+
+        <span class="c1"># three-vectors</span>
+        <span class="n">field_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">forms</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">all_collections</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">threevec_name</span><span class="p">,</span> <span class="n">subfields</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_threevec_fields</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">sub</span><span class="si">}</span><span class="s2">"</span> <span class="ow">in</span> <span class="n">field_names</span> <span class="k">for</span> <span class="n">sub</span> <span class="ow">in</span> <span class="n">subfields</span><span class="p">):</span>
+                    <span class="n">content</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="n">axis</span><span class="p">:</span> <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">threevec_name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">axis</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">)</span>
+                    <span class="p">}</span>
+                    <span class="n">forms</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">threevec_name</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span> <span class="o">=</span> <span class="n">_zip_shared_offsets</span><span class="p">(</span>
+                        <span class="n">sort_dict</span><span class="p">(</span><span class="n">content</span><span class="p">),</span> <span class="n">record_name</span><span class="o">=</span><span class="s2">"ThreeVector"</span>
+                    <span class="p">)</span>
+        <span class="k">return</span> <span class="n">forms</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_global_indexers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forms</span><span class="p">,</span> <span class="n">all_collections</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">cross_ref</span><span class="p">,</span> <span class="n">target</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_cross_references</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">collection_name</span><span class="p">,</span> <span class="n">index_name</span> <span class="o">=</span> <span class="n">cross_ref</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span>
+            <span class="n">source_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">collection_name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">collection_name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">index_name</span><span class="si">}</span><span class="s2">"</span>
+            <span class="k">if</span> <span class="n">source_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">forms</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">available</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">forms</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">."</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">available</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">target_offsets</span> <span class="o">=</span> <span class="n">forms</span><span class="p">[</span><span class="n">available</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">offsets</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">forms</span><span class="p">[</span><span class="n">source_key</span><span class="p">]</span>
+            <span class="n">grown</span> <span class="o">=</span> <span class="n">grow_local_index_to_target_shape</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">target_offsets</span><span class="p">)</span>
+            <span class="n">grown_jagged</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span><span class="n">target_offsets</span><span class="p">,</span> <span class="n">grown</span><span class="p">)</span>
+            <span class="n">replaced</span> <span class="o">=</span> <span class="n">collection_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"#"</span><span class="p">,</span> <span class="s2">"idx"</span><span class="p">)</span>
+            <span class="n">forms</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">replaced</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">index_name</span><span class="si">}</span><span class="s2">Global"</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+                    <span class="n">target_offsets</span><span class="p">,</span> <span class="n">local2global</span><span class="p">(</span><span class="n">grown_jagged</span><span class="p">,</span> <span class="n">target_offsets</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">forms</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_idx_collections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">forms</span><span class="p">,</span> <span class="n">all_collections</span><span class="p">):</span>
+        <span class="n">field_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">forms</span><span class="p">)</span>
+        <span class="n">idxs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">all_collections</span> <span class="k">if</span> <span class="n">_idxs</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">k</span><span class="p">)}</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">field_names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">_idxs</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">"/"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">k</span><span class="p">:</span>
+                <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">idxs</span><span class="p">:</span>
+            <span class="n">repl</span> <span class="o">=</span> <span class="n">idx</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"#"</span><span class="p">,</span> <span class="s2">"idx"</span><span class="p">)</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">k</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span> <span class="p">:]:</span> <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">field_names</span>
+                <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span> <span class="ow">and</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">forms</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">content</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">output</span><span class="p">[</span><span class="n">repl</span><span class="p">]</span> <span class="o">=</span> <span class="n">_zip_shared_offsets</span><span class="p">(</span>
+                <span class="n">sort_dict</span><span class="p">(</span><span class="n">content</span><span class="p">),</span>
+                <span class="n">record_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mixins_dictionary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"*idx"</span><span class="p">,</span> <span class="s2">"NanoCollection"</span><span class="p">),</span>
+                <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">"collection_name"</span><span class="p">:</span> <span class="n">repl</span><span class="p">},</span>
+            <span class="p">)</span>
+
+        <span class="c1"># MCRecoAssociations idx0/idx1 join later as reco/mc</span>
+        <span class="k">if</span> <span class="s2">"MCRecoAssociationsidx0"</span> <span class="ow">in</span> <span class="n">output</span> <span class="ow">and</span> <span class="s2">"MCRecoAssociationsidx1"</span> <span class="ow">in</span> <span class="n">output</span><span class="p">:</span>
+            <span class="n">forms</span><span class="p">[</span><span class="s2">"MCRecoAssociations/MCRecoAssociations.reco"</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span>
+                <span class="s2">"MCRecoAssociationsidx0"</span>
+            <span class="p">)</span>
+            <span class="n">forms</span><span class="p">[</span><span class="s2">"MCRecoAssociations/MCRecoAssociations.mc"</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span>
+                <span class="s2">"MCRecoAssociationsidx1"</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">forms</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_trailing_underscore_collections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">forms</span><span class="p">,</span> <span class="n">all_collections</span><span class="p">):</span>
+        <span class="n">collections</span> <span class="o">=</span> <span class="p">{</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">all_collections</span> <span class="k">if</span> <span class="n">_trailing_under</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">n</span><span class="p">)}</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">collections</span><span class="p">:</span>
+            <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">field_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">forms</span><span class="p">)</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">k</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span> <span class="p">:]:</span> <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">field_names</span>
+                <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span> <span class="ow">and</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">forms</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">content</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">output</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">_zip_shared_offsets</span><span class="p">(</span>
+                <span class="n">sort_dict</span><span class="p">(</span><span class="n">content</span><span class="p">),</span>
+                <span class="n">record_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mixins_dictionary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">"NanoCollection"</span><span class="p">),</span>
+                <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">"collection_name"</span><span class="p">:</span> <span class="n">name</span><span class="p">},</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">forms</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_main_collections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">forms</span><span class="p">,</span> <span class="n">all_collections</span><span class="p">):</span>
+        <span class="n">field_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">forms</span><span class="p">)</span>
+        <span class="n">collections</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">n</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">all_collections</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">_idxs</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_trailing_under</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">collections</span><span class="p">:</span>
+            <span class="n">mixin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixins_dictionary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">"NanoCollection"</span><span class="p">)</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">k</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span> <span class="p">:]:</span> <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">field_names</span>
+                <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span> <span class="ow">and</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">forms</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">content</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_replacement</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">content</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="k">if</span> <span class="n">mixin</span> <span class="o">==</span> <span class="s2">"ReconstructedParticle"</span><span class="p">:</span>
+                <span class="n">content</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"E"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">output</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">_zip_shared_offsets</span><span class="p">(</span>
+                <span class="n">sort_dict</span><span class="p">(</span><span class="n">content</span><span class="p">),</span>
+                <span class="n">record_name</span><span class="o">=</span><span class="n">mixin</span><span class="p">,</span>
+                <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">"collection_name"</span><span class="p">:</span> <span class="n">name</span><span class="p">},</span>
+            <span class="p">)</span>
+            <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">forms</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_unknown_collections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">forms</span><span class="p">,</span> <span class="n">all_collections</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">layout</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="n">record</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+                <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">layout</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+                <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">output</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">forms</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_collections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forms</span><span class="p">):</span>
+        <span class="n">all_collections</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">forms</span> <span class="k">if</span> <span class="s2">"/"</span> <span class="ow">in</span> <span class="n">name</span><span class="p">}</span>
+
+        <span class="n">forms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_subcollections</span><span class="p">(</span><span class="n">forms</span><span class="p">,</span> <span class="n">all_collections</span><span class="p">)</span>
+        <span class="n">forms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_global_indexers</span><span class="p">(</span><span class="n">forms</span><span class="p">,</span> <span class="n">all_collections</span><span class="p">)</span>
+
+        <span class="n">output</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">forms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_idx_collections</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">forms</span><span class="p">,</span> <span class="n">all_collections</span><span class="p">)</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">forms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trailing_underscore_collections</span><span class="p">(</span>
+            <span class="n">output</span><span class="p">,</span> <span class="n">forms</span><span class="p">,</span> <span class="n">all_collections</span>
+        <span class="p">)</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">forms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_main_collections</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">forms</span><span class="p">,</span> <span class="n">all_collections</span><span class="p">)</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">forms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unknown_collections</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">forms</span><span class="p">,</span> <span class="n">all_collections</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sort_dict</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FCCSchema.behavior">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.FCCSchema.behavior">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">behavior</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Behaviors necessary to implement this schema (dict)"""</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.behaviors</span><span class="w"> </span><span class="kn">import</span> <span class="n">base</span><span class="p">,</span> <span class="n">fcc</span><span class="p">,</span> <span class="n">vector</span>
+
+        <span class="n">behavior</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">behavior</span><span class="p">)</span>
+        <span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">vector</span><span class="o">.</span><span class="n">behavior</span><span class="p">)</span>
+        <span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">fcc</span><span class="o">.</span><span class="n">behavior</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">behavior</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="FCCSchema_edm4hep1">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.FCCSchema_edm4hep1">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FCCSchema_edm4hep1</span><span class="p">(</span><span class="n">EDM4HEP</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""FCC layout builder for samples produced with edm4hep &gt;= 1.</span>
+
+<span class="sd">    Inherits from :class:`~awkward_zipper.EDM4HEP` version 00.99.01 (matching</span>
+<span class="sd">    coffea's ``FCCSchema_edm4hep1(EDM4HEPSchema)``) and adds more functionality</span>
+<span class="sd">    on top of it: the Links are also copied onto the collection they point to,</span>
+<span class="sd">    with ``_datatype_priority`` choosing ``ReconstructedParticles`` among the</span>
+<span class="sd">    collections sharing the ``ReconstructedParticle`` datatype (e.g. ``Jet``).</span>
+<span class="sd">    """</span>
+
+    <span class="n">edm4hep_version</span> <span class="o">=</span> <span class="s2">"00-99-01"</span>
+
+    <span class="n">copy_links_to_target_datatype</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">_datatype_priority</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"ReconstructedParticle"</span><span class="p">:</span> <span class="s2">"ReconstructedParticles"</span>
+    <span class="p">}</span>
+
+<div class="viewcode-block" id="FCCSchema_edm4hep1.behavior">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.FCCSchema_edm4hep1.behavior">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">behavior</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Behaviors necessary to implement this schema (dict)"""</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.behaviors</span><span class="w"> </span><span class="kn">import</span> <span class="n">base</span><span class="p">,</span> <span class="n">fcc</span><span class="p">,</span> <span class="n">vector</span>
+
+        <span class="n">behavior</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">behavior</span><span class="p">)</span>
+        <span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">vector</span><span class="o">.</span><span class="n">behavior</span><span class="p">)</span>
+        <span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">fcc</span><span class="o">.</span><span class="n">behavior_edm4hep1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">behavior</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="FCC">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.FCC">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FCC</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Choose the required variant of the FCC layout builder.</span>
+
+<span class="sd">    Example usage::</span>
+
+<span class="sd">        from awkward_zipper import FCC</span>
+<span class="sd">        FCC.get_schema(version="latest")</span>
+
+<span class="sd">    Available versions:</span>
+
+<span class="sd">    - ``"latest"`` -&gt; :class:`FCCSchema_edm4hep1`</span>
+<span class="sd">    - ``"pre-edm4hep1"`` -&gt; :class:`FCCSchema`</span>
+<span class="sd">    - ``"edm4hep1"`` -&gt; :class:`FCCSchema_edm4hep1`</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">"latest"</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_version</span> <span class="o">=</span> <span class="n">version</span>
+
+<div class="viewcode-block" id="FCC.get_schema">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.FCC.get_schema">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_schema</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">"latest"</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">version</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"latest"</span><span class="p">,</span> <span class="s2">"edm4hep1"</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">FCCSchema_edm4hep1</span>
+        <span class="k">if</span> <span class="n">version</span> <span class="o">==</span> <span class="s2">"pre-edm4hep1"</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">FCCSchema</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Invalid FCC schema version </span><span class="si">{</span><span class="n">version</span><span class="si">!r}</span><span class="s2">. "</span>
+            <span class="s2">"Valid versions: 'latest', 'pre-edm4hep1', 'edm4hep1'."</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Peter Fackeldey, Maxym Naumchyk.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

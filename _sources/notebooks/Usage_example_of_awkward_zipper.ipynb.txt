@@ -1,0 +1,1991 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "GDklQRC5v5Eg"
+   },
+   "source": [
+    "Install libraries"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "gaS-GOwH42SE",
+    "outputId": "23440bd6-121f-4f4f-d68b-e81c7596e19d"
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Collecting git+https://github.com/maxymnaumchyk/awkward-zipper.git\n",
+      "  Cloning https://github.com/maxymnaumchyk/awkward-zipper.git to /tmp/pip-req-build-mvp0qy7q\n",
+      "  Running command git clone --filter=blob:none --quiet https://github.com/maxymnaumchyk/awkward-zipper.git /tmp/pip-req-build-mvp0qy7q\n",
+      "  Resolved https://github.com/maxymnaumchyk/awkward-zipper.git to commit dd3613d1da6b934240f01845392317c6e94b731d\n",
+      "  Installing build dependencies ... \u001b[?25l\u001b[?25hdone\n",
+      "  Getting requirements to build wheel ... \u001b[?25l\u001b[?25hdone\n",
+      "  Preparing metadata (pyproject.toml) ... \u001b[?25l\u001b[?25hdone\n",
+      "Collecting awkward@ git+https://github.com/scikit-hep/awkward@main (from awkward-zipper==0.0.1)\n",
+      "  Cloning https://github.com/scikit-hep/awkward (to revision main) to /tmp/pip-install-r9r8y74u/awkward_3d58eb0a685741c0bbc580e5c5080ec1\n",
+      "  Running command git clone --filter=blob:none --quiet https://github.com/scikit-hep/awkward /tmp/pip-install-r9r8y74u/awkward_3d58eb0a685741c0bbc580e5c5080ec1\n",
+      "  Resolved https://github.com/scikit-hep/awkward to commit 8e2d4a85420e89617ccf5be0edef841d3b2d57bf\n",
+      "  Running command git submodule update --init --recursive -q\n",
+      "  Installing build dependencies ... \u001b[?25l\u001b[?25hdone\n",
+      "  Getting requirements to build wheel ... \u001b[?25l\u001b[?25hdone\n",
+      "  Preparing metadata (pyproject.toml) ... \u001b[?25l\u001b[?25hdone\n",
+      "Requirement already satisfied: numba in /usr/local/lib/python3.11/dist-packages (from awkward-zipper==0.0.1) (0.60.0)\n",
+      "Collecting vector (from awkward-zipper==0.0.1)\n",
+      "  Downloading vector-1.6.2-py3-none-any.whl.metadata (15 kB)\n",
+      "Collecting awkward-cpp==46 (from awkward@ git+https://github.com/scikit-hep/awkward@main->awkward-zipper==0.0.1)\n",
+      "  Downloading awkward_cpp-46-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.1 kB)\n",
+      "Requirement already satisfied: fsspec>=2022.11.0 in /usr/local/lib/python3.11/dist-packages (from awkward@ git+https://github.com/scikit-hep/awkward@main->awkward-zipper==0.0.1) (2025.3.2)\n",
+      "Requirement already satisfied: importlib-metadata>=4.13.0 in /usr/local/lib/python3.11/dist-packages (from awkward@ git+https://github.com/scikit-hep/awkward@main->awkward-zipper==0.0.1) (8.7.0)\n",
+      "Requirement already satisfied: numpy>=1.18.0 in /usr/local/lib/python3.11/dist-packages (from awkward@ git+https://github.com/scikit-hep/awkward@main->awkward-zipper==0.0.1) (2.0.2)\n",
+      "Requirement already satisfied: packaging in /usr/local/lib/python3.11/dist-packages (from awkward@ git+https://github.com/scikit-hep/awkward@main->awkward-zipper==0.0.1) (24.2)\n",
+      "Requirement already satisfied: llvmlite<0.44,>=0.43.0dev0 in /usr/local/lib/python3.11/dist-packages (from numba->awkward-zipper==0.0.1) (0.43.0)\n",
+      "Requirement already satisfied: zipp>=3.20 in /usr/local/lib/python3.11/dist-packages (from importlib-metadata>=4.13.0->awkward@ git+https://github.com/scikit-hep/awkward@main->awkward-zipper==0.0.1) (3.22.0)\n",
+      "Downloading awkward_cpp-46-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (638 kB)\n",
+      "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m638.7/638.7 kB\u001b[0m \u001b[31m13.9 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+      "\u001b[?25hDownloading vector-1.6.2-py3-none-any.whl (177 kB)\n",
+      "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m177.8/177.8 kB\u001b[0m \u001b[31m12.1 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+      "\u001b[?25hBuilding wheels for collected packages: awkward-zipper, awkward\n",
+      "  Building wheel for awkward-zipper (pyproject.toml) ... \u001b[?25l\u001b[?25hdone\n",
+      "  Created wheel for awkward-zipper: filename=awkward_zipper-0.0.1-py3-none-any.whl size=23500 sha256=4b59bd8410f92e5013eeaced62f0f3ab5fa66fdbbddbe33990b90254dfdcf6de\n",
+      "  Stored in directory: /tmp/pip-ephem-wheel-cache-gvugxi0d/wheels/13/ff/6a/a86ac1ebbfd7f56ba74dec9ccffa35df23b6890fac28284fed\n",
+      "  Building wheel for awkward (pyproject.toml) ... \u001b[?25l\u001b[?25hdone\n",
+      "  Created wheel for awkward: filename=awkward-2.8.3-py3-none-any.whl size=852964 sha256=ccdbcbdcabe7a578319d02cf78d7d8122baecd9204526d03999630d739e61048\n",
+      "  Stored in directory: /tmp/pip-ephem-wheel-cache-gvugxi0d/wheels/b9/90/e9/6455c7a94885426a7e2fc34b49d59ee756873090f777c368b0\n",
+      "Successfully built awkward-zipper awkward\n",
+      "Installing collected packages: vector, awkward-cpp, awkward, awkward-zipper\n",
+      "Successfully installed awkward-2.8.3 awkward-cpp-46 awkward-zipper-0.0.1 vector-1.6.2\n"
+     ]
+    }
+   ],
+   "source": [
+    "!pip install git+https://github.com/CoffeaTeam/awkward-zipper.git"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "l4hJJEJWmHL9"
+   },
+   "source": [
+    "Use a branch from main to load virtual arrays with uproot"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "kVWRGuyxmG2s",
+    "outputId": "a4ea6e5f-24cc-4f33-9f90-af9573c0fad6"
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Collecting uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy\n",
+      "  Cloning https://github.com/scikit-hep/uproot5 (to revision pfackeldey/uproot_lazy) to /tmp/pip-install-gc9d60kr/uproot_34e3315b4eb448c89caf404c61e204ab\n",
+      "  Running command git clone --filter=blob:none --quiet https://github.com/scikit-hep/uproot5 /tmp/pip-install-gc9d60kr/uproot_34e3315b4eb448c89caf404c61e204ab\n",
+      "  Running command git checkout -b pfackeldey/uproot_lazy --track origin/pfackeldey/uproot_lazy\n",
+      "  Switched to a new branch 'pfackeldey/uproot_lazy'\n",
+      "  Branch 'pfackeldey/uproot_lazy' set up to track remote branch 'pfackeldey/uproot_lazy' from 'origin'.\n",
+      "  Resolved https://github.com/scikit-hep/uproot5 to commit 892961513afd630bacd2495628c70b2c878da63a\n",
+      "  Installing build dependencies ... \u001b[?25l\u001b[?25hdone\n",
+      "  Getting requirements to build wheel ... \u001b[?25l\u001b[?25hdone\n",
+      "  Preparing metadata (pyproject.toml) ... \u001b[?25l\u001b[?25hdone\n",
+      "Collecting awkward>=2.8.2 (from uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy)\n",
+      "  Downloading awkward-2.8.4-py3-none-any.whl.metadata (7.0 kB)\n",
+      "Requirement already satisfied: cramjam>=2.5.0 in /usr/local/lib/python3.11/dist-packages (from uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (2.10.0)\n",
+      "Requirement already satisfied: fsspec in /usr/local/lib/python3.11/dist-packages (from uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (2025.3.2)\n",
+      "Requirement already satisfied: numpy in /usr/local/lib/python3.11/dist-packages (from uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (2.0.2)\n",
+      "Requirement already satisfied: packaging in /usr/local/lib/python3.11/dist-packages (from uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (24.2)\n",
+      "Requirement already satisfied: xxhash in /usr/local/lib/python3.11/dist-packages (from uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (3.5.0)\n",
+      "Collecting awkward-cpp==46 (from awkward>=2.8.2->uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy)\n",
+      "  Downloading awkward_cpp-46-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.1 kB)\n",
+      "Requirement already satisfied: importlib-metadata>=4.13.0 in /usr/local/lib/python3.11/dist-packages (from awkward>=2.8.2->uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (8.7.0)\n",
+      "Requirement already satisfied: zipp>=3.20 in /usr/local/lib/python3.11/dist-packages (from importlib-metadata>=4.13.0->awkward>=2.8.2->uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (3.23.0)\n",
+      "Downloading awkward-2.8.4-py3-none-any.whl (886 kB)\n",
+      "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m886.3/886.3 kB\u001b[0m \u001b[31m11.6 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+      "\u001b[?25hDownloading awkward_cpp-46-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (638 kB)\n",
+      "\u001b[2K   \u001b[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\u001b[0m \u001b[32m638.7/638.7 kB\u001b[0m \u001b[31m35.6 MB/s\u001b[0m eta \u001b[36m0:00:00\u001b[0m\n",
+      "\u001b[?25hBuilding wheels for collected packages: uproot\n",
+      "  Building wheel for uproot (pyproject.toml) ... \u001b[?25l\u001b[?25hdone\n",
+      "  Created wheel for uproot: filename=uproot-5.6.2.dev25+g8929615-py3-none-any.whl size=377052 sha256=20d26986a5b56e6f7b3d8d155f2a128e1b9ebf773fae7237551abcdb33cec25c\n",
+      "  Stored in directory: /tmp/pip-ephem-wheel-cache-23008dtr/wheels/6d/4a/38/cca594ce698fdd158d6039640034edca9dda20c890c171703a\n",
+      "Successfully built uproot\n",
+      "Installing collected packages: awkward-cpp, awkward, uproot\n",
+      "Successfully installed awkward-2.8.4 awkward-cpp-46 uproot-5.6.2.dev25+g8929615\n"
+     ]
+    }
+   ],
+   "source": [
+    "!pip install uproot@git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "L32udy-jvxUm"
+   },
+   "source": [
+    "Download test root file"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "8JenSD97vvyI",
+    "outputId": "999afc49-dbeb-469f-93fe-e62e3ea786e4"
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "--2025-06-09 16:22:50--  https://raw.githubusercontent.com/scikit-hep/coffea/refs/heads/master/tests/samples/nano_dy.root\n",
+      "Resolving raw.githubusercontent.com (raw.githubusercontent.com)... 185.199.108.133, 185.199.109.133, 185.199.110.133, ...\n",
+      "Connecting to raw.githubusercontent.com (raw.githubusercontent.com)|185.199.108.133|:443... connected.\n",
+      "HTTP request sent, awaiting response... 200 OK\n",
+      "Length: 352599 (344K) [application/octet-stream]\n",
+      "Saving to: ‘nano_dy.root’\n",
+      "\n",
+      "nano_dy.root        100%[===================>] 344.33K  --.-KB/s    in 0.03s   \n",
+      "\n",
+      "2025-06-09 16:22:50 (13.2 MB/s) - ‘nano_dy.root’ saved [352599/352599]\n",
+      "\n"
+     ]
+    }
+   ],
+   "source": [
+    "!wget {'https://raw.githubusercontent.com/scikit-hep/coffea/refs/heads/master/tests/samples/nano_dy.root'}"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "wXU7fNGMvMeP"
+   },
+   "source": [
+    "Import libraries"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "-7K2A3Hm3S21"
+   },
+   "outputs": [],
+   "source": [
+    "import awkward\n",
+    "import uproot"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "1lhg9AWkKcP-"
+   },
+   "source": [
+    "Let's load the example data in [NanoAOD](https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookNanoAOD) format:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "oK97AsG5vW8T"
+   },
+   "outputs": [],
+   "source": [
+    "# Create a TTree from root\n",
+    "tree = uproot.open(\"nano_dy.root\")[\"Events\"]\n",
+    "# TTree -> awkward.Array[awkward.Record[str, awkward.Array]]\n",
+    "array = tree.arrays(ak_add_doc=True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "rS_ZuXVFx65l",
+    "outputId": "98f9b8c6-3bc0-4e96-d864-5bd985adf04d"
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[{run: 1, luminosityBlock: 13889, event: 3749778, HTXS_Higgs_pt: 0, ...},\n",
+      " {run: 1, luminosityBlock: 13889, event: 3749762, HTXS_Higgs_pt: 0, ...},\n",
+      " {run: 1, luminosityBlock: 13889, event: 3749777, HTXS_Higgs_pt: 0, ...},\n",
+      " {run: 1, luminosityBlock: 13889, event: 3749768, HTXS_Higgs_pt: 0, ...},\n",
+      " {run: 1, luminosityBlock: 13889, event: 3749761, HTXS_Higgs_pt: 0, ...},\n",
+      " {run: 1, luminosityBlock: 13889, event: 3749773, HTXS_Higgs_pt: 0, ...},\n",
+      " {run: 1, luminosityBlock: 13889, event: 3749781, HTXS_Higgs_pt: 0, ...},\n",
+      " {run: 1, luminosityBlock: 13889, event: 3749786, HTXS_Higgs_pt: 0, ...},\n",
+      " {run: 1, luminosityBlock: 13889, event: 3749788, HTXS_Higgs_pt: 0, ...},\n",
+      " {run: 1, luminosityBlock: 13889, event: 3749783, HTXS_Higgs_pt: 0, ...},\n",
+      " ...,\n",
+      " {run: 1, luminosityBlock: 13889, event: 3749862, HTXS_Higgs_pt: 0, ...},\n",
+      " {run: 1, luminosityBlock: 13889, event: 3749866, HTXS_Higgs_pt: 0, ...},\n",
+      " {run: 1, luminosityBlock: 13889, event: 3749861, HTXS_Higgs_pt: 0, ...},\n",
+      " {run: 1, luminosityBlock: 13889, event: 3749863, HTXS_Higgs_pt: 0, ...},\n",
+      " {run: 1, luminosityBlock: 13889, event: 3749875, HTXS_Higgs_pt: 0, ...},\n",
+      " {run: 1, luminosityBlock: 13889, event: 3749865, HTXS_Higgs_pt: 0, ...},\n",
+      " {run: 1, luminosityBlock: 13889, event: 3749883, HTXS_Higgs_pt: 0, ...},\n",
+      " {run: 1, luminosityBlock: 13889, event: 3749882, HTXS_Higgs_pt: 0, ...},\n",
+      " {run: 1, luminosityBlock: 13889, event: 3749892, HTXS_Higgs_pt: 0, ...}]\n"
+     ]
+    }
+   ],
+   "source": [
+    "array.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "SmvO8A7aw0NE"
+   },
+   "source": [
+    "The resulting data is a list of records. Each record represents a single event and all of its parameters data. For example here's some of the data for the first event in our file:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "Y0PeY_7uRXCj",
+    "outputId": "2652a43d-35af-4bfe-bd24-f6849cc2efcc"
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{run: 1,\n",
+      " luminosityBlock: 13889,\n",
+      " event: 3749778,\n",
+      " HTXS_Higgs_pt: 0,\n",
+      " HTXS_Higgs_y: nan,\n",
+      " HTXS_stage1_1_cat_pTjet25GeV: 0,\n",
+      " HTXS_stage1_1_cat_pTjet30GeV: 0,\n",
+      " HTXS_stage1_1_fine_cat_pTjet25GeV: 0,\n",
+      " HTXS_stage1_1_fine_cat_pTjet30GeV: 0,\n",
+      " HTXS_stage_0: 0,\n",
+      " HTXS_stage_1_pTjet25: 0,\n",
+      " HTXS_stage_1_pTjet30: 0,\n",
+      " HTXS_njets25: 0,\n",
+      " HTXS_njets30: 0,\n",
+      " btagWeight_CSVV2: 0.951,\n",
+      " btagWeight_DeepCSVB: 0.893,\n",
+      " CaloMET_phi: 2.79,\n",
+      " CaloMET_pt: 32.1,\n",
+      " CaloMET_sumEt: 652,\n",
+      " ChsMET_phi: 2.51,\n",
+      " ChsMET_pt: 33.7,\n",
+      " ChsMET_sumEt: 784,\n",
+      " nCorrT1METJet: 5,\n",
+      " CorrT1METJet_area: [0.579, 0.449, 0.509, 0.519, 0.638],\n",
+      " CorrT1METJet_eta: [-2.36, 4.33, 2.27, 3.92, 2.62],\n",
+      " CorrT1METJet_muonSubtrFactor: [3.59e-08, 1.08e-08, ..., 7.16e-09, -2.98e-08],\n",
+      " CorrT1METJet_phi: [0.387, 2.03, 1.56, 2.39, -0.405],\n",
+      " CorrT1METJet_rawPt: [12.9, 15.3, 10.2, 14.9, 9.41],\n",
+      " nElectron: 0,\n",
+      " Electron_deltaEtaSC: [],\n",
+      " Electron_dr03EcalRecHitSumEt: [],\n",
+      " Electron_dr03HcalDepth1TowerSumEt: [],\n",
+      " Electron_dr03TkSumPt: [],\n",
+      " Electron_dr03TkSumPtHEEP: [],\n",
+      " Electron_dxy: [],\n",
+      " Electron_dxyErr: [],\n",
+      " Electron_dz: [],\n",
+      " Electron_dzErr: [],\n",
+      " Electron_eCorr: [],\n",
+      " Electron_eInvMinusPInv: [],\n",
+      " Electron_energyErr: [],\n",
+      " Electron_eta: [],\n",
+      " Electron_hoe: [],\n",
+      " Electron_ip3d: [],\n",
+      " Electron_jetPtRelv2: [],\n",
+      " Electron_jetRelIso: [],\n",
+      " Electron_mass: [],\n",
+      " Electron_miniPFRelIso_all: [],\n",
+      " Electron_miniPFRelIso_chg: [],\n",
+      " ...}\n"
+     ]
+    }
+   ],
+   "source": [
+    "array[0].show(50)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "Uyrh9ixRLg66"
+   },
+   "source": [
+    "## Awkward-zipper example usage"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "jJV_ht1jyYEv"
+   },
+   "source": [
+    "The goal of the awkward-zipper package is to restructure the record of each event. These records are restructured in the same manner as in [Coffea package](https://coffea-hep.readthedocs.io/en/v2025.1.1/api/coffea.nanoevents.NanoAODSchema.html)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "4hOy8KZpvISY",
+    "outputId": "1a42d9f8-d341-4712-ea4f-8d4147957952"
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "<ipython-input-16-4e778724ceb1>:4: RuntimeWarning: Missing cross-reference index for LowPtElectron_electronIdx => Electron\n",
+      "  result = restructure(array)\n",
+      "<ipython-input-16-4e778724ceb1>:4: RuntimeWarning: Missing cross-reference index for LowPtElectron_genPartIdx => GenPart\n",
+      "  result = restructure(array)\n",
+      "<ipython-input-16-4e778724ceb1>:4: RuntimeWarning: Missing cross-reference index for LowPtElectron_photonIdx => Photon\n",
+      "  result = restructure(array)\n",
+      "<ipython-input-16-4e778724ceb1>:4: RuntimeWarning: Missing cross-reference index for FatJet_genJetAK8Idx => GenJetAK8\n",
+      "  result = restructure(array)\n",
+      "/usr/local/lib/python3.11/dist-packages/awkward_zipper/kernels.py:122: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed. __array__ must implement 'dtype' and 'copy' keyword arguments.\n",
+      "  out[i::n] = idx\n"
+     ]
+    }
+   ],
+   "source": [
+    "from awkward_zipper import NanoAOD\n",
+    "\n",
+    "restructure = NanoAOD(version=\"latest\")\n",
+    "result = restructure(array)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "BJ4rQmJl5FYT"
+   },
+   "outputs": [],
+   "source": [
+    "# awkward.materialize(result)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 434
+    },
+    "id": "4rNjmzXKymlR",
+    "outputId": "c3ab0596-e8ad-486f-b2f0-5b6860834b73"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<pre>[{SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},\n",
+       " {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},\n",
+       " {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},\n",
+       " {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},\n",
+       " {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},\n",
+       " {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},\n",
+       " {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},\n",
+       " {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},\n",
+       " {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},\n",
+       " {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},\n",
+       " ...,\n",
+       " {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},\n",
+       " {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},\n",
+       " {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},\n",
+       " {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},\n",
+       " {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},\n",
+       " {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},\n",
+       " {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},\n",
+       " {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},\n",
+       " {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...}]\n",
+       "------------------------------------------------------------------------------\n",
+       "backend: cpu\n",
+       "nbytes: unknown\n",
+       "type: 40 * event</pre>"
+      ],
+      "text/plain": [
+       "<NanoEventsArray [<NanoAOD event>, ...] type='40 * event'>"
+      ]
+     },
+     "execution_count": 10,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "result"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "-IRxumr3QL1_"
+   },
+   "source": [
+    "Now let's go step by step how awkward-zipper reconstructs the original NanoAOD data."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "7Hn1dSUWMcp_"
+   },
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "NBjilpbWMcyf"
+   },
+   "source": [
+    "## How the new fields are added\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "RlXE0TiQMcyg"
+   },
+   "source": [
+    "Now let's go step by step how awkward-zipper reconstructs the original NanoAOD data."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "O75AIVTfMcyh"
+   },
+   "outputs": [],
+   "source": [
+    "from awkward_zipper.kernels import counts2offsets, local2globalindex, nestedindex"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "z1ExDaOzRsDF"
+   },
+   "source": [
+    "Any branches named `n{name}` are assumed to be counts branches can be converted to offsets `o{name}` using using `counts2offsets` helper function"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 434
+    },
+    "id": "IrhYBK5NR2M_",
+    "outputId": "438d1a9e-84fb-471b-97f2-56d6166dc8aa"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<pre>[5,\n",
+       " 8,\n",
+       " 5,\n",
+       " 3,\n",
+       " 5,\n",
+       " 8,\n",
+       " 4,\n",
+       " 4,\n",
+       " 1,\n",
+       " 9,\n",
+       " ...,\n",
+       " 2,\n",
+       " 4,\n",
+       " 9,\n",
+       " 3,\n",
+       " 2,\n",
+       " 3,\n",
+       " 1,\n",
+       " 6,\n",
+       " 2]\n",
+       "--------------------------------------------------------------------------------------------------------------------------------\n",
+       "backend: cpu\n",
+       "nbytes: 160 B\n",
+       "type: 40 * uint32[parameters={&quot;__doc__&quot;: &quot;slimmedJets, i.e. ak4 PFJets CHS with JECs applied, after basic selection (pt &gt; 15)&quot;}]</pre>"
+      ],
+      "text/plain": [
+       "<Array [5, 8, 5, 3, 5, 8, ..., 2, 3, 1, 6, 2] type='40 * uint32[parameters=...'>"
+      ]
+     },
+     "execution_count": 14,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "array[\"nJet\"]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "HK5Z9q66txFK"
+   },
+   "source": [
+    "*Note: How the functions(kernels) like `counts2offsets` work is the main difference between awkward-zipper and coffea. awkward-zipper does its inner calculations on awkward arrays, while coffea does them using [forms and buffers](https://awkward-array.org/doc/main/reference/generated/ak.to_buffers.html).*\n",
+    "\n",
+    "\n",
+    "\n",
+    "*This change will make it easier for users to create their own ‘schemas’ (or modify existing ones)*"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "haj4mUzgSNbl",
+    "outputId": "f47a946d-0eb5-46df-d1a7-5112b085431f"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "array([  0,   5,  13,  18,  21,  26,  34,  38,  42,  43,  52,  54,  62,\n",
+       "        64,  68,  73,  77,  82,  87,  94,  98, 101, 106, 115, 118, 123,\n",
+       "       127, 134, 139, 147, 152, 156, 158, 162, 171, 174, 176, 179, 180,\n",
+       "       186, 188])"
+      ]
+     },
+     "execution_count": 15,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "counts2offsets(array[\"nJet\"])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "UDPPq36MMcyj"
+   },
+   "source": [
+    "Any local index branches with names matching `{source}_{target}Idx*` are converted to global indexes for the event chunk (postfix `G`).\n",
+    "All local indices and their correlating global indices are taken from `NanoAOD.all_cross_references` dictionary"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 434
+    },
+    "id": "_PClb5hsMcyj",
+    "outputId": "3fa02bbd-3cfa-4fdc-cb39-1f24f5d692da"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<pre>[[-1, -1, -1, -1, -1],\n",
+       " [-1, 0, -1, -1, -1, -1, -1, -1],\n",
+       " [-1, 1, 2, -1, -1],\n",
+       " [-1, -1, 3],\n",
+       " [-1, -1, -1, -1, -1],\n",
+       " [5, -1, -1, -1, -1, -1, -1, -1],\n",
+       " [6, -1, -1, -1],\n",
+       " [-1, -1, -1, -1],\n",
+       " [-1],\n",
+       " [-1, 7, -1, -1, -1, -1, -1, -1, -1],\n",
+       " ...,\n",
+       " [21, -1],\n",
+       " [-1, -1, -1, -1],\n",
+       " [22, -1, -1, -1, -1, -1, -1, -1, -1],\n",
+       " [-1, -1, -1],\n",
+       " [23, -1],\n",
+       " [-1, -1, -1],\n",
+       " [24],\n",
+       " [-1, -1, -1, -1, -1, -1],\n",
+       " [-1, -1]]\n",
+       "------------------------------------------------------------------------------------\n",
+       "backend: cpu\n",
+       "nbytes: 1.8 kB\n",
+       "type: 40 * [var * int64, parameters={&quot;__doc__&quot;: &quot;index of first matching electron&quot;}]</pre>"
+      ],
+      "text/plain": [
+       "<Array [[-1, -1, -1, -1, -1], ..., [-1, ...]] type='40 * [var * int64, para...'>"
+      ]
+     },
+     "execution_count": 28,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "local_index = \"Jet_electronIdx1\"\n",
+    "\n",
+    "cross_referense = NanoAOD.all_cross_references[local_index]\n",
+    "global_index = \"n\" + cross_referense\n",
+    "\n",
+    "array[\"Jet_electronIdx1G\"] = local2globalindex(array[local_index], array[global_index])\n",
+    "array[\"Jet_electronIdx1G\"]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "tFSH81mJDrW5"
+   },
+   "source": [
+    "Any `NanoAOD.nested_items` are constructed, if the necessary branches are available"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 489
+    },
+    "id": "aZUmXp8yDskJ",
+    "outputId": "f7dbf7da-0e95-41b6-d1ed-5f6a55d3925f"
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "/usr/local/lib/python3.11/dist-packages/awkward_zipper/kernels.py:100: DeprecationWarning: __array__ implementation doesn't accept a copy keyword, so passing copy=False failed. __array__ must implement 'dtype' and 'copy' keyword arguments.\n",
+      "  out[i::n] = idx\n"
+     ]
+    },
+    {
+     "data": {
+      "text/html": [
+       "<pre>[[[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1]],\n",
+       " [[-1, -1], [0, -1], [-1, -1], [-1, ...], ..., [-1, -1], [-1, -1], [-1, -1]],\n",
+       " [[-1, -1], [1, -1], [2, -1], [-1, -1], [-1, -1]],\n",
+       " [[-1, -1], [-1, -1], [3, -1]],\n",
+       " [[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1]],\n",
+       " [[5, -1], [-1, -1], [-1, -1], [-1, ...], ..., [-1, -1], [-1, -1], [-1, -1]],\n",
+       " [[6, -1], [-1, -1], [-1, -1], [-1, -1]],\n",
+       " [[-1, -1], [-1, -1], [-1, -1], [-1, -1]],\n",
+       " [[-1, -1]],\n",
+       " [[-1, -1], [7, -1], [-1, -1], [-1, ...], ..., [-1, -1], [-1, -1], [-1, -1]],\n",
+       " ...,\n",
+       " [[21, -1], [-1, -1]],\n",
+       " [[-1, -1], [-1, -1], [-1, -1], [-1, -1]],\n",
+       " [[22, -1], [-1, -1], [-1, -1], [-1, ...], ..., [-1, -1], [-1, -1], [-1, -1]],\n",
+       " [[-1, -1], [-1, -1], [-1, -1]],\n",
+       " [[23, -1], [-1, -1]],\n",
+       " [[-1, -1], [-1, -1], [-1, -1]],\n",
+       " [[24, -1]],\n",
+       " [[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1]],\n",
+       " [[-1, -1], [-1, -1]]]\n",
+       "--------------------------------------------------------------------------------------------------------------------------------------------\n",
+       "backend: cpu\n",
+       "nbytes: 4.8 kB\n",
+       "type: 40 * [var * var * int64, parameters={&quot;__doc__&quot;: &quot;nested from index of first matching electron and index of second matching electron&quot;}]</pre>"
+      ],
+      "text/plain": [
+       "<Array [[[-1, -1], [...], ..., [-1, -1]], ...] type='40 * [var * var * int6...'>"
+      ]
+     },
+     "execution_count": 33,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "array[\"Jet_electronIdx2G\"] = local2globalindex(\n",
+    "    array[\"Jet_electronIdx2\"], array[\"nElectron\"]\n",
+    ")\n",
+    "nestedindex([array[\"Jet_electronIdx1G\"], array[\"Jet_electronIdx2G\"]])"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "tUgfuRf52rGv"
+   },
+   "source": [
+    "In the same manner any `awkward_zipper.NanoAOD.nested_index_items` and `awkward_zipper.NanoAOD.special_items` are constructed, if the necessary branches are available. You can find all these functions at `awkward_zipper.kernels`"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "Ft7nW34C2Vad"
+   },
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "5Z037oGc2XdX"
+   },
+   "source": [
+    "## These fields are then grouped by name, where if:"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "KF2qrlxj2gCy"
+   },
+   "source": [
+    "one branch exists named name and no branches start with name_, it gets interpreted as a single flat array;"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 434
+    },
+    "id": "-dHsEYPQ2sOy",
+    "outputId": "d388ff60-c2c9-4406-876d-a734db453c7c"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<pre>[1,\n",
+       " 1,\n",
+       " 1,\n",
+       " 1,\n",
+       " 1,\n",
+       " 1,\n",
+       " 1,\n",
+       " 1,\n",
+       " 1,\n",
+       " 1,\n",
+       " ...,\n",
+       " 1,\n",
+       " 1,\n",
+       " 1,\n",
+       " 1,\n",
+       " 1,\n",
+       " 1,\n",
+       " 1,\n",
+       " 1,\n",
+       " 1]\n",
+       "--------------------------------------------------\n",
+       "backend: cpu\n",
+       "nbytes: 160 B\n",
+       "type: 40 * uint32[parameters={&quot;__doc__&quot;: &quot;run/i&quot;}]</pre>"
+      ],
+      "text/plain": [
+       "<Array [1, 1, 1, 1, 1, 1, ..., 1, 1, 1, 1, 1] type='40 * uint32[parameters=...'>"
+      ]
+     },
+     "execution_count": 54,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Example: Each event has only one Run Id. Interpreted flat array will look look like this:\n",
+    "result.run"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "odU4PCSQ2gIr"
+   },
+   "source": [
+    "one branch exists named name, one named n{name}, and no branches start with name_, it gets interpreted as a single jagged array;"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 434
+    },
+    "id": "f8u-_6HGta1B",
+    "outputId": "6625347c-f33f-4e82-ea88-f2f5b2a52f35"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<pre>[[1.01, 1.26, 0.99, 0.791],\n",
+       " [2.06, 0.872, 0.535, 0.962],\n",
+       " [1.07, 0.887, 0.933, 1.02],\n",
+       " [0.833, 0.827, 1.15, 1.1],\n",
+       " [0.936, 0.622, 1.04, 1.17],\n",
+       " [1.17, 1, 0.86, 0.978],\n",
+       " [1.12, 1.59, 0.906, 0.688],\n",
+       " [0.946, 0.922, 1.04, 0.997],\n",
+       " [0.88, 0.855, 1.09, 0.811],\n",
+       " [0.854, 0.518, 1.11, 1.16],\n",
+       " ...,\n",
+       " [0.906, 0.687, 1.07, 1.18],\n",
+       " [0.917, 0.977, 1.07, 1.01],\n",
+       " [0.858, 0.812, 1.11, 0.841],\n",
+       " [0.884, 1, 1.09, 1],\n",
+       " [0.919, 0.848, 1.07, 1.08],\n",
+       " [0.953, 1.02, 1.04, 0.968],\n",
+       " [0.946, 1, 1.04, 1],\n",
+       " [1.08, 2.17, 0.932, 0.57],\n",
+       " [0.856, 1.41, 1.12, 0.761]]\n",
+       "-------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n",
+       "backend: cpu\n",
+       "nbytes: 968 B\n",
+       "type: 40 * [var * float32, parameters={&quot;__doc__&quot;: &quot;PS weights (w_var / w_nominal); [0] is ISR=0.5 FSR=1; [1] is ISR=1 FSR=0.5; [2] is ISR=2 FSR=1; [3] is ISR=1 FSR=2 &quot;}]</pre>"
+      ],
+      "text/plain": [
+       "<Array [[1.01, 1.26, 0.99, 0.791], ..., [...]] type='40 * [var * float32, p...'>"
+      ]
+     },
+     "execution_count": 55,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Example: Each event has a flat array of PS Weights. Interpreted single jagged array will look look like this:\n",
+    "result.PSWeight"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "zFUxVZvr2z3A"
+   },
+   "source": [
+    "no branch exists named {name} and many branches start with name_*, they get interpreted as a flat table; or"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 627
+    },
+    "id": "G1k1r41w2Zbv",
+    "outputId": "067ef6ce-d74a-40d6-cfdd-1560b19ef7b0"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<pre>[{id2: -1, x1: 0.214, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: 1, ...},\n",
+       " {id2: 1, x1: 0.0142, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: -1, ...},\n",
+       " {id2: 21, x1: 0.00564, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: -1, ...},\n",
+       " {id2: -1, x1: 0.00173, xpdf2: 0, xpdf1: 0, weight: 2.58e+04, id1: 21, ...},\n",
+       " {id2: 1, x1: 0.0432, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: 21, ...},\n",
+       " {id2: -4, x1: 0.00337, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: 4, ...},\n",
+       " {id2: 2, x1: 0.0051, xpdf2: 0, xpdf1: 0, weight: -2.63e+04, id1: 2, ...},\n",
+       " {id2: 2, x1: 0.000154, xpdf2: 0, xpdf1: 0, weight: 2.61e+04, id1: -2, ...},\n",
+       " {id2: -2, x1: 0.0541, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: 2, ...},\n",
+       " {id2: -1, x1: 0.011, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: 1, ...},\n",
+       " ...,\n",
+       " {id2: -1, x1: 0.0069, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: 1, ...},\n",
+       " {id2: 2, x1: 0.000121, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: -2, ...},\n",
+       " {id2: 21, x1: 0.229, xpdf2: 0, xpdf1: 0, weight: -2.63e+04, id1: 2, ...},\n",
+       " {id2: -1, x1: 0.00506, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: 1, ...},\n",
+       " {id2: -2, x1: 0.00608, xpdf2: 0, xpdf1: 0, weight: -2.63e+04, id1: 2, ...},\n",
+       " {id2: 2, x1: 0.000411, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: -2, ...},\n",
+       " {id2: 1, x1: 0.0004, xpdf2: 0, xpdf1: 0, weight: -2.63e+04, id1: -1, ...},\n",
+       " {id2: -2, x1: 0.184, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: 2, ...},\n",
+       " {id2: -1, x1: 0.00268, xpdf2: 0, xpdf1: 0, weight: -2.63e+04, id1: 1, ...}]\n",
+       "--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n",
+       "backend: cpu\n",
+       "nbytes: 1.4 kB\n",
+       "type: 40 * NanoCollection[\n",
+       "    id2: int32[parameters={&quot;__doc__&quot;: &quot;id of second parton&quot;}],\n",
+       "    x1: float32[parameters={&quot;__doc__&quot;: &quot;x1 fraction of proton momentum carried by the first parton&quot;}],\n",
+       "    xpdf2: float32[parameters={&quot;__doc__&quot;: &quot;x*pdf(x) for the second parton&quot;}],\n",
+       "    xpdf1: float32[parameters={&quot;__doc__&quot;: &quot;x*pdf(x) for the first parton&quot;}],\n",
+       "    weight: float32[parameters={&quot;__doc__&quot;: &quot;MC generator weight&quot;}],\n",
+       "    id1: int32[parameters={&quot;__doc__&quot;: &quot;id of first parton&quot;}],\n",
+       "    x2: float32[parameters={&quot;__doc__&quot;: &quot;x2 fraction of proton momentum carried by the second parton&quot;}],\n",
+       "    binvar: float32[parameters={&quot;__doc__&quot;: &quot;MC generation binning value&quot;}],\n",
+       "    scalePDF: float32[parameters={&quot;__doc__&quot;: &quot;Q2 scale for PDF&quot;}], \n",
+       "parameters={&quot;collection_name&quot;: &quot;Generator&quot;}]</pre>"
+      ],
+      "text/plain": [
+       "<NanoCollectionArray [{id2: -1, x1: 0.214, ...}, ..., {...}] type='40 * Nan...'>"
+      ]
+     },
+     "execution_count": 47,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Example: Each event has a SINGLE Generator. Each Generator consists of a record of Generator parameters. These parameters can be scalars or flat arrays. Interpreted flat table will look look like this:\n",
+    "result.Generator"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "qjbnG49K23xS"
+   },
+   "source": [
+    "one branch exists named n{name} and many branches start with name_*, they interpreted as a jagged table."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 1000
+    },
+    "id": "ODRiS7N-24zS",
+    "outputId": "dc315246-664e-4691-a917-04411d812830"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<pre>[[Jet, ...],\n",
+       " [Jet, ...],\n",
+       " [Jet, ...],\n",
+       " [Jet, ...],\n",
+       " [Jet, ...],\n",
+       " [Jet, ..., Jet],\n",
+       " [Jet, ...],\n",
+       " [Jet, ...],\n",
+       " [{cleanmask: 1, pt: 20.4, jetId: 6, neEmEF: 0.139, phi: 1.54, mass: ..., ...}],\n",
+       " [Jet, ..., Jet],\n",
+       " ...,\n",
+       " [Jet, ...],\n",
+       " [Jet, ..., Jet],\n",
+       " [Jet, ...],\n",
+       " [Jet, ...],\n",
+       " [Jet, ...],\n",
+       " [Jet, ...],\n",
+       " [{cleanmask: 0, pt: 22.1, jetId: 6, neEmEF: 0.391, phi: 2.11, mass: ..., ...}],\n",
+       " [Jet, ...],\n",
+       " [Jet, ...]]\n",
+       "-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n",
+       "backend: cpu\n",
+       "nbytes: 43.4 kB\n",
+       "type: 40 * var * Jet[\n",
+       "    cleanmask: uint8[parameters={&quot;__doc__&quot;: &quot;simple cleaning mask with priority to leptons&quot;}],\n",
+       "    pt: float32[parameters={&quot;__doc__&quot;: &quot;pt&quot;}],\n",
+       "    jetId: int32[parameters={&quot;__doc__&quot;: &quot;Jet ID flags bit1 is loose (always false in 2017 since it does not exist), bit2 is tight, bit3 is tightLepVeto&quot;}],\n",
+       "    neEmEF: float32[parameters={&quot;__doc__&quot;: &quot;neutral Electromagnetic Energy Fraction&quot;}],\n",
+       "    phi: float32[parameters={&quot;__doc__&quot;: &quot;phi&quot;}],\n",
+       "    mass: float32[parameters={&quot;__doc__&quot;: &quot;mass&quot;}],\n",
+       "    puId: int32[parameters={&quot;__doc__&quot;: &quot;Pilup ID flags&quot;}],\n",
+       "    hadronFlavour: int32[parameters={&quot;__doc__&quot;: &quot;flavour from hadron ghost clustering&quot;}],\n",
+       "    genJetIdx: int32[parameters={&quot;__doc__&quot;: &quot;index of matched gen jet&quot;}],\n",
+       "    qgl: float32[parameters={&quot;__doc__&quot;: &quot;Quark vs Gluon likelihood discriminator&quot;}],\n",
+       "    area: float32[parameters={&quot;__doc__&quot;: &quot;jet catchment area, for JECs&quot;}],\n",
+       "    eta: float32[parameters={&quot;__doc__&quot;: &quot;eta&quot;}],\n",
+       "    neHEF: float32[parameters={&quot;__doc__&quot;: &quot;neutral Hadron Energy Fraction&quot;}],\n",
+       "    muonIdx1: int32[parameters={&quot;__doc__&quot;: &quot;index of first matching muon&quot;}],\n",
+       "    nMuons: int32[parameters={&quot;__doc__&quot;: &quot;number of muons in the jet&quot;}],\n",
+       "    btagDeepC: float32[parameters={&quot;__doc__&quot;: &quot;DeepCSV charm btag discriminator&quot;}],\n",
+       "    jercCHF: float32[parameters={&quot;__doc__&quot;: &quot;Charged Hadron Energy Fraction with the JERC group definition&quot;}],\n",
+       "    partonFlavour: int32[parameters={&quot;__doc__&quot;: &quot;flavour from parton matching&quot;}],\n",
+       "    muonSubtrFactor: float32[parameters={&quot;__doc__&quot;: &quot;1-(muon-subtracted raw pt)/(raw pt)&quot;}],\n",
+       "    btagCSVV2: float32[parameters={&quot;__doc__&quot;: &quot; pfCombinedInclusiveSecondaryVertexV2 b-tag discriminator (aka CSVV2)&quot;}],\n",
+       "    rawFactor: float32[parameters={&quot;__doc__&quot;: &quot;1 - Factor to get back to raw pT&quot;}],\n",
+       "    btagDeepFlavB: float32[parameters={&quot;__doc__&quot;: &quot;DeepFlavour b+bb+lepb tag discriminator&quot;}],\n",
+       "    bRegRes: float32[parameters={&quot;__doc__&quot;: &quot;res on pt corrected with b-jet regression&quot;}],\n",
+       "    nConstituents: int32[parameters={&quot;__doc__&quot;: &quot;Number of particles in the jet&quot;}],\n",
+       "    jercCHPUF: float32[parameters={&quot;__doc__&quot;: &quot;Pileup Charged Hadron Energy Fraction with the JERC group definition&quot;}],\n",
+       "    muEF: float32[parameters={&quot;__doc__&quot;: &quot;muon Energy Fraction&quot;}],\n",
+       "    nElectrons: int32[parameters={&quot;__doc__&quot;: &quot;number of electrons in the jet&quot;}],\n",
+       "    btagDeepFlavC: float32[parameters={&quot;__doc__&quot;: &quot;DeepFlavour charm tag discriminator&quot;}],\n",
+       "    electronIdx1: int32[parameters={&quot;__doc__&quot;: &quot;index of first matching electron&quot;}],\n",
+       "    electronIdx2: int32[parameters={&quot;__doc__&quot;: &quot;index of second matching electron&quot;}],\n",
+       "    chEmEF: float32[parameters={&quot;__doc__&quot;: &quot;charged Electromagnetic Energy Fraction&quot;}],\n",
+       "    muonIdx2: int32[parameters={&quot;__doc__&quot;: &quot;index of second matching muon&quot;}],\n",
+       "    btagDeepB: float32[parameters={&quot;__doc__&quot;: &quot;DeepCSV b+bb tag discriminator&quot;}],\n",
+       "    btagCMVA: float32[parameters={&quot;__doc__&quot;: &quot;CMVA V2 btag discriminator&quot;}],\n",
+       "    chHEF: float32[parameters={&quot;__doc__&quot;: &quot;charged Hadron Energy Fraction&quot;}],\n",
+       "    bRegCorr: float32[parameters={&quot;__doc__&quot;: &quot;pt correction for b-jet energy regression&quot;}],\n",
+       "    electronIdx1G: int64[parameters={&quot;__doc__&quot;: &quot;global index of first matching electron&quot;}],\n",
+       "    muonIdx1G: int64[parameters={&quot;__doc__&quot;: &quot;global index of first matching muon&quot;}],\n",
+       "    muonIdxG: [var * int64, parameters={&quot;__doc__&quot;: &quot;nested from global index of first matching muon and global index of second matching muon&quot;}],\n",
+       "    electronIdxG: [var * int64, parameters={&quot;__doc__&quot;: &quot;nested from global index of first matching electron and global index of second matching electron&quot;}],\n",
+       "    electronIdx2G: int64[parameters={&quot;__doc__&quot;: &quot;global index of second matching electron&quot;}],\n",
+       "    muonIdx2G: int64[parameters={&quot;__doc__&quot;: &quot;global index of second matching muon&quot;}],\n",
+       "    genJetIdxG: int64[parameters={&quot;__doc__&quot;: &quot;global index of matched gen jet&quot;}], \n",
+       "parameters={&quot;collection_name&quot;: &quot;Jet&quot;, &quot;__doc__&quot;: &quot;slimmedJets, i.e. ak4 PFJets CHS with JECs applied, after basic selection (pt &gt; 15)&quot;}]</pre>"
+      ],
+      "text/plain": [
+       "<JetArray [[Jet, ..., Jet], ...] type='40 * var * Jet[cleanmask: uint8[para...'>"
+      ]
+     },
+     "execution_count": 56,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# Example: Each event has an array of Jets. Each Jet consists of a record of Jet parameters. These parameters can be scalars or flat arrays. Interpreted jagged table will look look like this:\n",
+    "result.Jet"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "WpXUsMBqvsf6"
+   },
+   "source": [
+    "Finally, all collections are then zipped into one NanoEvents record and returned."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "_8CPLNKbrwNm"
+   },
+   "source": [
+    "Final result:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 434
+    },
+    "id": "6ooWejwMrgxc",
+    "outputId": "5ba382f3-e4c7-4d9f-a468-feb59d671129"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<pre>[{btagWeight: {CSVV2: 0.951, ...}, GenVisTau: [GenVisTau, ...], ...},\n",
+       " {btagWeight: {CSVV2: 0.996, ...}, GenVisTau: [], CorrT1METJet: [...], ...},\n",
+       " {btagWeight: {CSVV2: 1.01, ...}, GenVisTau: [], CorrT1METJet: [...], ...},\n",
+       " {btagWeight: {CSVV2: 1.55, ...}, GenVisTau: [{...}], CorrT1METJet: [...], ...},\n",
+       " {btagWeight: {CSVV2: 0.805, ...}, GenVisTau: [], CorrT1METJet: [...], ...},\n",
+       " {btagWeight: {CSVV2: 0.84, ...}, GenVisTau: [{...}], CorrT1METJet: [...], ...},\n",
+       " {btagWeight: {CSVV2: 0.997, ...}, GenVisTau: [], CorrT1METJet: [], ...},\n",
+       " {btagWeight: {CSVV2: 1, DeepCSVB: 1}, GenVisTau: [], CorrT1METJet: [...], ...},\n",
+       " {btagWeight: {CSVV2: 1, DeepCSVB: 1}, GenVisTau: [], CorrT1METJet: [...], ...},\n",
+       " {btagWeight: {CSVV2: 1.03, ...}, GenVisTau: [], CorrT1METJet: [...], ...},\n",
+       " ...,\n",
+       " {btagWeight: {CSVV2: 0.804, ...}, GenVisTau: [{...}], CorrT1METJet: ..., ...},\n",
+       " {btagWeight: {CSVV2: 1, DeepCSVB: 1}, GenVisTau: [], CorrT1METJet: [...], ...},\n",
+       " {btagWeight: {CSVV2: 0.97, ...}, GenVisTau: [], CorrT1METJet: [...], ...},\n",
+       " {btagWeight: {CSVV2: 1.05, ...}, GenVisTau: [{...}], CorrT1METJet: [...], ...},\n",
+       " {btagWeight: {CSVV2: 1, DeepCSVB: 1}, GenVisTau: [{...}], ...},\n",
+       " {btagWeight: {CSVV2: 0.954, ...}, GenVisTau: [], CorrT1METJet: [...], ...},\n",
+       " {btagWeight: {CSVV2: 1, DeepCSVB: 1}, GenVisTau: [], CorrT1METJet: [...], ...},\n",
+       " {btagWeight: {CSVV2: 1, DeepCSVB: 1}, GenVisTau: [], CorrT1METJet: [...], ...},\n",
+       " {btagWeight: {CSVV2: 1, DeepCSVB: 1}, GenVisTau: [{...}], ...}]\n",
+       "--------------------------------------------------------------------------------\n",
+       "backend: cpu\n",
+       "nbytes: 192.0 kB\n",
+       "type: 40 * event</pre>"
+      ],
+      "text/plain": [
+       "<NanoEventsArray [<NanoAOD event>, ..., <NanoAOD event>] type='40 * event'>"
+      ]
+     },
+     "execution_count": 57,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "result"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 434
+    },
+    "id": "u_NFN-lw4-Si",
+    "outputId": "9b7a3b19-9f19-46fe-c008-1ddf14426b4c"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<pre>[[11.7, 8.94, 2.69, 3.81, 4.23],\n",
+       " [17, 6.25, 6.07, 5, 3.89, 4, 4.31, 4.55],\n",
+       " [12.4, 5.99, 2.78, 5.88, 4.64],\n",
+       " [5.82, 6.14, 2.63],\n",
+       " [12.5, 6.99, 4.14, 3.24, 3.68],\n",
+       " [6.9, 7.5, 3.17, 6.78, 5.36, 4.16, 4.66, 4.62],\n",
+       " [9.49, 0.111, 7.05, 4.96],\n",
+       " [6.51, 4.98, 6.54, 5.12],\n",
+       " [3.69],\n",
+       " [4.89, 5.16, 7.83, 8.38, 6.3, 4.62, 4.41, 2.9, 3.54],\n",
+       " ...,\n",
+       " [2.28, 3.78],\n",
+       " [4.92, 4.43, 4.37, 3.54],\n",
+       " [7.45, 6.52, 7.59, 4.74, 4.27, 4.32, 5.01, 4, 4.23],\n",
+       " [4.83, 5.8, 4.85],\n",
+       " [3.62, 3.87],\n",
+       " [6.04, 4.84, 4.29],\n",
+       " [5.33],\n",
+       " [10.8, 9.75, 6.52, 5.45, 3.94, 3.42],\n",
+       " [3.88, 4.47]]\n",
+       "--------------------------------------------------------\n",
+       "backend: cpu\n",
+       "nbytes: 1.1 kB\n",
+       "type: 40 * var * float32[parameters={&quot;__doc__&quot;: &quot;mass&quot;}]</pre>"
+      ],
+      "text/plain": [
+       "<Array [[11.7, 8.94, ..., 3.81, 4.23], ...] type='40 * var * float32[parame...'>"
+      ]
+     },
+     "execution_count": 22,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "result.Jet.mass"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "lF3hLZ7w2741"
+   },
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "l2Tw0AG7lWtF"
+   },
+   "source": [
+    "## Zipper with virtual arrays"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "rClhlEKCOeqI"
+   },
+   "source": [
+    "Let's load the same root file but as virtual arrays. Virtual arrays don't load the data from disk (or in other words don't materialize the data)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "C1rpDTw4MVuU"
+   },
+   "outputs": [],
+   "source": [
+    "# Create a TTree from root\n",
+    "tree = uproot.open(\"nano_dy.root\")[\"Events\"]\n",
+    "# to load virtual arrays\n",
+    "access_log = []  # which of the data was materialized\n",
+    "# TTree -> awkward.Array[awkward.Record[str, awkward.Array]]\n",
+    "array = tree.arrays(virtual=True, ak_add_doc=True, access_log=access_log)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "gHAv_4-GmtRU"
+   },
+   "source": [
+    "Calling zipper"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "jsp649qomsJa",
+    "outputId": "e55cb608-75cf-4a92-f019-0a24ebf845ee"
+   },
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "<ipython-input-19-76941848e4f5>:2: RuntimeWarning: Missing cross-reference index for LowPtElectron_electronIdx => Electron\n",
+      "  result = restructure(array)\n",
+      "<ipython-input-19-76941848e4f5>:2: RuntimeWarning: Missing cross-reference index for LowPtElectron_genPartIdx => GenPart\n",
+      "  result = restructure(array)\n",
+      "<ipython-input-19-76941848e4f5>:2: RuntimeWarning: Missing cross-reference index for LowPtElectron_photonIdx => Photon\n",
+      "  result = restructure(array)\n",
+      "<ipython-input-19-76941848e4f5>:2: RuntimeWarning: Missing cross-reference index for FatJet_genJetAK8Idx => GenJetAK8\n",
+      "  result = restructure(array)\n"
+     ]
+    }
+   ],
+   "source": [
+    "restructure = NanoAOD(version=\"latest\")\n",
+    "result = restructure(array)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "uvtQDez4md3g",
+    "outputId": "339b9500-b443-495d-86a6-82a5ed991601"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "[]"
+      ]
+     },
+     "execution_count": 51,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "access_log"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 434
+    },
+    "id": "bu-9pM__l_lZ",
+    "outputId": "f0bb369c-c9e9-4095-eda7-b2b874490844"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<pre>[{btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},\n",
+       " {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},\n",
+       " {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},\n",
+       " {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},\n",
+       " {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},\n",
+       " {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},\n",
+       " {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},\n",
+       " {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},\n",
+       " {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},\n",
+       " {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},\n",
+       " ...,\n",
+       " {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},\n",
+       " {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},\n",
+       " {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},\n",
+       " {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},\n",
+       " {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},\n",
+       " {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},\n",
+       " {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},\n",
+       " {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},\n",
+       " {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...}]\n",
+       "----------------------------------------------------------------------\n",
+       "backend: cpu\n",
+       "nbytes: unknown\n",
+       "type: 40 * event</pre>"
+      ],
+      "text/plain": [
+       "<NanoEventsArray [<NanoAOD event>, ..., <NanoAOD event>] type='40 * event'>"
+      ]
+     },
+     "execution_count": 28,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "result"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 1000
+    },
+    "id": "wIoqL9vqx_NG",
+    "outputId": "85cdc8ea-f1ea-4a60-d3a2-d3cfc115a0bd"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<pre>[??,\n",
+       " ??,\n",
+       " ??,\n",
+       " ??,\n",
+       " ??,\n",
+       " ??,\n",
+       " ??,\n",
+       " ??,\n",
+       " ??,\n",
+       " ??,\n",
+       " ...,\n",
+       " ??,\n",
+       " ??,\n",
+       " ??,\n",
+       " ??,\n",
+       " ??,\n",
+       " ??,\n",
+       " ??,\n",
+       " ??,\n",
+       " ??]\n",
+       "-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n",
+       "backend: cpu\n",
+       "nbytes: unknown\n",
+       "type: 40 * var * Jet[\n",
+       "    cleanmask: uint8[parameters={&quot;__doc__&quot;: &quot;simple cleaning mask with priority to leptons&quot;}],\n",
+       "    pt: float32[parameters={&quot;__doc__&quot;: &quot;pt&quot;}],\n",
+       "    jetId: int32[parameters={&quot;__doc__&quot;: &quot;Jet ID flags bit1 is loose (always false in 2017 since it does not exist), bit2 is tight, bit3 is tightLepVeto&quot;}],\n",
+       "    neEmEF: float32[parameters={&quot;__doc__&quot;: &quot;neutral Electromagnetic Energy Fraction&quot;}],\n",
+       "    phi: float32[parameters={&quot;__doc__&quot;: &quot;phi&quot;}],\n",
+       "    mass: float32[parameters={&quot;__doc__&quot;: &quot;mass&quot;}],\n",
+       "    puId: int32[parameters={&quot;__doc__&quot;: &quot;Pilup ID flags&quot;}],\n",
+       "    hadronFlavour: int32[parameters={&quot;__doc__&quot;: &quot;flavour from hadron ghost clustering&quot;}],\n",
+       "    genJetIdx: int32[parameters={&quot;__doc__&quot;: &quot;index of matched gen jet&quot;}],\n",
+       "    qgl: float32[parameters={&quot;__doc__&quot;: &quot;Quark vs Gluon likelihood discriminator&quot;}],\n",
+       "    area: float32[parameters={&quot;__doc__&quot;: &quot;jet catchment area, for JECs&quot;}],\n",
+       "    eta: float32[parameters={&quot;__doc__&quot;: &quot;eta&quot;}],\n",
+       "    neHEF: float32[parameters={&quot;__doc__&quot;: &quot;neutral Hadron Energy Fraction&quot;}],\n",
+       "    muonIdx1: int32[parameters={&quot;__doc__&quot;: &quot;index of first matching muon&quot;}],\n",
+       "    nMuons: int32[parameters={&quot;__doc__&quot;: &quot;number of muons in the jet&quot;}],\n",
+       "    btagDeepC: float32[parameters={&quot;__doc__&quot;: &quot;DeepCSV charm btag discriminator&quot;}],\n",
+       "    jercCHF: float32[parameters={&quot;__doc__&quot;: &quot;Charged Hadron Energy Fraction with the JERC group definition&quot;}],\n",
+       "    partonFlavour: int32[parameters={&quot;__doc__&quot;: &quot;flavour from parton matching&quot;}],\n",
+       "    muonSubtrFactor: float32[parameters={&quot;__doc__&quot;: &quot;1-(muon-subtracted raw pt)/(raw pt)&quot;}],\n",
+       "    btagCSVV2: float32[parameters={&quot;__doc__&quot;: &quot; pfCombinedInclusiveSecondaryVertexV2 b-tag discriminator (aka CSVV2)&quot;}],\n",
+       "    rawFactor: float32[parameters={&quot;__doc__&quot;: &quot;1 - Factor to get back to raw pT&quot;}],\n",
+       "    btagDeepFlavB: float32[parameters={&quot;__doc__&quot;: &quot;DeepFlavour b+bb+lepb tag discriminator&quot;}],\n",
+       "    bRegRes: float32[parameters={&quot;__doc__&quot;: &quot;res on pt corrected with b-jet regression&quot;}],\n",
+       "    nConstituents: int32[parameters={&quot;__doc__&quot;: &quot;Number of particles in the jet&quot;}],\n",
+       "    jercCHPUF: float32[parameters={&quot;__doc__&quot;: &quot;Pileup Charged Hadron Energy Fraction with the JERC group definition&quot;}],\n",
+       "    muEF: float32[parameters={&quot;__doc__&quot;: &quot;muon Energy Fraction&quot;}],\n",
+       "    nElectrons: int32[parameters={&quot;__doc__&quot;: &quot;number of electrons in the jet&quot;}],\n",
+       "    btagDeepFlavC: float32[parameters={&quot;__doc__&quot;: &quot;DeepFlavour charm tag discriminator&quot;}],\n",
+       "    electronIdx1: int32[parameters={&quot;__doc__&quot;: &quot;index of first matching electron&quot;}],\n",
+       "    electronIdx2: int32[parameters={&quot;__doc__&quot;: &quot;index of second matching electron&quot;}],\n",
+       "    chEmEF: float32[parameters={&quot;__doc__&quot;: &quot;charged Electromagnetic Energy Fraction&quot;}],\n",
+       "    muonIdx2: int32[parameters={&quot;__doc__&quot;: &quot;index of second matching muon&quot;}],\n",
+       "    btagDeepB: float32[parameters={&quot;__doc__&quot;: &quot;DeepCSV b+bb tag discriminator&quot;}],\n",
+       "    btagCMVA: float32[parameters={&quot;__doc__&quot;: &quot;CMVA V2 btag discriminator&quot;}],\n",
+       "    chHEF: float32[parameters={&quot;__doc__&quot;: &quot;charged Hadron Energy Fraction&quot;}],\n",
+       "    bRegCorr: float32[parameters={&quot;__doc__&quot;: &quot;pt correction for b-jet energy regression&quot;}],\n",
+       "    electronIdx1G: int64[parameters={&quot;__doc__&quot;: &quot;global index of first matching electron&quot;}],\n",
+       "    muonIdx1G: int64[parameters={&quot;__doc__&quot;: &quot;global index of first matching muon&quot;}],\n",
+       "    muonIdxG: [var * int64, parameters={&quot;__doc__&quot;: &quot;nested from global index of first matching muon and global index of second matching muon&quot;}],\n",
+       "    electronIdxG: [var * int64, parameters={&quot;__doc__&quot;: &quot;nested from global index of first matching electron and global index of second matching electron&quot;}],\n",
+       "    electronIdx2G: int64[parameters={&quot;__doc__&quot;: &quot;global index of second matching electron&quot;}],\n",
+       "    muonIdx2G: int64[parameters={&quot;__doc__&quot;: &quot;global index of second matching muon&quot;}],\n",
+       "    genJetIdxG: int64[parameters={&quot;__doc__&quot;: &quot;global index of matched gen jet&quot;}], \n",
+       "parameters={&quot;collection_name&quot;: &quot;Jet&quot;, &quot;__doc__&quot;: &quot;slimmedJets, i.e. ak4 PFJets CHS with JECs applied, after basic selection (pt &gt; 15)&quot;}]</pre>"
+      ],
+      "text/plain": [
+       "<JetArray [??, ??, ??, ??, ..., ??, ??, ??, ??] type='40 * var * Jet[cleanm...'>"
+      ]
+     },
+     "execution_count": 30,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "result.Jet"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 957
+    },
+    "id": "Yoqv6woll9UZ",
+    "outputId": "11136928-b717-4f45-beae-bb09a663a19a"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<pre>[{cleanmask: ??, pt: ??, jetId: ??, neEmEF: ??, phi: ??, mass: ??, ...},\n",
+       " {cleanmask: ??, pt: ??, jetId: ??, neEmEF: ??, phi: ??, mass: ??, ...},\n",
+       " {cleanmask: ??, pt: ??, jetId: ??, neEmEF: ??, phi: ??, mass: ??, ...},\n",
+       " {cleanmask: ??, pt: ??, jetId: ??, neEmEF: ??, phi: ??, mass: ??, ...},\n",
+       " {cleanmask: ??, pt: ??, jetId: ??, neEmEF: ??, phi: ??, mass: ??, ...}]\n",
+       "----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n",
+       "backend: cpu\n",
+       "nbytes: unknown\n",
+       "type: 5 * Jet[\n",
+       "    cleanmask: uint8[parameters={&quot;__doc__&quot;: &quot;simple cleaning mask with priority to leptons&quot;}],\n",
+       "    pt: float32[parameters={&quot;__doc__&quot;: &quot;pt&quot;}],\n",
+       "    jetId: int32[parameters={&quot;__doc__&quot;: &quot;Jet ID flags bit1 is loose (always false in 2017 since it does not exist), bit2 is tight, bit3 is tightLepVeto&quot;}],\n",
+       "    neEmEF: float32[parameters={&quot;__doc__&quot;: &quot;neutral Electromagnetic Energy Fraction&quot;}],\n",
+       "    phi: float32[parameters={&quot;__doc__&quot;: &quot;phi&quot;}],\n",
+       "    mass: float32[parameters={&quot;__doc__&quot;: &quot;mass&quot;}],\n",
+       "    puId: int32[parameters={&quot;__doc__&quot;: &quot;Pilup ID flags&quot;}],\n",
+       "    hadronFlavour: int32[parameters={&quot;__doc__&quot;: &quot;flavour from hadron ghost clustering&quot;}],\n",
+       "    genJetIdx: int32[parameters={&quot;__doc__&quot;: &quot;index of matched gen jet&quot;}],\n",
+       "    qgl: float32[parameters={&quot;__doc__&quot;: &quot;Quark vs Gluon likelihood discriminator&quot;}],\n",
+       "    area: float32[parameters={&quot;__doc__&quot;: &quot;jet catchment area, for JECs&quot;}],\n",
+       "    eta: float32[parameters={&quot;__doc__&quot;: &quot;eta&quot;}],\n",
+       "    neHEF: float32[parameters={&quot;__doc__&quot;: &quot;neutral Hadron Energy Fraction&quot;}],\n",
+       "    muonIdx1: int32[parameters={&quot;__doc__&quot;: &quot;index of first matching muon&quot;}],\n",
+       "    nMuons: int32[parameters={&quot;__doc__&quot;: &quot;number of muons in the jet&quot;}],\n",
+       "    btagDeepC: float32[parameters={&quot;__doc__&quot;: &quot;DeepCSV charm btag discriminator&quot;}],\n",
+       "    jercCHF: float32[parameters={&quot;__doc__&quot;: &quot;Charged Hadron Energy Fraction with the JERC group definition&quot;}],\n",
+       "    partonFlavour: int32[parameters={&quot;__doc__&quot;: &quot;flavour from parton matching&quot;}],\n",
+       "    muonSubtrFactor: float32[parameters={&quot;__doc__&quot;: &quot;1-(muon-subtracted raw pt)/(raw pt)&quot;}],\n",
+       "    btagCSVV2: float32[parameters={&quot;__doc__&quot;: &quot; pfCombinedInclusiveSecondaryVertexV2 b-tag discriminator (aka CSVV2)&quot;}],\n",
+       "    rawFactor: float32[parameters={&quot;__doc__&quot;: &quot;1 - Factor to get back to raw pT&quot;}],\n",
+       "    btagDeepFlavB: float32[parameters={&quot;__doc__&quot;: &quot;DeepFlavour b+bb+lepb tag discriminator&quot;}],\n",
+       "    bRegRes: float32[parameters={&quot;__doc__&quot;: &quot;res on pt corrected with b-jet regression&quot;}],\n",
+       "    nConstituents: int32[parameters={&quot;__doc__&quot;: &quot;Number of particles in the jet&quot;}],\n",
+       "    jercCHPUF: float32[parameters={&quot;__doc__&quot;: &quot;Pileup Charged Hadron Energy Fraction with the JERC group definition&quot;}],\n",
+       "    muEF: float32[parameters={&quot;__doc__&quot;: &quot;muon Energy Fraction&quot;}],\n",
+       "    nElectrons: int32[parameters={&quot;__doc__&quot;: &quot;number of electrons in the jet&quot;}],\n",
+       "    btagDeepFlavC: float32[parameters={&quot;__doc__&quot;: &quot;DeepFlavour charm tag discriminator&quot;}],\n",
+       "    electronIdx1: int32[parameters={&quot;__doc__&quot;: &quot;index of first matching electron&quot;}],\n",
+       "    electronIdx2: int32[parameters={&quot;__doc__&quot;: &quot;index of second matching electron&quot;}],\n",
+       "    chEmEF: float32[parameters={&quot;__doc__&quot;: &quot;charged Electromagnetic Energy Fraction&quot;}],\n",
+       "    muonIdx2: int32[parameters={&quot;__doc__&quot;: &quot;index of second matching muon&quot;}],\n",
+       "    btagDeepB: float32[parameters={&quot;__doc__&quot;: &quot;DeepCSV b+bb tag discriminator&quot;}],\n",
+       "    btagCMVA: float32[parameters={&quot;__doc__&quot;: &quot;CMVA V2 btag discriminator&quot;}],\n",
+       "    chHEF: float32[parameters={&quot;__doc__&quot;: &quot;charged Hadron Energy Fraction&quot;}],\n",
+       "    bRegCorr: float32[parameters={&quot;__doc__&quot;: &quot;pt correction for b-jet energy regression&quot;}],\n",
+       "    electronIdx1G: int64[parameters={&quot;__doc__&quot;: &quot;global index of first matching electron&quot;}],\n",
+       "    muonIdx1G: int64[parameters={&quot;__doc__&quot;: &quot;global index of first matching muon&quot;}],\n",
+       "    muonIdxG: [var * int64, parameters={&quot;__doc__&quot;: &quot;nested from global index of first matching muon and global index of second matching muon&quot;}],\n",
+       "    electronIdxG: [var * int64, parameters={&quot;__doc__&quot;: &quot;nested from global index of first matching electron and global index of second matching electron&quot;}],\n",
+       "    electronIdx2G: int64[parameters={&quot;__doc__&quot;: &quot;global index of second matching electron&quot;}],\n",
+       "    muonIdx2G: int64[parameters={&quot;__doc__&quot;: &quot;global index of second matching muon&quot;}],\n",
+       "    genJetIdxG: int64[parameters={&quot;__doc__&quot;: &quot;global index of matched gen jet&quot;}], \n",
+       "parameters={&quot;collection_name&quot;: &quot;Jet&quot;, &quot;__doc__&quot;: &quot;slimmedJets, i.e. ak4 PFJets CHS with JECs applied, after basic selection (pt &gt; 15)&quot;}]</pre>"
+      ],
+      "text/plain": [
+       "<JetArray [Jet, ...] type='5 * Jet[cleanmask: uint8[parameters={\"__doc__\": ...'>"
+      ]
+     },
+     "execution_count": 31,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "result[0].Jet"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "yDcMOBodmwYq",
+    "outputId": "c9724398-c024-40b7-da3a-a9523f245a7d"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "[Accessed(branch='nJet', buffer_key=\"('<root>', 'nJet')-data\")]"
+      ]
+     },
+     "execution_count": 32,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "access_log"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 434
+    },
+    "id": "WqMr7PjgmfxA",
+    "outputId": "52ffd471-9c59-4471-e8f5-e26e33bcfc12"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<pre>[5,\n",
+       " 8,\n",
+       " 5,\n",
+       " 3,\n",
+       " 5,\n",
+       " 8,\n",
+       " 4,\n",
+       " 4,\n",
+       " 1,\n",
+       " 9,\n",
+       " ...,\n",
+       " 2,\n",
+       " 4,\n",
+       " 9,\n",
+       " 3,\n",
+       " 2,\n",
+       " 3,\n",
+       " 1,\n",
+       " 6,\n",
+       " 2]\n",
+       "--------------------------------------------------------------------------------------------------------------------------------\n",
+       "backend: cpu\n",
+       "nbytes: 160 B\n",
+       "type: 40 * uint32[parameters={&quot;__doc__&quot;: &quot;slimmedJets, i.e. ak4 PFJets CHS with JECs applied, after basic selection (pt &gt; 15)&quot;}]</pre>"
+      ],
+      "text/plain": [
+       "<Array [5, 8, 5, 3, 5, 8, ..., 2, 3, 1, 6, 2] type='40 * uint32[parameters=...'>"
+      ]
+     },
+     "execution_count": 34,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "array.nJet"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "keHwbaBGmm1K"
+   },
+   "source": [
+    "## Example calculation of a Z-peak"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "wzFnbttVlkIr"
+   },
+   "outputs": [],
+   "source": [
+    "zcands = awkward.combinations(result.Muon, 2)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "tAuBFo1um6GS",
+    "outputId": "ed29860f-32c8-4892-9545-c6411a67a488"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "[Accessed(branch='nMuon', buffer_key=\"('<root>', 'nMuon')-data\")]"
+      ]
+     },
+     "execution_count": 11,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "access_log"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "129j6Ju5llf4"
+   },
+   "outputs": [],
+   "source": [
+    "# count invariant mass\n",
+    "mass = awkward.flatten((zcands[\"0\"] + zcands[\"1\"]).mass)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "qZIRYSjLoh6f"
+   },
+   "source": [
+    "We can see that for this, 4-vector coordinates were loaded, which were used to add the combinations"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "Vfu6gt-Em8Aj",
+    "outputId": "579c76c6-51f4-4ad5-cb3b-4bf41803e12f"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "[Accessed(branch='nMuon', buffer_key=\"('<root>', 'nMuon')-data\"),\n",
+       " Accessed(branch='Muon_pt', buffer_key=\"('<root>', 'Muon_pt', None)-data\"),\n",
+       " Accessed(branch='Muon_phi', buffer_key=\"('<root>', 'Muon_phi', None)-data\"),\n",
+       " Accessed(branch='Muon_eta', buffer_key=\"('<root>', 'Muon_eta', None)-data\"),\n",
+       " Accessed(branch='Muon_mass', buffer_key=\"('<root>', 'Muon_mass', None)-data\"),\n",
+       " Accessed(branch='Muon_charge', buffer_key=\"('<root>', 'Muon_charge', None)-data\")]"
+      ]
+     },
+     "execution_count": 13,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "access_log"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "GdB-drMEnWG6"
+   },
+   "outputs": [],
+   "source": [
+    "%%capture\n",
+    "!pip install \"hist[plot]\""
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 466
+    },
+    "id": "HlcOtgfHlm6S",
+    "outputId": "537652fb-b9de-4826-a238-8274b6ded98e"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "[StairsArtists(stairs=<matplotlib.patches.StepPatch object at 0x7b4d8583b350>, errorbar=<ErrorbarContainer object of 3 artists>, legend_artist=<ErrorbarContainer object of 3 artists>)]"
+      ]
+     },
+     "execution_count": 25,
+     "metadata": {},
+     "output_type": "execute_result"
+    },
+    {
+     "data": {
+      "image/png": "iVBORw0KGgoAAAANSUhEUgAAAhYAAAGwCAYAAAD16iy9AAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjEwLjAsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvlHJYcgAAAAlwSFlzAAAPYQAAD2EBqD+naQAAH9xJREFUeJzt3X901fV9+PFXCCSAEqhagSg/1UH9ARUsFNttVjOFw/wxPUdKcUVr3ZFiJ2N1wqyyljpou7pj1aPW4XBbVcQq7vhbaZE6EQXFaW2ZOqxQATspBEQTCO/vH/2SEiAkN7wTcvHxOOee47353M/n/c7nvuOTm3tzS1JKKQAAMuhwoAcAABw8hAUAkI2wAACyERYAQDbCAgDIRlgAANkICwAgm45tfcAdO3bEu+++G926dYuSkpK2PjwA0AIppdi8eXNUVlZGhw6NPy/R5mHx7rvvRp8+fdr6sABABqtXr46jjz660a+3eVh069YtIn4/sIqKirY+PADQAtXV1dGnT5/6/483ps3DYuevPyoqKoQFABSZpl7G4MWbAEA2wgIAyEZYAADZCAsAIBthAQBkIywAgGyEBQCQjbAAALIRFgBANsICAMhGWAAA2QgLACAbYQEAZCMsAIBshAUAkI2wgBbaWrs9+k97JPpPeyS21m4/0MMBaBeEBQCQjbAAALIRFgBANsICAMhGWAAA2QgLACAbYQEAZCMsAIBshAUAkI2wAACyERYAQDbCAgDIRlgAANkICwAgG2EBAGQjLACAbIQFAJCNsAAAshEWAEA2wgIAyEZYAADZCAsAIBthAQBkIywAgGyEBQCQjbAAALIRFgBANsICAMhGWAAA2QgLACAbYQEAZCMsAIBshAUAkI2wAACyERYAQDbCAgDIRlgAANkICwAgG2EBAGQjLACAbIQFAJCNsAAAshEWAEA2wgIAyGa/wmL27NlRUlISU6ZMyTQcAKCYtTgsXnzxxbj99ttjyJAhOccDABSxFoXFli1bYsKECXHHHXfEJz7xiX1uW1NTE9XV1Q0uAMDBqUVhMXny5Bg7dmxUVVU1ue2sWbOie/fu9Zc+ffq05JAAQBEoOCzuvffeeOmll2LWrFnN2n769OmxadOm+svq1asLHiQAUBw6FrLx6tWr48orr4ynnnoqOnfu3Kz7lJeXR3l5eYsGBwAUl4LCYvny5fHee+/FsGHD6m+rq6uLxYsXx8033xw1NTVRWlqafZAAQHEoKCzOOOOMePXVVxvcdskll8TgwYPj6quvFhUA8DFXUFh069YtTjzxxAa3HXLIIXH44YfvcTsA8PHjL28CANkU9IzF3ixatCjDMACAg4FnLACAbIQFAJCNsAAAshEWAEA2wgIAyEZYAADZCAsAIBthAQBkIywAgGyEBQCQjbAAALIRFgBANsICAMhGWAAA2QgLACAbYQEAZCMsAIBshAUAkI2wAACyERYAQDbCAgDIRlgAANkICwAgG2EBAGQjLACAbIQFAJCNsAAAshEWAEA2wgIAyEZYAADZCAsAIBthAQBkIywAgGyEBQCQjbAAALIRFgBANsICAMhGWAAA2QgLACAbYQEAZCMsAIBshAUAkI2wAACyERYAQDbCAgDIRljAx8jW2u3Rf9oj0X/aI7G1dvuBHk6zFOOYi5HvM7kICwAgG2EBAGQjLACAbIQFAJCNsAAAshEWAEA2wgIAyEZYAADZCAsAIBthAQBkIywAgGyEBQCQjbAAALIRFgBANsICAMhGWAAA2QgLACAbYQEAZFNQWNx6660xZMiQqKioiIqKihg1alQ89thjrTU2AKDIFBQWRx99dMyePTuWL18ey5Yti9NPPz3OPffc+MUvftFa4wMAikjHQjY+++yzG1y//vrr49Zbb43nn38+TjjhhKwDAwCKT0Fhsau6urqYP39+fPDBBzFq1KhGt6upqYmampr669XV1S09JADQzhX84s1XX301Dj300CgvL4/LL788HnzwwTj++OMb3X7WrFnRvXv3+kufPn32a8AAQPtVcFgMGjQoVqxYEUuXLo1JkybFxIkT4/XXX290++nTp8emTZvqL6tXr96vAQMA7VfBvwopKyuLY489NiIihg8fHi+++GLceOONcfvtt+91+/Ly8igvL9+/UQIARWG//47Fjh07GryGAgD4+CroGYvp06fHmDFjom/fvrF58+a4++67Y9GiRfHEE0+01vgAgCJSUFi899578eUvfznWrl0b3bt3jyFDhsQTTzwRf/Znf9Za4wMAikhBYTFnzpzWGgcAcBDwWSEAQDbCAgDIRlgAANkICwAgG2EBAGQjLACAbIQFAJCNsAAAshEWAEA2wgIAyEZYAADZCAsAIBthAQBkIywAgGyEBQCQjbAAALIRFgBANsICAMhG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fosWLYojjzwyBg0aFJMmTYr333+/0X22p/MXUfg5XL9+fTzyyCNx6aWXNrnv9nAOt2/fHnV1ddG5c+cGt3fp0iWeffbZol+DTc1vb4ppDUY0f47Fug4LPYfFtgZ315w1t2TJkujRo0eccsop9dtUVVVFhw4dYunSpXvd7/Lly2Pbtm0N9jt48ODo27dvi89pq3+6aUtMmzYtqqurY/DgwVFaWhp1dXVx/fXXx4QJEyIiYt26dRERe/y1z549e9Z/bXf/93//F3V1dXu9z69+9atWmEXjmprf7j766KO4+uqrY/z48fv8UJmRI0fG3LlzY9CgQbF27dr41re+FX/8x38cr732WnTr1q21prOH5sxv9OjRcf7558eAAQPirbfeir//+7+PMWPGxJIlS6K0tHSPfban8xdR+Dm86667olu3bnH++efvc7/t5Rx269YtRo0aFTNnzoxPfepT0bNnz7jnnntiyZIlceyxxxb9GmxqfrsrtjUY0bw5FvM6LPQcFtsa3F1z1ty6dev2+MTvjh07xmGHHdbouly3bl2UlZXtEcz7WstNaZdhcd9998WPf/zjuPvuu+OEE06IFStWxJQpU6KysjImTpx4oIe33wqZ37Zt2+LCCy+MlFLceuut+9zvrv9aHjJkSIwcOTL69esX9913X7MqPZfmzO+LX/xi/fYnnXRSDBkyJI455phYtGhRnHHGGW021pYq9DF65513xoQJE/b419Xu2ss5jIj493//9/jKV74SRx11VJSWlsawYcNi/PjxsXz58jYdR2tp7vyKcQ3u1NQci30dFvIYLcY1WKza5a9Crrrqqpg2bVp88YtfjJNOOin+8i//Mv7mb/4mZs2aFRFR/xHthXx8e0s+8r21NDW/nXb+QPv1r38dTz31VMEfgdujR4/4oz/6o3jzzTdzDr9JzZ3frgYOHBhHHHFEo2NtT+cvorA5/vznP4+VK1fGV7/61YKPc6DOYUTEMcccE88880xs2bIlVq9eHS+88EJs27YtBg4cWPRrMGLf89upWNfgTs2Z466KbR02d37FugZ31Zw116tXr3jvvfcafH379u2xYcOGRs9Pr169ora2NjZu3NjofgvVLsNi69at0aFDw6GVlpbGjh07IiJiwIAB0atXrwYf315dXR1Lly5t9OPb28NHvu/U1Pwi/vAD7Y033oinn346Dj/8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\n",
+      "text/plain": [
+       "<Figure size 640x480 with 1 Axes>"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "from hist import Hist\n",
+    "\n",
+    "Hist.new.Reg(10, 80, 100).Double().fill(mass).plot()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 1000
+    },
+    "id": "uw2KlUDKwlSe",
+    "outputId": "b1032560-4602-48f9-fe0c-2458d2d4fb41"
+   },
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<pre>[[],\n",
+       " [],\n",
+       " [],\n",
+       " [],\n",
+       " [Muon, Muon],\n",
+       " [{jetRelIso: ??, pt: 31, sip3d: ??, isTracker: ??, mediumPromptId: ??, ...}],\n",
+       " [Muon, Muon],\n",
+       " [],\n",
+       " [],\n",
+       " [],\n",
+       " ...,\n",
+       " [{jetRelIso: ??, pt: 10.1, sip3d: ??, isTracker: ??, ...}],\n",
+       " [],\n",
+       " [],\n",
+       " [{jetRelIso: ??, pt: 17.9, sip3d: ??, isTracker: ??, ...}],\n",
+       " [],\n",
+       " [],\n",
+       " [],\n",
+       " [],\n",
+       " []]\n",
+       "--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n",
+       "backend: cpu\n",
+       "nbytes: 3.4 kB\n",
+       "type: 40 * var * Muon[\n",
+       "    jetRelIso: float32[parameters={&quot;__doc__&quot;: &quot;Relative isolation in matched jet (1/ptRatio-1, pfRelIso04_all if no matched jet)&quot;}],\n",
+       "    pt: float32[parameters={&quot;__doc__&quot;: &quot;pt&quot;}],\n",
+       "    sip3d: float32[parameters={&quot;__doc__&quot;: &quot;3D impact parameter significance wrt first PV&quot;}],\n",
+       "    isTracker: bool[parameters={&quot;__doc__&quot;: &quot;muon is tracker muon&quot;}],\n",
+       "    mediumPromptId: bool[parameters={&quot;__doc__&quot;: &quot;cut-based ID, medium prompt WP&quot;}],\n",
+       "    nTrackerLayers: int32[parameters={&quot;__doc__&quot;: &quot;number of layers in the tracker&quot;}],\n",
+       "    pfRelIso03_chg: float32[parameters={&quot;__doc__&quot;: &quot;PF relative isolation dR=0.3, charged component&quot;}],\n",
+       "    cleanmask: uint8[parameters={&quot;__doc__&quot;: &quot;simple cleaning mask with priority to leptons&quot;}],\n",
+       "    pfIsoId: uint8[parameters={&quot;__doc__&quot;: &quot;PFIso ID from miniAOD selector (1=PFIsoVeryLoose, 2=PFIsoLoose, 3=PFIsoMedium, 4=PFIsoTight, 5=PFIsoVeryTight, 6=PFIsoVeryVeryTight)&quot;}],\n",
+       "    pfRelIso04_all: float32[parameters={&quot;__doc__&quot;: &quot;PF relative isolation dR=0.4, total (deltaBeta corrections)&quot;}],\n",
+       "    dzErr: float32[parameters={&quot;__doc__&quot;: &quot;dz uncertainty, in cm&quot;}],\n",
+       "    genPartFlav: uint8[parameters={&quot;__doc__&quot;: &quot;Flavour of genParticle for MC matching to status==1 muons: 1 = prompt muon (including gamma*-&gt;mu mu), 15 = muon from prompt tau, 5 = muon from b, 4 = muon from c, 3 = muon from light or unknown, 0 = unmatched&quot;}],\n",
+       "    tunepRelPt: float32[parameters={&quot;__doc__&quot;: &quot;TuneP relative pt, tunePpt/pt&quot;}],\n",
+       "    miniPFRelIso_chg: float32[parameters={&quot;__doc__&quot;: &quot;mini PF relative isolation, charged component&quot;}],\n",
+       "    eta: float32[parameters={&quot;__doc__&quot;: &quot;eta&quot;}],\n",
+       "    genPartIdx: int32[parameters={&quot;__doc__&quot;: &quot;Index into genParticle list for MC matching to status==1 muons&quot;}],\n",
+       "    miniIsoId: uint8[parameters={&quot;__doc__&quot;: &quot;MiniIso ID from miniAOD selector (1=MiniIsoLoose, 2=MiniIsoMedium, 3=MiniIsoTight, 4=MiniIsoVeryTight)&quot;}],\n",
+       "    tightId: bool[parameters={&quot;__doc__&quot;: &quot;cut-based ID, tight WP&quot;}],\n",
+       "    dxy: float32[parameters={&quot;__doc__&quot;: &quot;dxy (with sign) wrt first PV, in cm&quot;}],\n",
+       "    tightCharge: int32[parameters={&quot;__doc__&quot;: &quot;Tight charge criterion using pterr/pt of muonBestTrack (0:fail, 2:pass)&quot;}],\n",
+       "    triggerIdLoose: bool[parameters={&quot;__doc__&quot;: &quot;TriggerIdLoose ID&quot;}],\n",
+       "    jetIdx: int32[parameters={&quot;__doc__&quot;: &quot;index of the associated jet (-1 if none)&quot;}],\n",
+       "    ptErr: float32[parameters={&quot;__doc__&quot;: &quot;ptError of the muon track&quot;}],\n",
+       "    nStations: int32[parameters={&quot;__doc__&quot;: &quot;number of matched stations with default arbitration (segment &amp; track)&quot;}],\n",
+       "    miniPFRelIso_all: float32[parameters={&quot;__doc__&quot;: &quot;mini PF relative isolation, total (with scaled rho*EA PU corrections)&quot;}],\n",
+       "    pfRelIso03_all: float32[parameters={&quot;__doc__&quot;: &quot;PF relative isolation dR=0.3, total (deltaBeta corrections)&quot;}],\n",
+       "    mvaTTH: float32[parameters={&quot;__doc__&quot;: &quot;TTH MVA lepton ID score&quot;}],\n",
+       "    softMva: float32[parameters={&quot;__doc__&quot;: &quot;soft MVA ID score&quot;}],\n",
+       "    pdgId: int32[parameters={&quot;__doc__&quot;: &quot;PDG code assigned by the event reconstruction (not by MC truth)&quot;}],\n",
+       "    mediumId: bool[parameters={&quot;__doc__&quot;: &quot;cut-based ID, medium WP&quot;}],\n",
+       "    isGlobal: bool[parameters={&quot;__doc__&quot;: &quot;muon is global muon&quot;}],\n",
+       "    highPtId: uint8[parameters={&quot;__doc__&quot;: &quot;high-pT cut-based ID (1 = tracker high pT, 2 = global high pT, which includes tracker high pT)&quot;}],\n",
+       "    looseId: bool[parameters={&quot;__doc__&quot;: &quot;muon is loose muon&quot;}],\n",
+       "    ip3d: float32[parameters={&quot;__doc__&quot;: &quot;3D impact parameter wrt first PV, in cm&quot;}],\n",
+       "    inTimeMuon: bool[parameters={&quot;__doc__&quot;: &quot;inTimeMuon ID&quot;}],\n",
+       "    isPFcand: bool[parameters={&quot;__doc__&quot;: &quot;muon is PF candidate&quot;}],\n",
+       "    mass: float32[parameters={&quot;__doc__&quot;: &quot;mass&quot;}],\n",
+       "    tkRelIso: float32[parameters={&quot;__doc__&quot;: &quot;Tracker-based relative isolation dR=0.3 for highPt, trkIso/tunePpt&quot;}],\n",
+       "    phi: float32[parameters={&quot;__doc__&quot;: &quot;phi&quot;}],\n",
+       "    dz: float32[parameters={&quot;__doc__&quot;: &quot;dz (with sign) wrt first PV, in cm&quot;}],\n",
+       "    softId: bool[parameters={&quot;__doc__&quot;: &quot;soft cut-based ID&quot;}],\n",
+       "    charge: int32[parameters={&quot;__doc__&quot;: &quot;electric charge&quot;}],\n",
+       "    mvaId: uint8[parameters={&quot;__doc__&quot;: &quot;Mva ID from miniAOD selector (1=MvaLoose, 2=MvaMedium, 3=MvaTight)&quot;}],\n",
+       "    segmentComp: float32[parameters={&quot;__doc__&quot;: &quot;muon segment compatibility&quot;}],\n",
+       "    mvaLowPt: float32[parameters={&quot;__doc__&quot;: &quot;Low pt muon ID score&quot;}],\n",
+       "    tkIsoId: uint8[parameters={&quot;__doc__&quot;: &quot;TkIso ID (1=TkIsoLoose, 2=TkIsoTight)&quot;}],\n",
+       "    multiIsoId: uint8[parameters={&quot;__doc__&quot;: &quot;MultiIsoId from miniAOD selector (1=MultiIsoLoose, 2=MultiIsoMedium)&quot;}],\n",
+       "    fsrPhotonIdx: int32[parameters={&quot;__doc__&quot;: &quot;Index of the associated FSR photon&quot;}],\n",
+       "    dxyErr: float32[parameters={&quot;__doc__&quot;: &quot;dxy uncertainty, in cm&quot;}],\n",
+       "    jetPtRelv2: float32[parameters={&quot;__doc__&quot;: &quot;Relative momentum of the lepton with respect to the closest jet after subtracting the lepton&quot;}],\n",
+       "    softMvaId: bool[parameters={&quot;__doc__&quot;: &quot;soft MVA ID&quot;}],\n",
+       "    fsrPhotonIdxG: int64[parameters={&quot;__doc__&quot;: &quot;global Index of the associated FSR photon&quot;}],\n",
+       "    jetIdxG: int64[parameters={&quot;__doc__&quot;: &quot;global index of the associated jet (-1 if none)&quot;}],\n",
+       "    genPartIdxG: int64[parameters={&quot;__doc__&quot;: &quot;global Index into genParticle list for MC matching to status==1 muons&quot;}], \n",
+       "parameters={&quot;collection_name&quot;: &quot;Muon&quot;, &quot;__doc__&quot;: &quot;slimmedMuons after basic selection (pt &gt; 3 &amp;&amp; (passed(&#x27;CutBasedIdLoose&#x27;) || passed(&#x27;SoftCutBasedId&#x27;) || passed(&#x27;SoftMvaId&#x27;) || passed(&#x27;CutBasedIdGlobalHighPt&#x27;) || passed(&#x27;CutBasedIdTrkHighPt&#x27;)))&quot;}]</pre>"
+      ],
+      "text/plain": [
+       "<MuonArray [[], [], [], [], ..., [], [], [], []] type='40 * var * Muon[jetR...'>"
+      ]
+     },
+     "execution_count": 73,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "result.Muon"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "vBe5pMDKrmC6",
+    "outputId": "53ef3a9b-287f-4c2a-c510-206630e799a6"
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "{jetRelIso: ??,\n",
+      " pt: 76.8,\n",
+      " sip3d: ??,\n",
+      " isTracker: ??,\n",
+      " mediumPromptId: ??,\n",
+      " nTrackerLayers: ??,\n",
+      " pfRelIso03_chg: ??,\n",
+      " cleanmask: ??,\n",
+      " pfIsoId: ??,\n",
+      " pfRelIso04_all: ??,\n",
+      " dzErr: ??,\n",
+      " genPartFlav: ??,\n",
+      " tunepRelPt: ??,\n",
+      " miniPFRelIso_chg: ??,\n",
+      " eta: 0.714,\n",
+      " genPartIdx: ??,\n",
+      " miniIsoId: ??,\n",
+      " tightId: ??,\n",
+      " dxy: ??,\n",
+      " tightCharge: ??,\n",
+      " triggerIdLoose: ??,\n",
+      " jetIdx: ??,\n",
+      " ptErr: ??,\n",
+      " nStations: ??,\n",
+      " miniPFRelIso_all: ??,\n",
+      " pfRelIso03_all: ??,\n",
+      " mvaTTH: ??,\n",
+      " softMva: ??,\n",
+      " pdgId: ??,\n",
+      " mediumId: ??,\n",
+      " isGlobal: ??,\n",
+      " highPtId: ??,\n",
+      " looseId: ??,\n",
+      " ip3d: ??,\n",
+      " inTimeMuon: ??,\n",
+      " isPFcand: ??,\n",
+      " mass: 0.106,\n",
+      " tkRelIso: ??,\n",
+      " phi: 1.64,\n",
+      " dz: ??,\n",
+      " softId: ??,\n",
+      " charge: -1,\n",
+      " mvaId: ??,\n",
+      " segmentComp: ??,\n",
+      " mvaLowPt: ??,\n",
+      " tkIsoId: ??,\n",
+      " multiIsoId: ??,\n",
+      " fsrPhotonIdx: ??,\n",
+      " dxyErr: ??,\n",
+      " jetPtRelv2: ??,\n",
+      " softMvaId: ??,\n",
+      " fsrPhotonIdxG: ??,\n",
+      " jetIdxG: ??,\n",
+      " genPartIdxG: ??}\n"
+     ]
+    }
+   ],
+   "source": [
+    "result.Muon[4][0].show(300)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "yATen57bunvg"
+   },
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "colab": {
+   "provenance": [],
+   "toc_visible": true
+  },
+  "kernelspec": {
+   "display_name": "Python 3",
+   "name": "python3"
+  },
+  "language_info": {
+   "name": "python"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 0
+}

@@ -1,0 +1,1494 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Awkward-zipper example usage &mdash; awkward-zipper 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+    <link rel="shortcut icon" href="../_static/logo_unfilled_with_text.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Benchmarks" href="../benchmarks.html" />
+    <link rel="prev" title="Quick start" href="../usage_example.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            awkward-zipper
+              <img src="../_static/logo_unfilled_with_black_text.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../notebooks.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../notebooks.html#how-awkward-zipper-works">How awkward_zipper works</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../notebooks.html#usage-example-of-awkward-zipper">Usage example of awkward_zipper</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Awkward-zipper example usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#How-the-new-fields-are-added">How the new fields are added</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#These-fields-are-then-grouped-by-name,-where-if:">These fields are then grouped by name, where if:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Zipper-with-virtual-arrays">Zipper with virtual arrays</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Example-calculation-of-a-Z-peak">Example calculation of a Z-peak</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">awkward-zipper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../notebooks.html">Examples</a></li>
+      <li class="breadcrumb-item active">Awkward-zipper example usage</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/notebooks/Usage_example_of_awkward_zipper.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <p>Install libraries</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">git</span><span class="o">+</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">CoffeaTeam</span><span class="o">/</span><span class="n">awkward</span><span class="o">-</span><span class="n">zipper</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Collecting git+https://github.com/maxymnaumchyk/awkward-zipper.git
+  Cloning https://github.com/maxymnaumchyk/awkward-zipper.git to /tmp/pip-req-build-mvp0qy7q
+  Running command git clone --filter=blob:none --quiet https://github.com/maxymnaumchyk/awkward-zipper.git /tmp/pip-req-build-mvp0qy7q
+  Resolved https://github.com/maxymnaumchyk/awkward-zipper.git to commit dd3613d1da6b934240f01845392317c6e94b731d
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... done
+  Preparing metadata (pyproject.toml) ... done
+Collecting awkward@ git+https://github.com/scikit-hep/awkward@main (from awkward-zipper==0.0.1)
+  Cloning https://github.com/scikit-hep/awkward (to revision main) to /tmp/pip-install-r9r8y74u/awkward_3d58eb0a685741c0bbc580e5c5080ec1
+  Running command git clone --filter=blob:none --quiet https://github.com/scikit-hep/awkward /tmp/pip-install-r9r8y74u/awkward_3d58eb0a685741c0bbc580e5c5080ec1
+  Resolved https://github.com/scikit-hep/awkward to commit 8e2d4a85420e89617ccf5be0edef841d3b2d57bf
+  Running command git submodule update --init --recursive -q
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... done
+  Preparing metadata (pyproject.toml) ... done
+Requirement already satisfied: numba in /usr/local/lib/python3.11/dist-packages (from awkward-zipper==0.0.1) (0.60.0)
+Collecting vector (from awkward-zipper==0.0.1)
+  Downloading vector-1.6.2-py3-none-any.whl.metadata (15 kB)
+Collecting awkward-cpp==46 (from awkward@ git+https://github.com/scikit-hep/awkward@main-&gt;awkward-zipper==0.0.1)
+  Downloading awkward_cpp-46-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.1 kB)
+Requirement already satisfied: fsspec&gt;=2022.11.0 in /usr/local/lib/python3.11/dist-packages (from awkward@ git+https://github.com/scikit-hep/awkward@main-&gt;awkward-zipper==0.0.1) (2025.3.2)
+Requirement already satisfied: importlib-metadata&gt;=4.13.0 in /usr/local/lib/python3.11/dist-packages (from awkward@ git+https://github.com/scikit-hep/awkward@main-&gt;awkward-zipper==0.0.1) (8.7.0)
+Requirement already satisfied: numpy&gt;=1.18.0 in /usr/local/lib/python3.11/dist-packages (from awkward@ git+https://github.com/scikit-hep/awkward@main-&gt;awkward-zipper==0.0.1) (2.0.2)
+Requirement already satisfied: packaging in /usr/local/lib/python3.11/dist-packages (from awkward@ git+https://github.com/scikit-hep/awkward@main-&gt;awkward-zipper==0.0.1) (24.2)
+Requirement already satisfied: llvmlite&lt;0.44,&gt;=0.43.0dev0 in /usr/local/lib/python3.11/dist-packages (from numba-&gt;awkward-zipper==0.0.1) (0.43.0)
+Requirement already satisfied: zipp&gt;=3.20 in /usr/local/lib/python3.11/dist-packages (from importlib-metadata&gt;=4.13.0-&gt;awkward@ git+https://github.com/scikit-hep/awkward@main-&gt;awkward-zipper==0.0.1) (3.22.0)
+Downloading awkward_cpp-46-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (638 kB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">638.7/638.7 kB</span> <span class="ansi-red-fg">13.9 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Downloading vector-1.6.2-py3-none-any.whl (177 kB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">177.8/177.8 kB</span> <span class="ansi-red-fg">12.1 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Building wheels for collected packages: awkward-zipper, awkward
+  Building wheel for awkward-zipper (pyproject.toml) ... done
+  Created wheel for awkward-zipper: filename=awkward_zipper-0.0.1-py3-none-any.whl size=23500 sha256=4b59bd8410f92e5013eeaced62f0f3ab5fa66fdbbddbe33990b90254dfdcf6de
+  Stored in directory: /tmp/pip-ephem-wheel-cache-gvugxi0d/wheels/13/ff/6a/a86ac1ebbfd7f56ba74dec9ccffa35df23b6890fac28284fed
+  Building wheel for awkward (pyproject.toml) ... done
+  Created wheel for awkward: filename=awkward-2.8.3-py3-none-any.whl size=852964 sha256=ccdbcbdcabe7a578319d02cf78d7d8122baecd9204526d03999630d739e61048
+  Stored in directory: /tmp/pip-ephem-wheel-cache-gvugxi0d/wheels/b9/90/e9/6455c7a94885426a7e2fc34b49d59ee756873090f777c368b0
+Successfully built awkward-zipper awkward
+Installing collected packages: vector, awkward-cpp, awkward, awkward-zipper
+Successfully installed awkward-2.8.3 awkward-cpp-46 awkward-zipper-0.0.1 vector-1.6.2
+</pre></div></div>
+</div>
+<p>Use a branch from main to load virtual arrays with uproot</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">uproot</span><span class="nd">@git</span><span class="o">+</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">scikit</span><span class="o">-</span><span class="n">hep</span><span class="o">/</span><span class="n">uproot5</span><span class="nd">@pfackeldey</span><span class="o">/</span><span class="n">uproot_lazy</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Collecting uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy
+  Cloning https://github.com/scikit-hep/uproot5 (to revision pfackeldey/uproot_lazy) to /tmp/pip-install-gc9d60kr/uproot_34e3315b4eb448c89caf404c61e204ab
+  Running command git clone --filter=blob:none --quiet https://github.com/scikit-hep/uproot5 /tmp/pip-install-gc9d60kr/uproot_34e3315b4eb448c89caf404c61e204ab
+  Running command git checkout -b pfackeldey/uproot_lazy --track origin/pfackeldey/uproot_lazy
+  Switched to a new branch &#39;pfackeldey/uproot_lazy&#39;
+  Branch &#39;pfackeldey/uproot_lazy&#39; set up to track remote branch &#39;pfackeldey/uproot_lazy&#39; from &#39;origin&#39;.
+  Resolved https://github.com/scikit-hep/uproot5 to commit 892961513afd630bacd2495628c70b2c878da63a
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... done
+  Preparing metadata (pyproject.toml) ... done
+Collecting awkward&gt;=2.8.2 (from uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy)
+  Downloading awkward-2.8.4-py3-none-any.whl.metadata (7.0 kB)
+Requirement already satisfied: cramjam&gt;=2.5.0 in /usr/local/lib/python3.11/dist-packages (from uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (2.10.0)
+Requirement already satisfied: fsspec in /usr/local/lib/python3.11/dist-packages (from uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (2025.3.2)
+Requirement already satisfied: numpy in /usr/local/lib/python3.11/dist-packages (from uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (2.0.2)
+Requirement already satisfied: packaging in /usr/local/lib/python3.11/dist-packages (from uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (24.2)
+Requirement already satisfied: xxhash in /usr/local/lib/python3.11/dist-packages (from uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (3.5.0)
+Collecting awkward-cpp==46 (from awkward&gt;=2.8.2-&gt;uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy)
+  Downloading awkward_cpp-46-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.1 kB)
+Requirement already satisfied: importlib-metadata&gt;=4.13.0 in /usr/local/lib/python3.11/dist-packages (from awkward&gt;=2.8.2-&gt;uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (8.7.0)
+Requirement already satisfied: zipp&gt;=3.20 in /usr/local/lib/python3.11/dist-packages (from importlib-metadata&gt;=4.13.0-&gt;awkward&gt;=2.8.2-&gt;uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (3.23.0)
+Downloading awkward-2.8.4-py3-none-any.whl (886 kB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">886.3/886.3 kB</span> <span class="ansi-red-fg">11.6 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Downloading awkward_cpp-46-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (638 kB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">638.7/638.7 kB</span> <span class="ansi-red-fg">35.6 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Building wheels for collected packages: uproot
+  Building wheel for uproot (pyproject.toml) ... done
+  Created wheel for uproot: filename=uproot-5.6.2.dev25+g8929615-py3-none-any.whl size=377052 sha256=20d26986a5b56e6f7b3d8d155f2a128e1b9ebf773fae7237551abcdb33cec25c
+  Stored in directory: /tmp/pip-ephem-wheel-cache-23008dtr/wheels/6d/4a/38/cca594ce698fdd158d6039640034edca9dda20c890c171703a
+Successfully built uproot
+Installing collected packages: awkward-cpp, awkward, uproot
+Successfully installed awkward-2.8.4 awkward-cpp-46 uproot-5.6.2.dev25+g8929615
+</pre></div></div>
+</div>
+<p>Download test root file</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="err">!</span><span class="n">wget</span> <span class="p">{</span><span class="s1">'https://raw.githubusercontent.com/scikit-hep/coffea/refs/heads/master/tests/samples/nano_dy.root'</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+--2025-06-09 16:22:50--  https://raw.githubusercontent.com/scikit-hep/coffea/refs/heads/master/tests/samples/nano_dy.root
+Resolving raw.githubusercontent.com (raw.githubusercontent.com)... 185.199.108.133, 185.199.109.133, 185.199.110.133, ...
+Connecting to raw.githubusercontent.com (raw.githubusercontent.com)|185.199.108.133|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 352599 (344K) [application/octet-stream]
+Saving to: ‘nano_dy.root’
+
+nano_dy.root        100%[===================&gt;] 344.33K  --.-KB/s    in 0.03s
+
+2025-06-09 16:22:50 (13.2 MB/s) - ‘nano_dy.root’ saved [352599/352599]
+
+</pre></div></div>
+</div>
+<p>Import libraries</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">awkward</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uproot</span>
+</pre></div>
+</div>
+</div>
+<p>Let’s load the example data in <a class="reference external" href="https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookNanoAOD">NanoAOD</a> format:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a TTree from root</span>
+<span class="n">tree</span> <span class="o">=</span> <span class="n">uproot</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"nano_dy.root"</span><span class="p">)[</span><span class="s2">"Events"</span><span class="p">]</span>
+<span class="c1"># TTree -&gt; awkward.Array[awkward.Record[str, awkward.Array]]</span>
+<span class="n">array</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">arrays</span><span class="p">(</span><span class="n">ak_add_doc</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">array</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[{run: 1, luminosityBlock: 13889, event: 3749778, HTXS_Higgs_pt: 0, ...},
+ {run: 1, luminosityBlock: 13889, event: 3749762, HTXS_Higgs_pt: 0, ...},
+ {run: 1, luminosityBlock: 13889, event: 3749777, HTXS_Higgs_pt: 0, ...},
+ {run: 1, luminosityBlock: 13889, event: 3749768, HTXS_Higgs_pt: 0, ...},
+ {run: 1, luminosityBlock: 13889, event: 3749761, HTXS_Higgs_pt: 0, ...},
+ {run: 1, luminosityBlock: 13889, event: 3749773, HTXS_Higgs_pt: 0, ...},
+ {run: 1, luminosityBlock: 13889, event: 3749781, HTXS_Higgs_pt: 0, ...},
+ {run: 1, luminosityBlock: 13889, event: 3749786, HTXS_Higgs_pt: 0, ...},
+ {run: 1, luminosityBlock: 13889, event: 3749788, HTXS_Higgs_pt: 0, ...},
+ {run: 1, luminosityBlock: 13889, event: 3749783, HTXS_Higgs_pt: 0, ...},
+ ...,
+ {run: 1, luminosityBlock: 13889, event: 3749862, HTXS_Higgs_pt: 0, ...},
+ {run: 1, luminosityBlock: 13889, event: 3749866, HTXS_Higgs_pt: 0, ...},
+ {run: 1, luminosityBlock: 13889, event: 3749861, HTXS_Higgs_pt: 0, ...},
+ {run: 1, luminosityBlock: 13889, event: 3749863, HTXS_Higgs_pt: 0, ...},
+ {run: 1, luminosityBlock: 13889, event: 3749875, HTXS_Higgs_pt: 0, ...},
+ {run: 1, luminosityBlock: 13889, event: 3749865, HTXS_Higgs_pt: 0, ...},
+ {run: 1, luminosityBlock: 13889, event: 3749883, HTXS_Higgs_pt: 0, ...},
+ {run: 1, luminosityBlock: 13889, event: 3749882, HTXS_Higgs_pt: 0, ...},
+ {run: 1, luminosityBlock: 13889, event: 3749892, HTXS_Higgs_pt: 0, ...}]
+</pre></div></div>
+</div>
+<p>The resulting data is a list of records. Each record represents a single event and all of its parameters data. For example here’s some of the data for the first event in our file:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{run: 1,
+ luminosityBlock: 13889,
+ event: 3749778,
+ HTXS_Higgs_pt: 0,
+ HTXS_Higgs_y: nan,
+ HTXS_stage1_1_cat_pTjet25GeV: 0,
+ HTXS_stage1_1_cat_pTjet30GeV: 0,
+ HTXS_stage1_1_fine_cat_pTjet25GeV: 0,
+ HTXS_stage1_1_fine_cat_pTjet30GeV: 0,
+ HTXS_stage_0: 0,
+ HTXS_stage_1_pTjet25: 0,
+ HTXS_stage_1_pTjet30: 0,
+ HTXS_njets25: 0,
+ HTXS_njets30: 0,
+ btagWeight_CSVV2: 0.951,
+ btagWeight_DeepCSVB: 0.893,
+ CaloMET_phi: 2.79,
+ CaloMET_pt: 32.1,
+ CaloMET_sumEt: 652,
+ ChsMET_phi: 2.51,
+ ChsMET_pt: 33.7,
+ ChsMET_sumEt: 784,
+ nCorrT1METJet: 5,
+ CorrT1METJet_area: [0.579, 0.449, 0.509, 0.519, 0.638],
+ CorrT1METJet_eta: [-2.36, 4.33, 2.27, 3.92, 2.62],
+ CorrT1METJet_muonSubtrFactor: [3.59e-08, 1.08e-08, ..., 7.16e-09, -2.98e-08],
+ CorrT1METJet_phi: [0.387, 2.03, 1.56, 2.39, -0.405],
+ CorrT1METJet_rawPt: [12.9, 15.3, 10.2, 14.9, 9.41],
+ nElectron: 0,
+ Electron_deltaEtaSC: [],
+ Electron_dr03EcalRecHitSumEt: [],
+ Electron_dr03HcalDepth1TowerSumEt: [],
+ Electron_dr03TkSumPt: [],
+ Electron_dr03TkSumPtHEEP: [],
+ Electron_dxy: [],
+ Electron_dxyErr: [],
+ Electron_dz: [],
+ Electron_dzErr: [],
+ Electron_eCorr: [],
+ Electron_eInvMinusPInv: [],
+ Electron_energyErr: [],
+ Electron_eta: [],
+ Electron_hoe: [],
+ Electron_ip3d: [],
+ Electron_jetPtRelv2: [],
+ Electron_jetRelIso: [],
+ Electron_mass: [],
+ Electron_miniPFRelIso_all: [],
+ Electron_miniPFRelIso_chg: [],
+ ...}
+</pre></div></div>
+</div>
+<section id="Awkward-zipper-example-usage">
+<h1>Awkward-zipper example usage<a class="headerlink" href="#Awkward-zipper-example-usage" title="Link to this heading"></a></h1>
+<p>The goal of the awkward-zipper package is to restructure the record of each event. These records are restructured in the same manner as in <a class="reference external" href="https://coffea-hep.readthedocs.io/en/v2025.1.1/api/coffea.nanoevents.NanoAODSchema.html">Coffea package</a>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper</span><span class="w"> </span><span class="kn">import</span> <span class="n">NanoAOD</span>
+
+<span class="n">restructure</span> <span class="o">=</span> <span class="n">NanoAOD</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="s2">"latest"</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">restructure</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+&lt;ipython-input-16-4e778724ceb1&gt;:4: RuntimeWarning: Missing cross-reference index for LowPtElectron_electronIdx =&gt; Electron
+  result = restructure(array)
+&lt;ipython-input-16-4e778724ceb1&gt;:4: RuntimeWarning: Missing cross-reference index for LowPtElectron_genPartIdx =&gt; GenPart
+  result = restructure(array)
+&lt;ipython-input-16-4e778724ceb1&gt;:4: RuntimeWarning: Missing cross-reference index for LowPtElectron_photonIdx =&gt; Photon
+  result = restructure(array)
+&lt;ipython-input-16-4e778724ceb1&gt;:4: RuntimeWarning: Missing cross-reference index for FatJet_genJetAK8Idx =&gt; GenJetAK8
+  result = restructure(array)
+/usr/local/lib/python3.11/dist-packages/awkward_zipper/kernels.py:122: DeprecationWarning: __array__ implementation doesn&#39;t accept a copy keyword, so passing copy=False failed. __array__ must implement &#39;dtype&#39; and &#39;copy&#39; keyword arguments.
+  out[i::n] = idx
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># awkward.materialize(result)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<pre>[{SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},
+ {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},
+ {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},
+ {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},
+ {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},
+ {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},
+ {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},
+ {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},
+ {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},
+ {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},
+ ...,
+ {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},
+ {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},
+ {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},
+ {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},
+ {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},
+ {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},
+ {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},
+ {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...},
+ {SoftActivityJetNjets5: ??, LHEReweightingWeight: ??, Generator: {...}, ...}]
+------------------------------------------------------------------------------
+backend: cpu
+nbytes: unknown
+type: 40 * event</pre></div>
+</div>
+<p>Now let’s go step by step how awkward-zipper reconstructs the original NanoAOD data.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="How-the-new-fields-are-added">
+<h1>How the new fields are added<a class="headerlink" href="#How-the-new-fields-are-added" title="Link to this heading"></a></h1>
+<p>Now let’s go step by step how awkward-zipper reconstructs the original NanoAOD data.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="n">counts2offsets</span><span class="p">,</span> <span class="n">local2globalindex</span><span class="p">,</span> <span class="n">nestedindex</span>
+</pre></div>
+</div>
+</div>
+<p>Any branches named <code class="docutils literal notranslate"><span class="pre">n{name}</span></code> are assumed to be counts branches can be converted to offsets <code class="docutils literal notranslate"><span class="pre">o{name}</span></code> using using <code class="docutils literal notranslate"><span class="pre">counts2offsets</span></code> helper function</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">[</span><span class="s2">"nJet"</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<pre>[5,
+ 8,
+ 5,
+ 3,
+ 5,
+ 8,
+ 4,
+ 4,
+ 1,
+ 9,
+ ...,
+ 2,
+ 4,
+ 9,
+ 3,
+ 2,
+ 3,
+ 1,
+ 6,
+ 2]
+--------------------------------------------------------------------------------------------------------------------------------
+backend: cpu
+nbytes: 160 B
+type: 40 * uint32[parameters={&quot;__doc__&quot;: &quot;slimmedJets, i.e. ak4 PFJets CHS with JECs applied, after basic selection (pt &gt; 15)&quot;}]</pre></div>
+</div>
+<p><em>Note: How the functions(kernels) like ``counts2offsets`` work is the main difference between awkward-zipper and coffea. awkward-zipper does its inner calculations on awkward arrays, while coffea does them using</em> <a class="reference external" href="https://awkward-array.org/doc/main/reference/generated/ak.to_buffers.html">forms and buffers</a><em>.</em></p>
+<p><em>This change will make it easier for users to create their own ‘schemas’ (or modify existing ones)</em></p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">counts2offsets</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="s2">"nJet"</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+array([  0,   5,  13,  18,  21,  26,  34,  38,  42,  43,  52,  54,  62,
+        64,  68,  73,  77,  82,  87,  94,  98, 101, 106, 115, 118, 123,
+       127, 134, 139, 147, 152, 156, 158, 162, 171, 174, 176, 179, 180,
+       186, 188])
+</pre></div></div>
+</div>
+<p>Any local index branches with names matching <code class="docutils literal notranslate"><span class="pre">{source}_{target}Idx*</span></code> are converted to global indexes for the event chunk (postfix <code class="docutils literal notranslate"><span class="pre">G</span></code>). All local indices and their correlating global indices are taken from <code class="docutils literal notranslate"><span class="pre">NanoAOD.all_cross_references</span></code> dictionary</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">local_index</span> <span class="o">=</span> <span class="s2">"Jet_electronIdx1"</span>
+
+<span class="n">cross_referense</span> <span class="o">=</span> <span class="n">NanoAOD</span><span class="o">.</span><span class="n">all_cross_references</span><span class="p">[</span><span class="n">local_index</span><span class="p">]</span>
+<span class="n">global_index</span> <span class="o">=</span> <span class="s2">"n"</span> <span class="o">+</span> <span class="n">cross_referense</span>
+
+<span class="n">array</span><span class="p">[</span><span class="s2">"Jet_electronIdx1G"</span><span class="p">]</span> <span class="o">=</span> <span class="n">local2globalindex</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="n">local_index</span><span class="p">],</span> <span class="n">array</span><span class="p">[</span><span class="n">global_index</span><span class="p">])</span>
+<span class="n">array</span><span class="p">[</span><span class="s2">"Jet_electronIdx1G"</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<pre>[[-1, -1, -1, -1, -1],
+ [-1, 0, -1, -1, -1, -1, -1, -1],
+ [-1, 1, 2, -1, -1],
+ [-1, -1, 3],
+ [-1, -1, -1, -1, -1],
+ [5, -1, -1, -1, -1, -1, -1, -1],
+ [6, -1, -1, -1],
+ [-1, -1, -1, -1],
+ [-1],
+ [-1, 7, -1, -1, -1, -1, -1, -1, -1],
+ ...,
+ [21, -1],
+ [-1, -1, -1, -1],
+ [22, -1, -1, -1, -1, -1, -1, -1, -1],
+ [-1, -1, -1],
+ [23, -1],
+ [-1, -1, -1],
+ [24],
+ [-1, -1, -1, -1, -1, -1],
+ [-1, -1]]
+------------------------------------------------------------------------------------
+backend: cpu
+nbytes: 1.8 kB
+type: 40 * [var * int64, parameters={&quot;__doc__&quot;: &quot;index of first matching electron&quot;}]</pre></div>
+</div>
+<p>Any <code class="docutils literal notranslate"><span class="pre">NanoAOD.nested_items</span></code> are constructed, if the necessary branches are available</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">array</span><span class="p">[</span><span class="s2">"Jet_electronIdx2G"</span><span class="p">]</span> <span class="o">=</span> <span class="n">local2globalindex</span><span class="p">(</span>
+    <span class="n">array</span><span class="p">[</span><span class="s2">"Jet_electronIdx2"</span><span class="p">],</span> <span class="n">array</span><span class="p">[</span><span class="s2">"nElectron"</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="n">nestedindex</span><span class="p">([</span><span class="n">array</span><span class="p">[</span><span class="s2">"Jet_electronIdx1G"</span><span class="p">],</span> <span class="n">array</span><span class="p">[</span><span class="s2">"Jet_electronIdx2G"</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/usr/local/lib/python3.11/dist-packages/awkward_zipper/kernels.py:100: DeprecationWarning: __array__ implementation doesn&#39;t accept a copy keyword, so passing copy=False failed. __array__ must implement &#39;dtype&#39; and &#39;copy&#39; keyword arguments.
+  out[i::n] = idx
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<pre>[[[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1]],
+ [[-1, -1], [0, -1], [-1, -1], [-1, ...], ..., [-1, -1], [-1, -1], [-1, -1]],
+ [[-1, -1], [1, -1], [2, -1], [-1, -1], [-1, -1]],
+ [[-1, -1], [-1, -1], [3, -1]],
+ [[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1]],
+ [[5, -1], [-1, -1], [-1, -1], [-1, ...], ..., [-1, -1], [-1, -1], [-1, -1]],
+ [[6, -1], [-1, -1], [-1, -1], [-1, -1]],
+ [[-1, -1], [-1, -1], [-1, -1], [-1, -1]],
+ [[-1, -1]],
+ [[-1, -1], [7, -1], [-1, -1], [-1, ...], ..., [-1, -1], [-1, -1], [-1, -1]],
+ ...,
+ [[21, -1], [-1, -1]],
+ [[-1, -1], [-1, -1], [-1, -1], [-1, -1]],
+ [[22, -1], [-1, -1], [-1, -1], [-1, ...], ..., [-1, -1], [-1, -1], [-1, -1]],
+ [[-1, -1], [-1, -1], [-1, -1]],
+ [[23, -1], [-1, -1]],
+ [[-1, -1], [-1, -1], [-1, -1]],
+ [[24, -1]],
+ [[-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1], [-1, -1]],
+ [[-1, -1], [-1, -1]]]
+--------------------------------------------------------------------------------------------------------------------------------------------
+backend: cpu
+nbytes: 4.8 kB
+type: 40 * [var * var * int64, parameters={&quot;__doc__&quot;: &quot;nested from index of first matching electron and index of second matching electron&quot;}]</pre></div>
+</div>
+<p>In the same manner any <code class="docutils literal notranslate"><span class="pre">awkward_zipper.NanoAOD.nested_index_items</span></code> and <code class="docutils literal notranslate"><span class="pre">awkward_zipper.NanoAOD.special_items</span></code> are constructed, if the necessary branches are available. You can find all these functions at <code class="docutils literal notranslate"><span class="pre">awkward_zipper.kernels</span></code></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="These-fields-are-then-grouped-by-name,-where-if:">
+<h1>These fields are then grouped by name, where if:<a class="headerlink" href="#These-fields-are-then-grouped-by-name,-where-if:" title="Link to this heading"></a></h1>
+<p>one branch exists named name and no branches start with name_, it gets interpreted as a single flat array;</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: Each event has only one Run Id. Interpreted flat array will look look like this:</span>
+<span class="n">result</span><span class="o">.</span><span class="n">run</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<pre>[1,
+ 1,
+ 1,
+ 1,
+ 1,
+ 1,
+ 1,
+ 1,
+ 1,
+ 1,
+ ...,
+ 1,
+ 1,
+ 1,
+ 1,
+ 1,
+ 1,
+ 1,
+ 1,
+ 1]
+--------------------------------------------------
+backend: cpu
+nbytes: 160 B
+type: 40 * uint32[parameters={&quot;__doc__&quot;: &quot;run/i&quot;}]</pre></div>
+</div>
+<p>one branch exists named name, one named n{name}, and no branches start with name_, it gets interpreted as a single jagged array;</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: Each event has a flat array of PS Weights. Interpreted single jagged array will look look like this:</span>
+<span class="n">result</span><span class="o">.</span><span class="n">PSWeight</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<pre>[[1.01, 1.26, 0.99, 0.791],
+ [2.06, 0.872, 0.535, 0.962],
+ [1.07, 0.887, 0.933, 1.02],
+ [0.833, 0.827, 1.15, 1.1],
+ [0.936, 0.622, 1.04, 1.17],
+ [1.17, 1, 0.86, 0.978],
+ [1.12, 1.59, 0.906, 0.688],
+ [0.946, 0.922, 1.04, 0.997],
+ [0.88, 0.855, 1.09, 0.811],
+ [0.854, 0.518, 1.11, 1.16],
+ ...,
+ [0.906, 0.687, 1.07, 1.18],
+ [0.917, 0.977, 1.07, 1.01],
+ [0.858, 0.812, 1.11, 0.841],
+ [0.884, 1, 1.09, 1],
+ [0.919, 0.848, 1.07, 1.08],
+ [0.953, 1.02, 1.04, 0.968],
+ [0.946, 1, 1.04, 1],
+ [1.08, 2.17, 0.932, 0.57],
+ [0.856, 1.41, 1.12, 0.761]]
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+backend: cpu
+nbytes: 968 B
+type: 40 * [var * float32, parameters={&quot;__doc__&quot;: &quot;PS weights (w_var / w_nominal); [0] is ISR=0.5 FSR=1; [1] is ISR=1 FSR=0.5; [2] is ISR=2 FSR=1; [3] is ISR=1 FSR=2 &quot;}]</pre></div>
+</div>
+<p>no branch exists named {name} and many branches start with name_*, they get interpreted as a flat table; or</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: Each event has a SINGLE Generator. Each Generator consists of a record of Generator parameters. These parameters can be scalars or flat arrays. Interpreted flat table will look look like this:</span>
+<span class="n">result</span><span class="o">.</span><span class="n">Generator</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<pre>[{id2: -1, x1: 0.214, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: 1, ...},
+ {id2: 1, x1: 0.0142, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: -1, ...},
+ {id2: 21, x1: 0.00564, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: -1, ...},
+ {id2: -1, x1: 0.00173, xpdf2: 0, xpdf1: 0, weight: 2.58e+04, id1: 21, ...},
+ {id2: 1, x1: 0.0432, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: 21, ...},
+ {id2: -4, x1: 0.00337, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: 4, ...},
+ {id2: 2, x1: 0.0051, xpdf2: 0, xpdf1: 0, weight: -2.63e+04, id1: 2, ...},
+ {id2: 2, x1: 0.000154, xpdf2: 0, xpdf1: 0, weight: 2.61e+04, id1: -2, ...},
+ {id2: -2, x1: 0.0541, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: 2, ...},
+ {id2: -1, x1: 0.011, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: 1, ...},
+ ...,
+ {id2: -1, x1: 0.0069, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: 1, ...},
+ {id2: 2, x1: 0.000121, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: -2, ...},
+ {id2: 21, x1: 0.229, xpdf2: 0, xpdf1: 0, weight: -2.63e+04, id1: 2, ...},
+ {id2: -1, x1: 0.00506, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: 1, ...},
+ {id2: -2, x1: 0.00608, xpdf2: 0, xpdf1: 0, weight: -2.63e+04, id1: 2, ...},
+ {id2: 2, x1: 0.000411, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: -2, ...},
+ {id2: 1, x1: 0.0004, xpdf2: 0, xpdf1: 0, weight: -2.63e+04, id1: -1, ...},
+ {id2: -2, x1: 0.184, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: 2, ...},
+ {id2: -1, x1: 0.00268, xpdf2: 0, xpdf1: 0, weight: -2.63e+04, id1: 1, ...}]
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+backend: cpu
+nbytes: 1.4 kB
+type: 40 * NanoCollection[
+    id2: int32[parameters={&quot;__doc__&quot;: &quot;id of second parton&quot;}],
+    x1: float32[parameters={&quot;__doc__&quot;: &quot;x1 fraction of proton momentum carried by the first parton&quot;}],
+    xpdf2: float32[parameters={&quot;__doc__&quot;: &quot;x*pdf(x) for the second parton&quot;}],
+    xpdf1: float32[parameters={&quot;__doc__&quot;: &quot;x*pdf(x) for the first parton&quot;}],
+    weight: float32[parameters={&quot;__doc__&quot;: &quot;MC generator weight&quot;}],
+    id1: int32[parameters={&quot;__doc__&quot;: &quot;id of first parton&quot;}],
+    x2: float32[parameters={&quot;__doc__&quot;: &quot;x2 fraction of proton momentum carried by the second parton&quot;}],
+    binvar: float32[parameters={&quot;__doc__&quot;: &quot;MC generation binning value&quot;}],
+    scalePDF: float32[parameters={&quot;__doc__&quot;: &quot;Q2 scale for PDF&quot;}],
+parameters={&quot;collection_name&quot;: &quot;Generator&quot;}]</pre></div>
+</div>
+<p>one branch exists named n{name} and many branches start with name_*, they interpreted as a jagged table.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: Each event has an array of Jets. Each Jet consists of a record of Jet parameters. These parameters can be scalars or flat arrays. Interpreted jagged table will look look like this:</span>
+<span class="n">result</span><span class="o">.</span><span class="n">Jet</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<pre>[[Jet, ...],
+ [Jet, ...],
+ [Jet, ...],
+ [Jet, ...],
+ [Jet, ...],
+ [Jet, ..., Jet],
+ [Jet, ...],
+ [Jet, ...],
+ [{cleanmask: 1, pt: 20.4, jetId: 6, neEmEF: 0.139, phi: 1.54, mass: ..., ...}],
+ [Jet, ..., Jet],
+ ...,
+ [Jet, ...],
+ [Jet, ..., Jet],
+ [Jet, ...],
+ [Jet, ...],
+ [Jet, ...],
+ [Jet, ...],
+ [{cleanmask: 0, pt: 22.1, jetId: 6, neEmEF: 0.391, phi: 2.11, mass: ..., ...}],
+ [Jet, ...],
+ [Jet, ...]]
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+backend: cpu
+nbytes: 43.4 kB
+type: 40 * var * Jet[
+    cleanmask: uint8[parameters={&quot;__doc__&quot;: &quot;simple cleaning mask with priority to leptons&quot;}],
+    pt: float32[parameters={&quot;__doc__&quot;: &quot;pt&quot;}],
+    jetId: int32[parameters={&quot;__doc__&quot;: &quot;Jet ID flags bit1 is loose (always false in 2017 since it does not exist), bit2 is tight, bit3 is tightLepVeto&quot;}],
+    neEmEF: float32[parameters={&quot;__doc__&quot;: &quot;neutral Electromagnetic Energy Fraction&quot;}],
+    phi: float32[parameters={&quot;__doc__&quot;: &quot;phi&quot;}],
+    mass: float32[parameters={&quot;__doc__&quot;: &quot;mass&quot;}],
+    puId: int32[parameters={&quot;__doc__&quot;: &quot;Pilup ID flags&quot;}],
+    hadronFlavour: int32[parameters={&quot;__doc__&quot;: &quot;flavour from hadron ghost clustering&quot;}],
+    genJetIdx: int32[parameters={&quot;__doc__&quot;: &quot;index of matched gen jet&quot;}],
+    qgl: float32[parameters={&quot;__doc__&quot;: &quot;Quark vs Gluon likelihood discriminator&quot;}],
+    area: float32[parameters={&quot;__doc__&quot;: &quot;jet catchment area, for JECs&quot;}],
+    eta: float32[parameters={&quot;__doc__&quot;: &quot;eta&quot;}],
+    neHEF: float32[parameters={&quot;__doc__&quot;: &quot;neutral Hadron Energy Fraction&quot;}],
+    muonIdx1: int32[parameters={&quot;__doc__&quot;: &quot;index of first matching muon&quot;}],
+    nMuons: int32[parameters={&quot;__doc__&quot;: &quot;number of muons in the jet&quot;}],
+    btagDeepC: float32[parameters={&quot;__doc__&quot;: &quot;DeepCSV charm btag discriminator&quot;}],
+    jercCHF: float32[parameters={&quot;__doc__&quot;: &quot;Charged Hadron Energy Fraction with the JERC group definition&quot;}],
+    partonFlavour: int32[parameters={&quot;__doc__&quot;: &quot;flavour from parton matching&quot;}],
+    muonSubtrFactor: float32[parameters={&quot;__doc__&quot;: &quot;1-(muon-subtracted raw pt)/(raw pt)&quot;}],
+    btagCSVV2: float32[parameters={&quot;__doc__&quot;: &quot; pfCombinedInclusiveSecondaryVertexV2 b-tag discriminator (aka CSVV2)&quot;}],
+    rawFactor: float32[parameters={&quot;__doc__&quot;: &quot;1 - Factor to get back to raw pT&quot;}],
+    btagDeepFlavB: float32[parameters={&quot;__doc__&quot;: &quot;DeepFlavour b+bb+lepb tag discriminator&quot;}],
+    bRegRes: float32[parameters={&quot;__doc__&quot;: &quot;res on pt corrected with b-jet regression&quot;}],
+    nConstituents: int32[parameters={&quot;__doc__&quot;: &quot;Number of particles in the jet&quot;}],
+    jercCHPUF: float32[parameters={&quot;__doc__&quot;: &quot;Pileup Charged Hadron Energy Fraction with the JERC group definition&quot;}],
+    muEF: float32[parameters={&quot;__doc__&quot;: &quot;muon Energy Fraction&quot;}],
+    nElectrons: int32[parameters={&quot;__doc__&quot;: &quot;number of electrons in the jet&quot;}],
+    btagDeepFlavC: float32[parameters={&quot;__doc__&quot;: &quot;DeepFlavour charm tag discriminator&quot;}],
+    electronIdx1: int32[parameters={&quot;__doc__&quot;: &quot;index of first matching electron&quot;}],
+    electronIdx2: int32[parameters={&quot;__doc__&quot;: &quot;index of second matching electron&quot;}],
+    chEmEF: float32[parameters={&quot;__doc__&quot;: &quot;charged Electromagnetic Energy Fraction&quot;}],
+    muonIdx2: int32[parameters={&quot;__doc__&quot;: &quot;index of second matching muon&quot;}],
+    btagDeepB: float32[parameters={&quot;__doc__&quot;: &quot;DeepCSV b+bb tag discriminator&quot;}],
+    btagCMVA: float32[parameters={&quot;__doc__&quot;: &quot;CMVA V2 btag discriminator&quot;}],
+    chHEF: float32[parameters={&quot;__doc__&quot;: &quot;charged Hadron Energy Fraction&quot;}],
+    bRegCorr: float32[parameters={&quot;__doc__&quot;: &quot;pt correction for b-jet energy regression&quot;}],
+    electronIdx1G: int64[parameters={&quot;__doc__&quot;: &quot;global index of first matching electron&quot;}],
+    muonIdx1G: int64[parameters={&quot;__doc__&quot;: &quot;global index of first matching muon&quot;}],
+    muonIdxG: [var * int64, parameters={&quot;__doc__&quot;: &quot;nested from global index of first matching muon and global index of second matching muon&quot;}],
+    electronIdxG: [var * int64, parameters={&quot;__doc__&quot;: &quot;nested from global index of first matching electron and global index of second matching electron&quot;}],
+    electronIdx2G: int64[parameters={&quot;__doc__&quot;: &quot;global index of second matching electron&quot;}],
+    muonIdx2G: int64[parameters={&quot;__doc__&quot;: &quot;global index of second matching muon&quot;}],
+    genJetIdxG: int64[parameters={&quot;__doc__&quot;: &quot;global index of matched gen jet&quot;}],
+parameters={&quot;collection_name&quot;: &quot;Jet&quot;, &quot;__doc__&quot;: &quot;slimmedJets, i.e. ak4 PFJets CHS with JECs applied, after basic selection (pt &gt; 15)&quot;}]</pre></div>
+</div>
+<p>Finally, all collections are then zipped into one NanoEvents record and returned.</p>
+<p>Final result:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<pre>[{btagWeight: {CSVV2: 0.951, ...}, GenVisTau: [GenVisTau, ...], ...},
+ {btagWeight: {CSVV2: 0.996, ...}, GenVisTau: [], CorrT1METJet: [...], ...},
+ {btagWeight: {CSVV2: 1.01, ...}, GenVisTau: [], CorrT1METJet: [...], ...},
+ {btagWeight: {CSVV2: 1.55, ...}, GenVisTau: [{...}], CorrT1METJet: [...], ...},
+ {btagWeight: {CSVV2: 0.805, ...}, GenVisTau: [], CorrT1METJet: [...], ...},
+ {btagWeight: {CSVV2: 0.84, ...}, GenVisTau: [{...}], CorrT1METJet: [...], ...},
+ {btagWeight: {CSVV2: 0.997, ...}, GenVisTau: [], CorrT1METJet: [], ...},
+ {btagWeight: {CSVV2: 1, DeepCSVB: 1}, GenVisTau: [], CorrT1METJet: [...], ...},
+ {btagWeight: {CSVV2: 1, DeepCSVB: 1}, GenVisTau: [], CorrT1METJet: [...], ...},
+ {btagWeight: {CSVV2: 1.03, ...}, GenVisTau: [], CorrT1METJet: [...], ...},
+ ...,
+ {btagWeight: {CSVV2: 0.804, ...}, GenVisTau: [{...}], CorrT1METJet: ..., ...},
+ {btagWeight: {CSVV2: 1, DeepCSVB: 1}, GenVisTau: [], CorrT1METJet: [...], ...},
+ {btagWeight: {CSVV2: 0.97, ...}, GenVisTau: [], CorrT1METJet: [...], ...},
+ {btagWeight: {CSVV2: 1.05, ...}, GenVisTau: [{...}], CorrT1METJet: [...], ...},
+ {btagWeight: {CSVV2: 1, DeepCSVB: 1}, GenVisTau: [{...}], ...},
+ {btagWeight: {CSVV2: 0.954, ...}, GenVisTau: [], CorrT1METJet: [...], ...},
+ {btagWeight: {CSVV2: 1, DeepCSVB: 1}, GenVisTau: [], CorrT1METJet: [...], ...},
+ {btagWeight: {CSVV2: 1, DeepCSVB: 1}, GenVisTau: [], CorrT1METJet: [...], ...},
+ {btagWeight: {CSVV2: 1, DeepCSVB: 1}, GenVisTau: [{...}], ...}]
+--------------------------------------------------------------------------------
+backend: cpu
+nbytes: 192.0 kB
+type: 40 * event</pre></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="o">.</span><span class="n">Jet</span><span class="o">.</span><span class="n">mass</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<pre>[[11.7, 8.94, 2.69, 3.81, 4.23],
+ [17, 6.25, 6.07, 5, 3.89, 4, 4.31, 4.55],
+ [12.4, 5.99, 2.78, 5.88, 4.64],
+ [5.82, 6.14, 2.63],
+ [12.5, 6.99, 4.14, 3.24, 3.68],
+ [6.9, 7.5, 3.17, 6.78, 5.36, 4.16, 4.66, 4.62],
+ [9.49, 0.111, 7.05, 4.96],
+ [6.51, 4.98, 6.54, 5.12],
+ [3.69],
+ [4.89, 5.16, 7.83, 8.38, 6.3, 4.62, 4.41, 2.9, 3.54],
+ ...,
+ [2.28, 3.78],
+ [4.92, 4.43, 4.37, 3.54],
+ [7.45, 6.52, 7.59, 4.74, 4.27, 4.32, 5.01, 4, 4.23],
+ [4.83, 5.8, 4.85],
+ [3.62, 3.87],
+ [6.04, 4.84, 4.29],
+ [5.33],
+ [10.8, 9.75, 6.52, 5.45, 3.94, 3.42],
+ [3.88, 4.47]]
+--------------------------------------------------------
+backend: cpu
+nbytes: 1.1 kB
+type: 40 * var * float32[parameters={&quot;__doc__&quot;: &quot;mass&quot;}]</pre></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Zipper-with-virtual-arrays">
+<h1>Zipper with virtual arrays<a class="headerlink" href="#Zipper-with-virtual-arrays" title="Link to this heading"></a></h1>
+<p>Let’s load the same root file but as virtual arrays. Virtual arrays don’t load the data from disk (or in other words don’t materialize the data).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a TTree from root</span>
+<span class="n">tree</span> <span class="o">=</span> <span class="n">uproot</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"nano_dy.root"</span><span class="p">)[</span><span class="s2">"Events"</span><span class="p">]</span>
+<span class="c1"># to load virtual arrays</span>
+<span class="n">access_log</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># which of the data was materialized</span>
+<span class="c1"># TTree -&gt; awkward.Array[awkward.Record[str, awkward.Array]]</span>
+<span class="n">array</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">arrays</span><span class="p">(</span><span class="n">virtual</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ak_add_doc</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">access_log</span><span class="o">=</span><span class="n">access_log</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Calling zipper</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">restructure</span> <span class="o">=</span> <span class="n">NanoAOD</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="s2">"latest"</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">restructure</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+&lt;ipython-input-19-76941848e4f5&gt;:2: RuntimeWarning: Missing cross-reference index for LowPtElectron_electronIdx =&gt; Electron
+  result = restructure(array)
+&lt;ipython-input-19-76941848e4f5&gt;:2: RuntimeWarning: Missing cross-reference index for LowPtElectron_genPartIdx =&gt; GenPart
+  result = restructure(array)
+&lt;ipython-input-19-76941848e4f5&gt;:2: RuntimeWarning: Missing cross-reference index for LowPtElectron_photonIdx =&gt; Photon
+  result = restructure(array)
+&lt;ipython-input-19-76941848e4f5&gt;:2: RuntimeWarning: Missing cross-reference index for FatJet_genJetAK8Idx =&gt; GenJetAK8
+  result = restructure(array)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">access_log</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<pre>[{btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},
+ {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},
+ {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},
+ {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},
+ {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},
+ {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},
+ {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},
+ {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},
+ {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},
+ {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},
+ ...,
+ {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},
+ {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},
+ {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},
+ {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},
+ {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},
+ {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},
+ {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},
+ {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...},
+ {btagWeight: {CSVV2: ??, ...}, GenVisTau: ??, CorrT1METJet: ??, ...}]
+----------------------------------------------------------------------
+backend: cpu
+nbytes: unknown
+type: 40 * event</pre></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="o">.</span><span class="n">Jet</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<pre>[??,
+ ??,
+ ??,
+ ??,
+ ??,
+ ??,
+ ??,
+ ??,
+ ??,
+ ??,
+ ...,
+ ??,
+ ??,
+ ??,
+ ??,
+ ??,
+ ??,
+ ??,
+ ??,
+ ??]
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+backend: cpu
+nbytes: unknown
+type: 40 * var * Jet[
+    cleanmask: uint8[parameters={&quot;__doc__&quot;: &quot;simple cleaning mask with priority to leptons&quot;}],
+    pt: float32[parameters={&quot;__doc__&quot;: &quot;pt&quot;}],
+    jetId: int32[parameters={&quot;__doc__&quot;: &quot;Jet ID flags bit1 is loose (always false in 2017 since it does not exist), bit2 is tight, bit3 is tightLepVeto&quot;}],
+    neEmEF: float32[parameters={&quot;__doc__&quot;: &quot;neutral Electromagnetic Energy Fraction&quot;}],
+    phi: float32[parameters={&quot;__doc__&quot;: &quot;phi&quot;}],
+    mass: float32[parameters={&quot;__doc__&quot;: &quot;mass&quot;}],
+    puId: int32[parameters={&quot;__doc__&quot;: &quot;Pilup ID flags&quot;}],
+    hadronFlavour: int32[parameters={&quot;__doc__&quot;: &quot;flavour from hadron ghost clustering&quot;}],
+    genJetIdx: int32[parameters={&quot;__doc__&quot;: &quot;index of matched gen jet&quot;}],
+    qgl: float32[parameters={&quot;__doc__&quot;: &quot;Quark vs Gluon likelihood discriminator&quot;}],
+    area: float32[parameters={&quot;__doc__&quot;: &quot;jet catchment area, for JECs&quot;}],
+    eta: float32[parameters={&quot;__doc__&quot;: &quot;eta&quot;}],
+    neHEF: float32[parameters={&quot;__doc__&quot;: &quot;neutral Hadron Energy Fraction&quot;}],
+    muonIdx1: int32[parameters={&quot;__doc__&quot;: &quot;index of first matching muon&quot;}],
+    nMuons: int32[parameters={&quot;__doc__&quot;: &quot;number of muons in the jet&quot;}],
+    btagDeepC: float32[parameters={&quot;__doc__&quot;: &quot;DeepCSV charm btag discriminator&quot;}],
+    jercCHF: float32[parameters={&quot;__doc__&quot;: &quot;Charged Hadron Energy Fraction with the JERC group definition&quot;}],
+    partonFlavour: int32[parameters={&quot;__doc__&quot;: &quot;flavour from parton matching&quot;}],
+    muonSubtrFactor: float32[parameters={&quot;__doc__&quot;: &quot;1-(muon-subtracted raw pt)/(raw pt)&quot;}],
+    btagCSVV2: float32[parameters={&quot;__doc__&quot;: &quot; pfCombinedInclusiveSecondaryVertexV2 b-tag discriminator (aka CSVV2)&quot;}],
+    rawFactor: float32[parameters={&quot;__doc__&quot;: &quot;1 - Factor to get back to raw pT&quot;}],
+    btagDeepFlavB: float32[parameters={&quot;__doc__&quot;: &quot;DeepFlavour b+bb+lepb tag discriminator&quot;}],
+    bRegRes: float32[parameters={&quot;__doc__&quot;: &quot;res on pt corrected with b-jet regression&quot;}],
+    nConstituents: int32[parameters={&quot;__doc__&quot;: &quot;Number of particles in the jet&quot;}],
+    jercCHPUF: float32[parameters={&quot;__doc__&quot;: &quot;Pileup Charged Hadron Energy Fraction with the JERC group definition&quot;}],
+    muEF: float32[parameters={&quot;__doc__&quot;: &quot;muon Energy Fraction&quot;}],
+    nElectrons: int32[parameters={&quot;__doc__&quot;: &quot;number of electrons in the jet&quot;}],
+    btagDeepFlavC: float32[parameters={&quot;__doc__&quot;: &quot;DeepFlavour charm tag discriminator&quot;}],
+    electronIdx1: int32[parameters={&quot;__doc__&quot;: &quot;index of first matching electron&quot;}],
+    electronIdx2: int32[parameters={&quot;__doc__&quot;: &quot;index of second matching electron&quot;}],
+    chEmEF: float32[parameters={&quot;__doc__&quot;: &quot;charged Electromagnetic Energy Fraction&quot;}],
+    muonIdx2: int32[parameters={&quot;__doc__&quot;: &quot;index of second matching muon&quot;}],
+    btagDeepB: float32[parameters={&quot;__doc__&quot;: &quot;DeepCSV b+bb tag discriminator&quot;}],
+    btagCMVA: float32[parameters={&quot;__doc__&quot;: &quot;CMVA V2 btag discriminator&quot;}],
+    chHEF: float32[parameters={&quot;__doc__&quot;: &quot;charged Hadron Energy Fraction&quot;}],
+    bRegCorr: float32[parameters={&quot;__doc__&quot;: &quot;pt correction for b-jet energy regression&quot;}],
+    electronIdx1G: int64[parameters={&quot;__doc__&quot;: &quot;global index of first matching electron&quot;}],
+    muonIdx1G: int64[parameters={&quot;__doc__&quot;: &quot;global index of first matching muon&quot;}],
+    muonIdxG: [var * int64, parameters={&quot;__doc__&quot;: &quot;nested from global index of first matching muon and global index of second matching muon&quot;}],
+    electronIdxG: [var * int64, parameters={&quot;__doc__&quot;: &quot;nested from global index of first matching electron and global index of second matching electron&quot;}],
+    electronIdx2G: int64[parameters={&quot;__doc__&quot;: &quot;global index of second matching electron&quot;}],
+    muonIdx2G: int64[parameters={&quot;__doc__&quot;: &quot;global index of second matching muon&quot;}],
+    genJetIdxG: int64[parameters={&quot;__doc__&quot;: &quot;global index of matched gen jet&quot;}],
+parameters={&quot;collection_name&quot;: &quot;Jet&quot;, &quot;__doc__&quot;: &quot;slimmedJets, i.e. ak4 PFJets CHS with JECs applied, after basic selection (pt &gt; 15)&quot;}]</pre></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">Jet</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<pre>[{cleanmask: ??, pt: ??, jetId: ??, neEmEF: ??, phi: ??, mass: ??, ...},
+ {cleanmask: ??, pt: ??, jetId: ??, neEmEF: ??, phi: ??, mass: ??, ...},
+ {cleanmask: ??, pt: ??, jetId: ??, neEmEF: ??, phi: ??, mass: ??, ...},
+ {cleanmask: ??, pt: ??, jetId: ??, neEmEF: ??, phi: ??, mass: ??, ...},
+ {cleanmask: ??, pt: ??, jetId: ??, neEmEF: ??, phi: ??, mass: ??, ...}]
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+backend: cpu
+nbytes: unknown
+type: 5 * Jet[
+    cleanmask: uint8[parameters={&quot;__doc__&quot;: &quot;simple cleaning mask with priority to leptons&quot;}],
+    pt: float32[parameters={&quot;__doc__&quot;: &quot;pt&quot;}],
+    jetId: int32[parameters={&quot;__doc__&quot;: &quot;Jet ID flags bit1 is loose (always false in 2017 since it does not exist), bit2 is tight, bit3 is tightLepVeto&quot;}],
+    neEmEF: float32[parameters={&quot;__doc__&quot;: &quot;neutral Electromagnetic Energy Fraction&quot;}],
+    phi: float32[parameters={&quot;__doc__&quot;: &quot;phi&quot;}],
+    mass: float32[parameters={&quot;__doc__&quot;: &quot;mass&quot;}],
+    puId: int32[parameters={&quot;__doc__&quot;: &quot;Pilup ID flags&quot;}],
+    hadronFlavour: int32[parameters={&quot;__doc__&quot;: &quot;flavour from hadron ghost clustering&quot;}],
+    genJetIdx: int32[parameters={&quot;__doc__&quot;: &quot;index of matched gen jet&quot;}],
+    qgl: float32[parameters={&quot;__doc__&quot;: &quot;Quark vs Gluon likelihood discriminator&quot;}],
+    area: float32[parameters={&quot;__doc__&quot;: &quot;jet catchment area, for JECs&quot;}],
+    eta: float32[parameters={&quot;__doc__&quot;: &quot;eta&quot;}],
+    neHEF: float32[parameters={&quot;__doc__&quot;: &quot;neutral Hadron Energy Fraction&quot;}],
+    muonIdx1: int32[parameters={&quot;__doc__&quot;: &quot;index of first matching muon&quot;}],
+    nMuons: int32[parameters={&quot;__doc__&quot;: &quot;number of muons in the jet&quot;}],
+    btagDeepC: float32[parameters={&quot;__doc__&quot;: &quot;DeepCSV charm btag discriminator&quot;}],
+    jercCHF: float32[parameters={&quot;__doc__&quot;: &quot;Charged Hadron Energy Fraction with the JERC group definition&quot;}],
+    partonFlavour: int32[parameters={&quot;__doc__&quot;: &quot;flavour from parton matching&quot;}],
+    muonSubtrFactor: float32[parameters={&quot;__doc__&quot;: &quot;1-(muon-subtracted raw pt)/(raw pt)&quot;}],
+    btagCSVV2: float32[parameters={&quot;__doc__&quot;: &quot; pfCombinedInclusiveSecondaryVertexV2 b-tag discriminator (aka CSVV2)&quot;}],
+    rawFactor: float32[parameters={&quot;__doc__&quot;: &quot;1 - Factor to get back to raw pT&quot;}],
+    btagDeepFlavB: float32[parameters={&quot;__doc__&quot;: &quot;DeepFlavour b+bb+lepb tag discriminator&quot;}],
+    bRegRes: float32[parameters={&quot;__doc__&quot;: &quot;res on pt corrected with b-jet regression&quot;}],
+    nConstituents: int32[parameters={&quot;__doc__&quot;: &quot;Number of particles in the jet&quot;}],
+    jercCHPUF: float32[parameters={&quot;__doc__&quot;: &quot;Pileup Charged Hadron Energy Fraction with the JERC group definition&quot;}],
+    muEF: float32[parameters={&quot;__doc__&quot;: &quot;muon Energy Fraction&quot;}],
+    nElectrons: int32[parameters={&quot;__doc__&quot;: &quot;number of electrons in the jet&quot;}],
+    btagDeepFlavC: float32[parameters={&quot;__doc__&quot;: &quot;DeepFlavour charm tag discriminator&quot;}],
+    electronIdx1: int32[parameters={&quot;__doc__&quot;: &quot;index of first matching electron&quot;}],
+    electronIdx2: int32[parameters={&quot;__doc__&quot;: &quot;index of second matching electron&quot;}],
+    chEmEF: float32[parameters={&quot;__doc__&quot;: &quot;charged Electromagnetic Energy Fraction&quot;}],
+    muonIdx2: int32[parameters={&quot;__doc__&quot;: &quot;index of second matching muon&quot;}],
+    btagDeepB: float32[parameters={&quot;__doc__&quot;: &quot;DeepCSV b+bb tag discriminator&quot;}],
+    btagCMVA: float32[parameters={&quot;__doc__&quot;: &quot;CMVA V2 btag discriminator&quot;}],
+    chHEF: float32[parameters={&quot;__doc__&quot;: &quot;charged Hadron Energy Fraction&quot;}],
+    bRegCorr: float32[parameters={&quot;__doc__&quot;: &quot;pt correction for b-jet energy regression&quot;}],
+    electronIdx1G: int64[parameters={&quot;__doc__&quot;: &quot;global index of first matching electron&quot;}],
+    muonIdx1G: int64[parameters={&quot;__doc__&quot;: &quot;global index of first matching muon&quot;}],
+    muonIdxG: [var * int64, parameters={&quot;__doc__&quot;: &quot;nested from global index of first matching muon and global index of second matching muon&quot;}],
+    electronIdxG: [var * int64, parameters={&quot;__doc__&quot;: &quot;nested from global index of first matching electron and global index of second matching electron&quot;}],
+    electronIdx2G: int64[parameters={&quot;__doc__&quot;: &quot;global index of second matching electron&quot;}],
+    muonIdx2G: int64[parameters={&quot;__doc__&quot;: &quot;global index of second matching muon&quot;}],
+    genJetIdxG: int64[parameters={&quot;__doc__&quot;: &quot;global index of matched gen jet&quot;}],
+parameters={&quot;collection_name&quot;: &quot;Jet&quot;, &quot;__doc__&quot;: &quot;slimmedJets, i.e. ak4 PFJets CHS with JECs applied, after basic selection (pt &gt; 15)&quot;}]</pre></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">access_log</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[Accessed(branch=&#39;nJet&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;nJet&#39;)-data&#34;)]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">array</span><span class="o">.</span><span class="n">nJet</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<pre>[5,
+ 8,
+ 5,
+ 3,
+ 5,
+ 8,
+ 4,
+ 4,
+ 1,
+ 9,
+ ...,
+ 2,
+ 4,
+ 9,
+ 3,
+ 2,
+ 3,
+ 1,
+ 6,
+ 2]
+--------------------------------------------------------------------------------------------------------------------------------
+backend: cpu
+nbytes: 160 B
+type: 40 * uint32[parameters={&quot;__doc__&quot;: &quot;slimmedJets, i.e. ak4 PFJets CHS with JECs applied, after basic selection (pt &gt; 15)&quot;}]</pre></div>
+</div>
+</section>
+<section id="Example-calculation-of-a-Z-peak">
+<h1>Example calculation of a Z-peak<a class="headerlink" href="#Example-calculation-of-a-Z-peak" title="Link to this heading"></a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">zcands</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">Muon</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">access_log</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[Accessed(branch=&#39;nMuon&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;nMuon&#39;)-data&#34;)]
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># count invariant mass</span>
+<span class="n">mass</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">flatten</span><span class="p">((</span><span class="n">zcands</span><span class="p">[</span><span class="s2">"0"</span><span class="p">]</span> <span class="o">+</span> <span class="n">zcands</span><span class="p">[</span><span class="s2">"1"</span><span class="p">])</span><span class="o">.</span><span class="n">mass</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>We can see that for this, 4-vector coordinates were loaded, which were used to add the combinations</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">access_log</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[Accessed(branch=&#39;nMuon&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;nMuon&#39;)-data&#34;),
+ Accessed(branch=&#39;Muon_pt&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Muon_pt&#39;, None)-data&#34;),
+ Accessed(branch=&#39;Muon_phi&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Muon_phi&#39;, None)-data&#34;),
+ Accessed(branch=&#39;Muon_eta&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Muon_eta&#39;, None)-data&#34;),
+ Accessed(branch=&#39;Muon_mass&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Muon_mass&#39;, None)-data&#34;),
+ Accessed(branch=&#39;Muon_charge&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Muon_charge&#39;, None)-data&#34;)]
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">capture</span>
+<span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="s2">"hist[plot]"</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">hist</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hist</span>
+
+<span class="n">Hist</span><span class="o">.</span><span class="n">new</span><span class="o">.</span><span class="n">Reg</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span><span class="o">.</span><span class="n">Double</span><span class="p">()</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">mass</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[StairsArtists(stairs=&lt;matplotlib.patches.StepPatch object at 0x7b4d8583b350&gt;, errorbar=&lt;ErrorbarContainer object of 3 artists&gt;, legend_artist=&lt;ErrorbarContainer object of 3 artists&gt;)]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_Usage_example_of_awkward_zipper_65_1.png" src="../_images/notebooks_Usage_example_of_awkward_zipper_65_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="o">.</span><span class="n">Muon</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<pre>[[],
+ [],
+ [],
+ [],
+ [Muon, Muon],
+ [{jetRelIso: ??, pt: 31, sip3d: ??, isTracker: ??, mediumPromptId: ??, ...}],
+ [Muon, Muon],
+ [],
+ [],
+ [],
+ ...,
+ [{jetRelIso: ??, pt: 10.1, sip3d: ??, isTracker: ??, ...}],
+ [],
+ [],
+ [{jetRelIso: ??, pt: 17.9, sip3d: ??, isTracker: ??, ...}],
+ [],
+ [],
+ [],
+ [],
+ []]
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+backend: cpu
+nbytes: 3.4 kB
+type: 40 * var * Muon[
+    jetRelIso: float32[parameters={&quot;__doc__&quot;: &quot;Relative isolation in matched jet (1/ptRatio-1, pfRelIso04_all if no matched jet)&quot;}],
+    pt: float32[parameters={&quot;__doc__&quot;: &quot;pt&quot;}],
+    sip3d: float32[parameters={&quot;__doc__&quot;: &quot;3D impact parameter significance wrt first PV&quot;}],
+    isTracker: bool[parameters={&quot;__doc__&quot;: &quot;muon is tracker muon&quot;}],
+    mediumPromptId: bool[parameters={&quot;__doc__&quot;: &quot;cut-based ID, medium prompt WP&quot;}],
+    nTrackerLayers: int32[parameters={&quot;__doc__&quot;: &quot;number of layers in the tracker&quot;}],
+    pfRelIso03_chg: float32[parameters={&quot;__doc__&quot;: &quot;PF relative isolation dR=0.3, charged component&quot;}],
+    cleanmask: uint8[parameters={&quot;__doc__&quot;: &quot;simple cleaning mask with priority to leptons&quot;}],
+    pfIsoId: uint8[parameters={&quot;__doc__&quot;: &quot;PFIso ID from miniAOD selector (1=PFIsoVeryLoose, 2=PFIsoLoose, 3=PFIsoMedium, 4=PFIsoTight, 5=PFIsoVeryTight, 6=PFIsoVeryVeryTight)&quot;}],
+    pfRelIso04_all: float32[parameters={&quot;__doc__&quot;: &quot;PF relative isolation dR=0.4, total (deltaBeta corrections)&quot;}],
+    dzErr: float32[parameters={&quot;__doc__&quot;: &quot;dz uncertainty, in cm&quot;}],
+    genPartFlav: uint8[parameters={&quot;__doc__&quot;: &quot;Flavour of genParticle for MC matching to status==1 muons: 1 = prompt muon (including gamma*-&gt;mu mu), 15 = muon from prompt tau, 5 = muon from b, 4 = muon from c, 3 = muon from light or unknown, 0 = unmatched&quot;}],
+    tunepRelPt: float32[parameters={&quot;__doc__&quot;: &quot;TuneP relative pt, tunePpt/pt&quot;}],
+    miniPFRelIso_chg: float32[parameters={&quot;__doc__&quot;: &quot;mini PF relative isolation, charged component&quot;}],
+    eta: float32[parameters={&quot;__doc__&quot;: &quot;eta&quot;}],
+    genPartIdx: int32[parameters={&quot;__doc__&quot;: &quot;Index into genParticle list for MC matching to status==1 muons&quot;}],
+    miniIsoId: uint8[parameters={&quot;__doc__&quot;: &quot;MiniIso ID from miniAOD selector (1=MiniIsoLoose, 2=MiniIsoMedium, 3=MiniIsoTight, 4=MiniIsoVeryTight)&quot;}],
+    tightId: bool[parameters={&quot;__doc__&quot;: &quot;cut-based ID, tight WP&quot;}],
+    dxy: float32[parameters={&quot;__doc__&quot;: &quot;dxy (with sign) wrt first PV, in cm&quot;}],
+    tightCharge: int32[parameters={&quot;__doc__&quot;: &quot;Tight charge criterion using pterr/pt of muonBestTrack (0:fail, 2:pass)&quot;}],
+    triggerIdLoose: bool[parameters={&quot;__doc__&quot;: &quot;TriggerIdLoose ID&quot;}],
+    jetIdx: int32[parameters={&quot;__doc__&quot;: &quot;index of the associated jet (-1 if none)&quot;}],
+    ptErr: float32[parameters={&quot;__doc__&quot;: &quot;ptError of the muon track&quot;}],
+    nStations: int32[parameters={&quot;__doc__&quot;: &quot;number of matched stations with default arbitration (segment &amp; track)&quot;}],
+    miniPFRelIso_all: float32[parameters={&quot;__doc__&quot;: &quot;mini PF relative isolation, total (with scaled rho*EA PU corrections)&quot;}],
+    pfRelIso03_all: float32[parameters={&quot;__doc__&quot;: &quot;PF relative isolation dR=0.3, total (deltaBeta corrections)&quot;}],
+    mvaTTH: float32[parameters={&quot;__doc__&quot;: &quot;TTH MVA lepton ID score&quot;}],
+    softMva: float32[parameters={&quot;__doc__&quot;: &quot;soft MVA ID score&quot;}],
+    pdgId: int32[parameters={&quot;__doc__&quot;: &quot;PDG code assigned by the event reconstruction (not by MC truth)&quot;}],
+    mediumId: bool[parameters={&quot;__doc__&quot;: &quot;cut-based ID, medium WP&quot;}],
+    isGlobal: bool[parameters={&quot;__doc__&quot;: &quot;muon is global muon&quot;}],
+    highPtId: uint8[parameters={&quot;__doc__&quot;: &quot;high-pT cut-based ID (1 = tracker high pT, 2 = global high pT, which includes tracker high pT)&quot;}],
+    looseId: bool[parameters={&quot;__doc__&quot;: &quot;muon is loose muon&quot;}],
+    ip3d: float32[parameters={&quot;__doc__&quot;: &quot;3D impact parameter wrt first PV, in cm&quot;}],
+    inTimeMuon: bool[parameters={&quot;__doc__&quot;: &quot;inTimeMuon ID&quot;}],
+    isPFcand: bool[parameters={&quot;__doc__&quot;: &quot;muon is PF candidate&quot;}],
+    mass: float32[parameters={&quot;__doc__&quot;: &quot;mass&quot;}],
+    tkRelIso: float32[parameters={&quot;__doc__&quot;: &quot;Tracker-based relative isolation dR=0.3 for highPt, trkIso/tunePpt&quot;}],
+    phi: float32[parameters={&quot;__doc__&quot;: &quot;phi&quot;}],
+    dz: float32[parameters={&quot;__doc__&quot;: &quot;dz (with sign) wrt first PV, in cm&quot;}],
+    softId: bool[parameters={&quot;__doc__&quot;: &quot;soft cut-based ID&quot;}],
+    charge: int32[parameters={&quot;__doc__&quot;: &quot;electric charge&quot;}],
+    mvaId: uint8[parameters={&quot;__doc__&quot;: &quot;Mva ID from miniAOD selector (1=MvaLoose, 2=MvaMedium, 3=MvaTight)&quot;}],
+    segmentComp: float32[parameters={&quot;__doc__&quot;: &quot;muon segment compatibility&quot;}],
+    mvaLowPt: float32[parameters={&quot;__doc__&quot;: &quot;Low pt muon ID score&quot;}],
+    tkIsoId: uint8[parameters={&quot;__doc__&quot;: &quot;TkIso ID (1=TkIsoLoose, 2=TkIsoTight)&quot;}],
+    multiIsoId: uint8[parameters={&quot;__doc__&quot;: &quot;MultiIsoId from miniAOD selector (1=MultiIsoLoose, 2=MultiIsoMedium)&quot;}],
+    fsrPhotonIdx: int32[parameters={&quot;__doc__&quot;: &quot;Index of the associated FSR photon&quot;}],
+    dxyErr: float32[parameters={&quot;__doc__&quot;: &quot;dxy uncertainty, in cm&quot;}],
+    jetPtRelv2: float32[parameters={&quot;__doc__&quot;: &quot;Relative momentum of the lepton with respect to the closest jet after subtracting the lepton&quot;}],
+    softMvaId: bool[parameters={&quot;__doc__&quot;: &quot;soft MVA ID&quot;}],
+    fsrPhotonIdxG: int64[parameters={&quot;__doc__&quot;: &quot;global Index of the associated FSR photon&quot;}],
+    jetIdxG: int64[parameters={&quot;__doc__&quot;: &quot;global index of the associated jet (-1 if none)&quot;}],
+    genPartIdxG: int64[parameters={&quot;__doc__&quot;: &quot;global Index into genParticle list for MC matching to status==1 muons&quot;}],
+parameters={&quot;collection_name&quot;: &quot;Muon&quot;, &quot;__doc__&quot;: &quot;slimmedMuons after basic selection (pt &gt; 3 &amp;&amp; (passed(&#x27;CutBasedIdLoose&#x27;) || passed(&#x27;SoftCutBasedId&#x27;) || passed(&#x27;SoftMvaId&#x27;) || passed(&#x27;CutBasedIdGlobalHighPt&#x27;) || passed(&#x27;CutBasedIdTrkHighPt&#x27;)))&quot;}]</pre></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="o">.</span><span class="n">Muon</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="mi">300</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{jetRelIso: ??,
+ pt: 76.8,
+ sip3d: ??,
+ isTracker: ??,
+ mediumPromptId: ??,
+ nTrackerLayers: ??,
+ pfRelIso03_chg: ??,
+ cleanmask: ??,
+ pfIsoId: ??,
+ pfRelIso04_all: ??,
+ dzErr: ??,
+ genPartFlav: ??,
+ tunepRelPt: ??,
+ miniPFRelIso_chg: ??,
+ eta: 0.714,
+ genPartIdx: ??,
+ miniIsoId: ??,
+ tightId: ??,
+ dxy: ??,
+ tightCharge: ??,
+ triggerIdLoose: ??,
+ jetIdx: ??,
+ ptErr: ??,
+ nStations: ??,
+ miniPFRelIso_all: ??,
+ pfRelIso03_all: ??,
+ mvaTTH: ??,
+ softMva: ??,
+ pdgId: ??,
+ mediumId: ??,
+ isGlobal: ??,
+ highPtId: ??,
+ looseId: ??,
+ ip3d: ??,
+ inTimeMuon: ??,
+ isPFcand: ??,
+ mass: 0.106,
+ tkRelIso: ??,
+ phi: 1.64,
+ dz: ??,
+ softId: ??,
+ charge: -1,
+ mvaId: ??,
+ segmentComp: ??,
+ mvaLowPt: ??,
+ tkIsoId: ??,
+ multiIsoId: ??,
+ fsrPhotonIdx: ??,
+ dxyErr: ??,
+ jetPtRelv2: ??,
+ softMvaId: ??,
+ fsrPhotonIdxG: ??,
+ jetIdxG: ??,
+ genPartIdxG: ??}
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../usage_example.html" class="btn btn-neutral float-left" title="Quick start" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../benchmarks.html" class="btn btn-neutral float-right" title="Benchmarks" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Peter Fackeldey, Maxym Naumchyk.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
