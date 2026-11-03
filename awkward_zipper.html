@@ -1,0 +1,1228 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>awkward_zipper package &mdash; awkward-zipper 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=fd3f3429" />
+
+  
+    <link rel="shortcut icon" href="_static/logo_unfilled_with_text.png"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="awkward_zipper.behaviors" href="awkward_zipper.behaviors.html" />
+    <link rel="prev" title="Documentation" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            awkward-zipper
+              <img src="_static/logo_unfilled_with_black_text.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="notebooks.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">awkward_zipper package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#behaviors">Behaviors</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="awkward_zipper.behaviors.html">awkward_zipper.behaviors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#layouts">Layouts</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="awkward_zipper.layouts.html">awkward_zipper.layouts</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-awkward_zipper.awkward_util">awkward_zipper.awkward_util</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-awkward_zipper.kernels">Kernels</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.kernels.begin_end_counts"><code class="docutils literal notranslate"><span class="pre">begin_end_counts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.kernels.begin_end_mapping"><code class="docutils literal notranslate"><span class="pre">begin_end_mapping()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.kernels.children"><code class="docutils literal notranslate"><span class="pre">children()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.kernels.counts2nestedindex"><code class="docutils literal notranslate"><span class="pre">counts2nestedindex()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.kernels.counts2offsets"><code class="docutils literal notranslate"><span class="pre">counts2offsets()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.kernels.dispatch_wrap"><code class="docutils literal notranslate"><span class="pre">dispatch_wrap()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.kernels.distinct_children_deep"><code class="docutils literal notranslate"><span class="pre">distinct_children_deep()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.kernels.distinct_parent"><code class="docutils literal notranslate"><span class="pre">distinct_parent()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.kernels.ensure_array"><code class="docutils literal notranslate"><span class="pre">ensure_array()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.kernels.eventindex_content"><code class="docutils literal notranslate"><span class="pre">eventindex_content()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.kernels.full_like_from_array"><code class="docutils literal notranslate"><span class="pre">full_like_from_array()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.kernels.full_like_from_content"><code class="docutils literal notranslate"><span class="pre">full_like_from_content()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.kernels.full_like_from_counts"><code class="docutils literal notranslate"><span class="pre">full_like_from_counts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.kernels.grow_local_index_to_target_shape"><code class="docutils literal notranslate"><span class="pre">grow_local_index_to_target_shape()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.kernels.local2global"><code class="docutils literal notranslate"><span class="pre">local2global()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.kernels.local2globalindex"><code class="docutils literal notranslate"><span class="pre">local2globalindex()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.kernels.met_to_rho"><code class="docutils literal notranslate"><span class="pre">met_to_rho()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.kernels.nested_local2global"><code class="docutils literal notranslate"><span class="pre">nested_local2global()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.kernels.nestedindex"><code class="docutils literal notranslate"><span class="pre">nestedindex()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.kernels.qoverp_theta_to_pt"><code class="docutils literal notranslate"><span class="pre">qoverp_theta_to_pt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.kernels.qoverp_to_p"><code class="docutils literal notranslate"><span class="pre">qoverp_to_p()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.kernels.regular_to_jagged"><code class="docutils literal notranslate"><span class="pre">regular_to_jagged()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-awkward_zipper">Package classes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.BaseLayoutBuilder"><code class="docutils literal notranslate"><span class="pre">BaseLayoutBuilder</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.Delphes"><code class="docutils literal notranslate"><span class="pre">Delphes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.EDM4HEP"><code class="docutils literal notranslate"><span class="pre">EDM4HEP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.EDM4HEP_v00_10_01"><code class="docutils literal notranslate"><span class="pre">EDM4HEP_v00_10_01</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.EDM4HEP_v00_10_02"><code class="docutils literal notranslate"><span class="pre">EDM4HEP_v00_10_02</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.EDM4HEP_v00_10_03"><code class="docutils literal notranslate"><span class="pre">EDM4HEP_v00_10_03</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.EDM4HEP_v00_10_04"><code class="docutils literal notranslate"><span class="pre">EDM4HEP_v00_10_04</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.EDM4HEP_v00_10_05"><code class="docutils literal notranslate"><span class="pre">EDM4HEP_v00_10_05</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.EDM4HEP_v00_99_00"><code class="docutils literal notranslate"><span class="pre">EDM4HEP_v00_99_00</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.EDM4HEP_v00_99_01"><code class="docutils literal notranslate"><span class="pre">EDM4HEP_v00_99_01</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.EDM4HEP_v00_99_02"><code class="docutils literal notranslate"><span class="pre">EDM4HEP_v00_99_02</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.EDM4HEP_v00_99_03"><code class="docutils literal notranslate"><span class="pre">EDM4HEP_v00_99_03</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.EDM4HEP_v00_99_04"><code class="docutils literal notranslate"><span class="pre">EDM4HEP_v00_99_04</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.EDM4HEP_v01_00"><code class="docutils literal notranslate"><span class="pre">EDM4HEP_v01_00</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.EDM4HEP_v01_01"><code class="docutils literal notranslate"><span class="pre">EDM4HEP_v01_01</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.FCC"><code class="docutils literal notranslate"><span class="pre">FCC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.FCCSchema"><code class="docutils literal notranslate"><span class="pre">FCCSchema</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.FCCSchema_edm4hep1"><code class="docutils literal notranslate"><span class="pre">FCCSchema_edm4hep1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.NanoAOD"><code class="docutils literal notranslate"><span class="pre">NanoAOD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.Ntuple"><code class="docutils literal notranslate"><span class="pre">Ntuple</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.PDUNE"><code class="docutils literal notranslate"><span class="pre">PDUNE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.PFNanoAOD"><code class="docutils literal notranslate"><span class="pre">PFNanoAOD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.PHYSLITE"><code class="docutils literal notranslate"><span class="pre">PHYSLITE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.ScoutingNanoAOD"><code class="docutils literal notranslate"><span class="pre">ScoutingNanoAOD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.TreeMaker"><code class="docutils literal notranslate"><span class="pre">TreeMaker</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.edm4hep_version"><code class="docutils literal notranslate"><span class="pre">edm4hep_version()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#awkward_zipper.podio_collection_types"><code class="docutils literal notranslate"><span class="pre">podio_collection_types()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">awkward-zipper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">Documentation</a></li>
+      <li class="breadcrumb-item active">awkward_zipper package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/awkward_zipper.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="awkward-zipper-package">
+<h1>awkward_zipper package<a class="headerlink" href="#awkward-zipper-package" title="Link to this heading"></a></h1>
+<section id="behaviors">
+<h2>Behaviors<a class="headerlink" href="#behaviors" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="awkward_zipper.behaviors.html">awkward_zipper.behaviors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="awkward_zipper.behaviors.html#module-awkward_zipper.behaviors.atlas">awkward_zipper.behaviors.atlas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="awkward_zipper.behaviors.html#module-awkward_zipper.behaviors.atlas_enums">awkward_zipper.behaviors.atlas_enums</a></li>
+<li class="toctree-l2"><a class="reference internal" href="awkward_zipper.behaviors.html#module-awkward_zipper.behaviors.base">awkward_zipper.behaviors.base</a></li>
+<li class="toctree-l2"><a class="reference internal" href="awkward_zipper.behaviors.html#module-awkward_zipper.behaviors.candidate">awkward_zipper.behaviors.candidate</a></li>
+<li class="toctree-l2"><a class="reference internal" href="awkward_zipper.behaviors.html#module-awkward_zipper.behaviors.delphes">awkward_zipper.behaviors.delphes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="awkward_zipper.behaviors.html#module-awkward_zipper.behaviors.edm4hep">awkward_zipper.behaviors.edm4hep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="awkward_zipper.behaviors.html#module-awkward_zipper.behaviors.fcc">awkward_zipper.behaviors.fcc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="awkward_zipper.behaviors.html#module-awkward_zipper.behaviors.nanoaod">awkward_zipper.behaviors.nanoaod</a></li>
+<li class="toctree-l2"><a class="reference internal" href="awkward_zipper.behaviors.html#module-awkward_zipper.behaviors.pdune">awkward_zipper.behaviors.pdune</a></li>
+<li class="toctree-l2"><a class="reference internal" href="awkward_zipper.behaviors.html#module-awkward_zipper.behaviors.physlite">awkward_zipper.behaviors.physlite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="awkward_zipper.behaviors.html#module-awkward_zipper.behaviors.treemaker">awkward_zipper.behaviors.treemaker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="awkward_zipper.behaviors.html#module-awkward_zipper.behaviors.vector">awkward_zipper.behaviors.vector</a></li>
+<li class="toctree-l2"><a class="reference internal" href="awkward_zipper.behaviors.html#module-awkward_zipper.behaviors">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="layouts">
+<h2>Layouts<a class="headerlink" href="#layouts" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="awkward_zipper.layouts.html">awkward_zipper.layouts</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="awkward_zipper.layouts.html#module-awkward_zipper.layouts.atlas">awkward_zipper.layouts.atlas</a></li>
+<li class="toctree-l2"><a class="reference internal" href="awkward_zipper.layouts.html#module-awkward_zipper.layouts.base">awkward_zipper.layouts.base</a></li>
+<li class="toctree-l2"><a class="reference internal" href="awkward_zipper.layouts.html#module-awkward_zipper.layouts.delphes">awkward_zipper.layouts.delphes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="awkward_zipper.layouts.html#module-awkward_zipper.layouts.edm4hep">awkward_zipper.layouts.edm4hep</a></li>
+<li class="toctree-l2"><a class="reference internal" href="awkward_zipper.layouts.html#module-awkward_zipper.layouts.fcc">awkward_zipper.layouts.fcc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="awkward_zipper.layouts.html#module-awkward_zipper.layouts.nanoaod">awkward_zipper.layouts.nanoaod</a></li>
+<li class="toctree-l2"><a class="reference internal" href="awkward_zipper.layouts.html#module-awkward_zipper.layouts.pdune">awkward_zipper.layouts.pdune</a></li>
+<li class="toctree-l2"><a class="reference internal" href="awkward_zipper.layouts.html#module-awkward_zipper.layouts.physlite">awkward_zipper.layouts.physlite</a></li>
+<li class="toctree-l2"><a class="reference internal" href="awkward_zipper.layouts.html#module-awkward_zipper.layouts.treemaker">awkward_zipper.layouts.treemaker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="awkward_zipper.layouts.html#module-awkward_zipper.layouts">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="module-awkward_zipper.awkward_util">
+<span id="awkward-zipper-awkward-util"></span><h2>awkward_zipper.awkward_util<a class="headerlink" href="#module-awkward_zipper.awkward_util" title="Link to this heading"></a></h2>
+</section>
+<section id="module-awkward_zipper.kernels">
+<span id="kernels"></span><h2>Kernels<a class="headerlink" href="#module-awkward_zipper.kernels" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="awkward_zipper.kernels.begin_end_counts">
+<span class="sig-prename descclassname"><span class="pre">awkward_zipper.kernels.</span></span><span class="sig-name descname"><span class="pre">begin_end_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">begin_content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_content</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/kernels.html#begin_end_counts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.kernels.begin_end_counts" title="Link to this definition"></a></dt>
+<dd><p>Flat <code class="docutils literal notranslate"><span class="pre">end</span> <span class="pre">-</span> <span class="pre">begin</span></code> counts for EDM4HEP begin/end index ranges (lazy).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="awkward_zipper.kernels.begin_end_mapping">
+<span class="sig-prename descclassname"><span class="pre">awkward_zipper.kernels.</span></span><span class="sig-name descname"><span class="pre">begin_end_mapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">begin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_content</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/kernels.html#begin_end_mapping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.kernels.begin_end_mapping" title="Link to this definition"></a></dt>
+<dd><p>Group <code class="docutils literal notranslate"><span class="pre">target_content</span></code> into per-item lists using begin/end index ranges.</p>
+<p>EDM4HEP stores OneToMany relations and VectorMembers as flat per-event arrays
+plus per-item <code class="docutils literal notranslate"><span class="pre">{member}_begin</span></code> / <code class="docutils literal notranslate"><span class="pre">{member}_end</span></code> ranges. Those ranges are
+contiguous and exactly cover the target, so the mapping reduces to regrouping
+the target by <code class="docutils literal notranslate"><span class="pre">counts</span> <span class="pre">=</span> <span class="pre">end</span> <span class="pre">-</span> <span class="pre">begin</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">begin</span></code>/<code class="docutils literal notranslate"><span class="pre">end</span></code> are the per-event jagged range arrays (<code class="docutils literal notranslate"><span class="pre">ListOffsetArray</span></code>);
+<code class="docutils literal notranslate"><span class="pre">target_content</span></code> is the flat content of the per-event target array. Returns
+a doubly-jagged <code class="docutils literal notranslate"><span class="pre">ListOffsetArray</span></code> (event -&gt; item -&gt; sub-items).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="awkward_zipper.kernels.children">
+<span class="sig-prename descclassname"><span class="pre">awkward_zipper.kernels.</span></span><span class="sig-name descname"><span class="pre">children</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">counts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">globalparents</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/kernels.html#children"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.kernels.children" title="Link to this definition"></a></dt>
+<dd><p>Compute children</p>
+<p>Signature: offsets,globalparents,!children
+Output will be a jagged array with same outer shape as globalparents content</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="awkward_zipper.kernels.counts2nestedindex">
+<span class="sig-prename descclassname"><span class="pre">awkward_zipper.kernels.</span></span><span class="sig-name descname"><span class="pre">counts2nestedindex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">local_counts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_offsets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/kernels.html#counts2nestedindex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.kernels.counts2nestedindex" title="Link to this definition"></a></dt>
+<dd><p>Turn jagged local counts into doubly-jagged global index into a target
+Outputs a jagged array with same axis-0 shape as counts axis-1</p>
+<p>Example usage:
+Local counts
+[[4, 3, 2],</p>
+<blockquote>
+<div><p>[4, 2]]</p>
+</div></blockquote>
+<p>Target offsets
+[9, 6]
+Target output
+[[[0, 1, 2, 3], [4, 5, 6], [7, 8]],</p>
+<blockquote>
+<div><p>[[9, 10, 11, 12], [13, 14]]]</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="awkward_zipper.kernels.counts2offsets">
+<span class="sig-prename descclassname"><span class="pre">awkward_zipper.kernels.</span></span><span class="sig-name descname"><span class="pre">counts2offsets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">counts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/kernels.html#counts2offsets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.kernels.counts2offsets" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="awkward_zipper.kernels.dispatch_wrap">
+<span class="sig-prename descclassname"><span class="pre">awkward_zipper.kernels.</span></span><span class="sig-name descname"><span class="pre">dispatch_wrap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/kernels.html#dispatch_wrap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.kernels.dispatch_wrap" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="awkward_zipper.kernels.distinct_children_deep">
+<span class="sig-prename descclassname"><span class="pre">awkward_zipper.kernels.</span></span><span class="sig-name descname"><span class="pre">distinct_children_deep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">counts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_parents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_pdgs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/kernels.html#distinct_children_deep"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.kernels.distinct_children_deep" title="Link to this definition"></a></dt>
+<dd><p>Compute all distinct children, skipping children with same pdg id in between.</p>
+<p>Signature: offsets,global_parents,global_pdgs,!distinctChildrenDeep
+Expects global indexes, flat arrays, which should be same length</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="awkward_zipper.kernels.distinct_parent">
+<span class="sig-prename descclassname"><span class="pre">awkward_zipper.kernels.</span></span><span class="sig-name descname"><span class="pre">distinct_parent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pdg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/kernels.html#distinct_parent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.kernels.distinct_parent" title="Link to this definition"></a></dt>
+<dd><p>Compute first parent with distinct PDG id</p>
+<p>Signature: globalparents,globalpdgs,!distinctParent
+Expects global indexes, flat arrays, which should be same length</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="awkward_zipper.kernels.ensure_array">
+<span class="sig-prename descclassname"><span class="pre">awkward_zipper.kernels.</span></span><span class="sig-name descname"><span class="pre">ensure_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arraylike</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/kernels.html#ensure_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.kernels.ensure_array" title="Link to this definition"></a></dt>
+<dd><p>Converts arraylike to a Numpy array</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="awkward_zipper.kernels.eventindex_content">
+<span class="sig-prename descclassname"><span class="pre">awkward_zipper.kernels.</span></span><span class="sig-name descname"><span class="pre">eventindex_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">offsets_index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/kernels.html#eventindex_content"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.kernels.eventindex_content" title="Link to this definition"></a></dt>
+<dd><p>Flat int64 content giving each element’s event index (from offsets).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="awkward_zipper.kernels.full_like_from_array">
+<span class="sig-prename descclassname"><span class="pre">awkward_zipper.kernels.</span></span><span class="sig-name descname"><span class="pre">full_like_from_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/kernels.html#full_like_from_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.kernels.full_like_from_array" title="Link to this definition"></a></dt>
+<dd><p>Create a flat content shaped like <code class="docutils literal notranslate"><span class="pre">content</span></code> with every element set to
+<code class="docutils literal notranslate"><span class="pre">fill_value</span></code>.</p>
+<p>Mirrors coffea’s <code class="docutils literal notranslate"><span class="pre">full_like_from_content</span></code> transform (the ATLAS ntuple
+variant: takes a possibly jagged array, fills float32). Unlike
+<a class="reference internal" href="#awkward_zipper.kernels.full_like_from_counts" title="awkward_zipper.kernels.full_like_from_counts"><code class="xref py py-func docutils literal notranslate"><span class="pre">full_like_from_counts()</span></code></a> this works from an existing flat content, which is
+what the ATLAS ntuple schema needs: its collections carry their own offsets and
+there is no <code class="docutils literal notranslate"><span class="pre">n{collection}</span></code> counts branch to derive a shape from.</p>
+<p>A jagged source keeps its offsets, so the result lines up element-for-element
+with the collection it was derived from.</p>
+<p>Stays lazy: when the source buffer is virtual the result is a virtual buffer that
+only materializes the source to learn how many elements to fill.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="awkward_zipper.kernels.full_like_from_content">
+<span class="sig-prename descclassname"><span class="pre">awkward_zipper.kernels.</span></span><span class="sig-name descname"><span class="pre">full_like_from_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/kernels.html#full_like_from_content"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.kernels.full_like_from_content" title="Link to this definition"></a></dt>
+<dd><p>A flat content shaped like <code class="docutils literal notranslate"><span class="pre">source_content</span></code>, filled with <code class="docutils literal notranslate"><span class="pre">fill_value</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="awkward_zipper.kernels.full_like_from_counts">
+<span class="sig-prename descclassname"><span class="pre">awkward_zipper.kernels.</span></span><span class="sig-name descname"><span class="pre">full_like_from_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">counts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/kernels.html#full_like_from_counts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.kernels.full_like_from_counts" title="Link to this definition"></a></dt>
+<dd><p>Create a jagged array shaped like a collection with <code class="docutils literal notranslate"><span class="pre">counts</span></code> elements per
+event, with every element set to <code class="docutils literal notranslate"><span class="pre">fill_value</span></code> (as float32).</p>
+<p>This mirrors coffea’s <code class="docutils literal notranslate"><span class="pre">full_like_from_offsets</span></code> transform, but works from the
+<code class="docutils literal notranslate"><span class="pre">n{collection}</span></code> counts branch instead of the <code class="docutils literal notranslate"><span class="pre">o{collection}</span></code> offsets branch.
+It is used to synthesize branches (e.g. <code class="docutils literal notranslate"><span class="pre">Photon_mass</span></code>, <code class="docutils literal notranslate"><span class="pre">Jet_charge</span></code>) that
+must be present for the 4-vector behaviors to work.</p>
+<p>Only the flat content of the returned array is ultimately consumed by the
+schema (the collection re-wraps it with its own offsets), but a valid
+<code class="docutils literal notranslate"><span class="pre">ListOffsetArray</span></code> is returned so that <code class="docutils literal notranslate"><span class="pre">awkward.to_buffers</span></code> yields the
+expected <code class="docutils literal notranslate"><span class="pre">{&quot;node0-offsets&quot;,</span> <span class="pre">&quot;node1-data&quot;}</span></code> buffers.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="awkward_zipper.kernels.grow_local_index_to_target_shape">
+<span class="sig-prename descclassname"><span class="pre">awkward_zipper.kernels.</span></span><span class="sig-name descname"><span class="pre">grow_local_index_to_target_shape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_offsets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/kernels.html#grow_local_index_to_target_shape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.kernels.grow_local_index_to_target_shape" title="Link to this definition"></a></dt>
+<dd><p>Grow a local index to the target’s shape, filling unreferenced slots with -1.</p>
+<p>Mirrors coffea’s <code class="docutils literal notranslate"><span class="pre">grow_local_index_to_target_shape</span></code>: for every element of the
+target, emit its local index if that index appears in <code class="docutils literal notranslate"><span class="pre">index</span></code> for the event,
+otherwise -1. Returns the flat content, evaluated lazily.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="awkward_zipper.kernels.local2global">
+<span class="sig-prename descclassname"><span class="pre">awkward_zipper.kernels.</span></span><span class="sig-name descname"><span class="pre">local2global</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_offsets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/kernels.html#local2global"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.kernels.local2global" title="Link to this definition"></a></dt>
+<dd><p>Turn a jagged local index into a global index into a target collection.</p>
+<p>Mirrors coffea’s <code class="docutils literal notranslate"><span class="pre">local2global</span></code> transform. <code class="docutils literal notranslate"><span class="pre">index</span></code> is a per-event jagged
+<code class="docutils literal notranslate"><span class="pre">ListOffsetArray</span></code>; <code class="docutils literal notranslate"><span class="pre">target_offsets</span></code> is the target collection’s per-event
+offsets buffer. Returns the flat (global) index content, evaluated lazily.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="awkward_zipper.kernels.local2globalindex">
+<span class="sig-prename descclassname"><span class="pre">awkward_zipper.kernels.</span></span><span class="sig-name descname"><span class="pre">local2globalindex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counts</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/kernels.html#local2globalindex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.kernels.local2globalindex" title="Link to this definition"></a></dt>
+<dd><p>Convert a jagged local index to a global index</p>
+<p>This is the same as local2global(index, counts2offsets(counts))
+where local2global and counts2offsets are as in coffea.nanoevents.transforms</p>
+<p>Example usage:
+Index array
+[[], [1], [], [2, 3]]
+Counts array
+[8, 7, 4, 7]
+Output array will be:
+[[], [9], [], [21, 22]]
+(here 21=8+7+4+2)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="awkward_zipper.kernels.met_to_rho">
+<span class="sig-prename descclassname"><span class="pre">awkward_zipper.kernels.</span></span><span class="sig-name descname"><span class="pre">met_to_rho</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">met_content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eta_content</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/kernels.html#met_to_rho"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.kernels.met_to_rho" title="Link to this definition"></a></dt>
+<dd><p>Compute <code class="docutils literal notranslate"><span class="pre">rho</span> <span class="pre">=</span> <span class="pre">met</span> <span class="pre">*</span> <span class="pre">cosh(eta)</span></code> on flat contents, lazily.</p>
+<p>Mirrors coffea’s <code class="docutils literal notranslate"><span class="pre">met_to_rho</span></code> transform. <code class="docutils literal notranslate"><span class="pre">met_content</span></code> and
+<code class="docutils literal notranslate"><span class="pre">eta_content</span></code> are flat <code class="docutils literal notranslate"><span class="pre">NumpyArray</span></code> contents; the result is returned as a
+flat <code class="docutils literal notranslate"><span class="pre">NumpyArray</span></code> content and is only evaluated when the buffer is read.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="awkward_zipper.kernels.nested_local2global">
+<span class="sig-prename descclassname"><span class="pre">awkward_zipper.kernels.</span></span><span class="sig-name descname"><span class="pre">nested_local2global</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nested_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_offsets</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/kernels.html#nested_local2global"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.kernels.nested_local2global" title="Link to this definition"></a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">local2global</span></code> for a doubly-jagged index (event -&gt; item -&gt; indices).</p>
+<p><code class="docutils literal notranslate"><span class="pre">nested_index</span></code> is <code class="docutils literal notranslate"><span class="pre">ListOffsetArray(ListOffsetArray(NumpyArray))</span></code>; the
+per-event grouping used for the offset lookup is the OUTER list.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="awkward_zipper.kernels.nestedindex">
+<span class="sig-prename descclassname"><span class="pre">awkward_zipper.kernels.</span></span><span class="sig-name descname"><span class="pre">nestedindex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indices</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/kernels.html#nestedindex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.kernels.nestedindex" title="Link to this definition"></a></dt>
+<dd><p>Concatenate a list of indices along a new axis
+Outputs a jagged array with same outer shape as index arrays</p>
+<p>Example usage:
+First index array
+[[0, 2, 4],</p>
+<blockquote>
+<div><p>[8, 6]]</p>
+</div></blockquote>
+<p>Second index array
+[[1, 3, 5],</p>
+<blockquote>
+<div><p>[-1, 7]]</p>
+</div></blockquote>
+<p>Output
+[[[0, 1], [2, 3], [4, 5]],</p>
+<blockquote>
+<div><p>[[8, -1], [6, 7]]]</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="awkward_zipper.kernels.qoverp_theta_to_pt">
+<span class="sig-prename descclassname"><span class="pre">awkward_zipper.kernels.</span></span><span class="sig-name descname"><span class="pre">qoverp_theta_to_pt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qoverp_content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_content</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/kernels.html#qoverp_theta_to_pt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.kernels.qoverp_theta_to_pt" title="Link to this definition"></a></dt>
+<dd><p>pt = sin(theta) / <a href="#id1"><span class="problematic" id="id2">|qOverP|</span></a>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="awkward_zipper.kernels.qoverp_to_p">
+<span class="sig-prename descclassname"><span class="pre">awkward_zipper.kernels.</span></span><span class="sig-name descname"><span class="pre">qoverp_to_p</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qoverp_content</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/kernels.html#qoverp_to_p"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.kernels.qoverp_to_p" title="Link to this definition"></a></dt>
+<dd><p>p = 1 / <a href="#id3"><span class="problematic" id="id4">|qOverP|</span></a> (cast to the source dtype, matching coffea).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="awkward_zipper.kernels.regular_to_jagged">
+<span class="sig-prename descclassname"><span class="pre">awkward_zipper.kernels.</span></span><span class="sig-name descname"><span class="pre">regular_to_jagged</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">regular</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float64'&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/kernels.html#regular_to_jagged"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.kernels.regular_to_jagged" title="Link to this definition"></a></dt>
+<dd><p>Convert a <code class="docutils literal notranslate"><span class="pre">RegularArray(size,</span> <span class="pre">NumpyArray)</span></code> to a jagged list of <code class="docutils literal notranslate"><span class="pre">dtype</span></code>.</p>
+<p>EDM4HEP stores fixed-size members (e.g. <code class="docutils literal notranslate"><span class="pre">covMatrix.values[21]</span></code>) as a regular
+array; coffea’s ArrayBuilder-based transform turns them into variable-length
+lists of float64. Evaluated lazily.</p>
+</dd></dl>
+
+</section>
+<section id="module-awkward_zipper">
+<span id="package-classes"></span><h2>Package classes<a class="headerlink" href="#module-awkward_zipper" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="awkward_zipper.BaseLayoutBuilder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">BaseLayoutBuilder</span></span><a class="reference internal" href="_modules/awkward_zipper/layouts/base.html#BaseLayoutBuilder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.BaseLayoutBuilder" title="Link to this definition"></a></dt>
+<dd><p>Base class for all layout builders</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="awkward_zipper.BaseLayoutBuilder.behavior">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">behavior</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/base.html#BaseLayoutBuilder.behavior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.BaseLayoutBuilder.behavior" title="Link to this definition"></a></dt>
+<dd><p>Behaviors necessary to implement this schema (dict)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="awkward_zipper.Delphes">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">Delphes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'latest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/delphes.html#Delphes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.Delphes" title="Link to this definition"></a></dt>
+<dd><p>Delphes layout builder</p>
+<p>The Delphes layout is built from all branches found in the supplied file,
+based on the naming pattern of the branches. Any branches named
+<code class="docutils literal notranslate"><span class="pre">{name}_size</span></code> are counts branches, converted to offsets. Every Delphes
+object collection is a jagged list of records; the split leaf branches
+(<code class="docutils literal notranslate"><span class="pre">{name}.{var}</span></code>) are grouped under the collection <code class="docutils literal notranslate"><span class="pre">{name}</span></code> and given the
+aliases required by the vector/candidate behaviors (<code class="docutils literal notranslate"><span class="pre">pt</span></code>, <code class="docutils literal notranslate"><span class="pre">eta</span></code>, <code class="docutils literal notranslate"><span class="pre">phi</span></code>,
+<code class="docutils literal notranslate"><span class="pre">mass</span></code>, <code class="docutils literal notranslate"><span class="pre">rho</span></code>).</p>
+<p>A companion <code class="docutils literal notranslate"><span class="pre">{name}.offsets</span></code> field is emitted for each collection (matching
+coffea). Collections stored as length-1 vectors (see <code class="docutils literal notranslate"><span class="pre">singletons</span></code>) are
+flattened, removing an unnecessary level of nesting.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="awkward_zipper.Delphes.behavior">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">behavior</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/delphes.html#Delphes.behavior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.Delphes.behavior" title="Link to this definition"></a></dt>
+<dd><p>Behaviors necessary to implement this schema (dict)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.Delphes.mixins">
+<span class="sig-name descname"><span class="pre">mixins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'CaloJet02':</span> <span class="pre">'Jet',</span> <span class="pre">'CaloJet04':</span> <span class="pre">'Jet',</span> <span class="pre">'CaloJet08':</span> <span class="pre">'Jet',</span> <span class="pre">'CaloJet15':</span> <span class="pre">'Jet',</span> <span class="pre">'EFlowNeutralHadron':</span> <span class="pre">'Tower',</span> <span class="pre">'EFlowPhoton':</span> <span class="pre">'Photon',</span> <span class="pre">'EFlowTrack':</span> <span class="pre">'Track',</span> <span class="pre">'Electron':</span> <span class="pre">'Electron',</span> <span class="pre">'ElectronCHS':</span> <span class="pre">'Electron',</span> <span class="pre">'Event':</span> <span class="pre">'Event',</span> <span class="pre">'EventLHEF':</span> <span class="pre">'EventLHEF',</span> <span class="pre">'FatJet':</span> <span class="pre">'Jet',</span> <span class="pre">'GenJet':</span> <span class="pre">'Jet',</span> <span class="pre">'GenJet02':</span> <span class="pre">'Jet',</span> <span class="pre">'GenJet04':</span> <span class="pre">'Jet',</span> <span class="pre">'GenJet08':</span> <span class="pre">'Jet',</span> <span class="pre">'GenJet15':</span> <span class="pre">'Jet',</span> <span class="pre">'GenJetAK8':</span> <span class="pre">'Jet',</span> <span class="pre">'GenMissingET':</span> <span class="pre">'MissingET',</span> <span class="pre">'GenPileUpMissingET':</span> <span class="pre">'MissingET',</span> <span class="pre">'HepMCEvent':</span> <span class="pre">'HepMCEvent',</span> <span class="pre">'Jet':</span> <span class="pre">'Jet',</span> <span class="pre">'JetAK8':</span> <span class="pre">'Jet',</span> <span class="pre">'JetPUPPI':</span> <span class="pre">'Jet',</span> <span class="pre">'JetPUPPIAK8':</span> <span class="pre">'Jet',</span> <span class="pre">'LHCOEvent':</span> <span class="pre">'LHCOEvent',</span> <span class="pre">'MissingET':</span> <span class="pre">'MissingET',</span> <span class="pre">'Muon':</span> <span class="pre">'Muon',</span> <span class="pre">'MuonLoose':</span> <span class="pre">'Muon',</span> <span class="pre">'MuonLooseCHS':</span> <span class="pre">'Muon',</span> <span class="pre">'MuonTight':</span> <span class="pre">'Muon',</span> <span class="pre">'MuonTightCHS':</span> <span class="pre">'Muon',</span> <span class="pre">'Particle':</span> <span class="pre">'Particle',</span> <span class="pre">'ParticleFlowJet02':</span> <span class="pre">'Jet',</span> <span class="pre">'ParticleFlowJet04':</span> <span class="pre">'Jet',</span> <span class="pre">'ParticleFlowJet08':</span> <span class="pre">'Jet',</span> <span class="pre">'ParticleFlowJet15':</span> <span class="pre">'Jet',</span> <span class="pre">'Photon':</span> <span class="pre">'Photon',</span> <span class="pre">'PhotonCHS':</span> <span class="pre">'Photon',</span> <span class="pre">'PuppiMissingET':</span> <span class="pre">'MissingET',</span> <span class="pre">'Rho':</span> <span class="pre">'Rho',</span> <span class="pre">'ScalarHT':</span> <span class="pre">'ScalarHT',</span> <span class="pre">'Tower':</span> <span class="pre">'Tower',</span> <span class="pre">'Track':</span> <span class="pre">'Track',</span> <span class="pre">'TrackJet02':</span> <span class="pre">'Jet',</span> <span class="pre">'TrackJet04':</span> <span class="pre">'Jet',</span> <span class="pre">'TrackJet08':</span> <span class="pre">'Jet',</span> <span class="pre">'TrackJet15':</span> <span class="pre">'Jet',</span> <span class="pre">'Weight':</span> <span class="pre">'Weight',</span> <span class="pre">'WeightLHEF':</span> <span class="pre">'WeightLHEF'}</span></em><a class="headerlink" href="#awkward_zipper.Delphes.mixins" title="Link to this definition"></a></dt>
+<dd><p>Default configuration for mixin types, based on the collection name.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.Delphes.singletons">
+<span class="sig-name descname"><span class="pre">singletons</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['Event',</span> <span class="pre">'EventLHEF',</span> <span class="pre">'HepMCEvent',</span> <span class="pre">'LHCOEvent',</span> <span class="pre">'Rho',</span> <span class="pre">'ScalarHT',</span> <span class="pre">'MissingET']</span></em><a class="headerlink" href="#awkward_zipper.Delphes.singletons" title="Link to this definition"></a></dt>
+<dd><p>Fields stored as length-1 vectors in Delphes, flattened out in nanoevents.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="awkward_zipper.Delphes.v1">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">v1</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/delphes.html#Delphes.v1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.Delphes.v1" title="Link to this definition"></a></dt>
+<dd><p>Build the DelphesEvents for version 1 (<code class="docutils literal notranslate"><span class="pre">DelphesSchema.v1</span></code> in coffea)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">EDM4HEP</span></span><a class="reference internal" href="_modules/awkward_zipper/layouts/edm4hep.html#EDM4HEP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.EDM4HEP" title="Link to this definition"></a></dt>
+<dd><p>EDM4HEP layout builder.</p>
+<p>Array-based re-implementation of coffea’s <code class="docutils literal notranslate"><span class="pre">EDM4HEPSchema</span></code> for the newest
+bundled <code class="docutils literal notranslate"><span class="pre">edm4hep.yaml</span></code> version; use <a class="reference internal" href="#awkward_zipper.edm4hep_version" title="awkward_zipper.edm4hep_version"><code class="xref py py-func docutils literal notranslate"><span class="pre">edm4hep_version()</span></code></a> (or
+<code class="docutils literal notranslate"><span class="pre">EDM4HEP.version(...)</span></code>) to pick an older one. The layout is driven by the
+vendored EDM4HEP yaml data model, which describes each datatype’s Members,
+VectorMembers, OneToOneRelations and OneToManyRelations:</p>
+<ul class="simple">
+<li><p>component members (<code class="docutils literal notranslate"><span class="pre">Vector3f</span></code>/<code class="docutils literal notranslate"><span class="pre">Vector4f</span></code>/…) such as
+<code class="docutils literal notranslate"><span class="pre">X.position.{x,y,z}</span></code> are zipped into an <code class="docutils literal notranslate"><span class="pre">X.position</span></code> sub-record,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">VectorMembers</span></code> and <code class="docutils literal notranslate"><span class="pre">OneToManyRelations</span></code> stored as flat per-event arrays
+plus per-item <code class="docutils literal notranslate"><span class="pre">{member}_begin</span></code>/<code class="docutils literal notranslate"><span class="pre">{member}_end</span></code> ranges are regrouped into
+doubly-jagged arrays,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OneToOneRelations</span></code> and Links get a global index (<code class="docutils literal notranslate"><span class="pre">index_Global</span></code>) into
+their target collection,</p></li>
+<li><p>the remaining <code class="docutils literal notranslate"><span class="pre">X.*</span></code> branches are zipped into the <code class="docutils literal notranslate"><span class="pre">X</span></code> collection.</p></li>
+</ul>
+<p>The collection datatypes come from the TTree’s branch typenames, which are not
+present in <code class="docutils literal notranslate"><span class="pre">tree.arrays()</span></code> output, so pass them explicitly. Generic podio
+links (<code class="docutils literal notranslate"><span class="pre">vector&lt;podio::LinkData&gt;</span></code>, podio &gt;= 1.3) are typed from the file’s
+<code class="docutils literal notranslate"><span class="pre">podio_metadata</span></code> tree, which <a class="reference internal" href="#awkward_zipper.podio_collection_types" title="awkward_zipper.podio_collection_types"><code class="xref py py-func docutils literal notranslate"><span class="pre">podio_collection_types()</span></code></a> reads:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EDM4HEP</span><span class="p">()(</span>
+    <span class="n">tree</span><span class="o">.</span><span class="n">arrays</span><span class="p">(</span><span class="o">...</span><span class="p">),</span>
+    <span class="n">typenames</span><span class="o">=</span><span class="n">tree</span><span class="o">.</span><span class="n">typenames</span><span class="p">(),</span>
+    <span class="n">podio_collection_types</span><span class="o">=</span><span class="n">podio_collection_types</span><span class="p">(</span><span class="n">tree</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">extra_mixins</span></code> overrides the link type of a collection. If <code class="docutils literal notranslate"><span class="pre">typenames</span></code> is
+omitted, the datatypes are inferred by matching each collection’s member branch
+names against the yaml data model.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP.behavior">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">behavior</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/edm4hep.html#EDM4HEP.behavior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.EDM4HEP.behavior" title="Link to this definition"></a></dt>
+<dd><p>Behaviors necessary to implement this schema (dict)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP.copy_links_to_target_datatype">
+<span class="sig-name descname"><span class="pre">copy_links_to_target_datatype</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#awkward_zipper.EDM4HEP.copy_links_to_target_datatype" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP.edm4hep_version">
+<span class="sig-name descname"><span class="pre">edm4hep_version</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'01-01'</span></em><a class="headerlink" href="#awkward_zipper.EDM4HEP.edm4hep_version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP.extra_mixins">
+<span class="sig-name descname"><span class="pre">extra_mixins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'*idx':</span> <span class="pre">'ObjectID'}</span></em><a class="headerlink" href="#awkward_zipper.EDM4HEP.extra_mixins" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP.version">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'latest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/edm4hep.html#EDM4HEP.version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.EDM4HEP.version" title="Link to this definition"></a></dt>
+<dd><p>Return the layout builder class for a given edm4hep.yaml version.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ver</strong> (<em>str</em><em>, </em><em>optional</em>) – Version of edm4hep.yaml, written either as “00.99.04” or “00-99-04”.
+“latest” (default) selects the newest bundled version. The available
+versions are listed in <code class="docutils literal notranslate"><span class="pre">awkward_zipper.assets.versions</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP_v00_10_01">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">EDM4HEP_v00_10_01</span></span><a class="headerlink" href="#awkward_zipper.EDM4HEP_v00_10_01" title="Link to this definition"></a></dt>
+<dd><p>EDM4HEP layout builder for edm4hep version 00.10.01</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP_v00_10_01.edm4hep_version">
+<span class="sig-name descname"><span class="pre">edm4hep_version</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'00-10-01'</span></em><a class="headerlink" href="#awkward_zipper.EDM4HEP_v00_10_01.edm4hep_version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP_v00_10_02">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">EDM4HEP_v00_10_02</span></span><a class="headerlink" href="#awkward_zipper.EDM4HEP_v00_10_02" title="Link to this definition"></a></dt>
+<dd><p>EDM4HEP layout builder for edm4hep version 00.10.02</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP_v00_10_02.edm4hep_version">
+<span class="sig-name descname"><span class="pre">edm4hep_version</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'00-10-02'</span></em><a class="headerlink" href="#awkward_zipper.EDM4HEP_v00_10_02.edm4hep_version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP_v00_10_03">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">EDM4HEP_v00_10_03</span></span><a class="headerlink" href="#awkward_zipper.EDM4HEP_v00_10_03" title="Link to this definition"></a></dt>
+<dd><p>EDM4HEP layout builder for edm4hep version 00.10.03</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP_v00_10_03.edm4hep_version">
+<span class="sig-name descname"><span class="pre">edm4hep_version</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'00-10-03'</span></em><a class="headerlink" href="#awkward_zipper.EDM4HEP_v00_10_03.edm4hep_version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP_v00_10_04">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">EDM4HEP_v00_10_04</span></span><a class="headerlink" href="#awkward_zipper.EDM4HEP_v00_10_04" title="Link to this definition"></a></dt>
+<dd><p>EDM4HEP layout builder for edm4hep version 00.10.04</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP_v00_10_04.edm4hep_version">
+<span class="sig-name descname"><span class="pre">edm4hep_version</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'00-10-04'</span></em><a class="headerlink" href="#awkward_zipper.EDM4HEP_v00_10_04.edm4hep_version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP_v00_10_05">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">EDM4HEP_v00_10_05</span></span><a class="headerlink" href="#awkward_zipper.EDM4HEP_v00_10_05" title="Link to this definition"></a></dt>
+<dd><p>EDM4HEP layout builder for edm4hep version 00.10.05</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP_v00_10_05.edm4hep_version">
+<span class="sig-name descname"><span class="pre">edm4hep_version</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'00-10-05'</span></em><a class="headerlink" href="#awkward_zipper.EDM4HEP_v00_10_05.edm4hep_version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP_v00_99_00">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">EDM4HEP_v00_99_00</span></span><a class="headerlink" href="#awkward_zipper.EDM4HEP_v00_99_00" title="Link to this definition"></a></dt>
+<dd><p>EDM4HEP layout builder for edm4hep version 00.99.00</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP_v00_99_00.edm4hep_version">
+<span class="sig-name descname"><span class="pre">edm4hep_version</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'00-99-00'</span></em><a class="headerlink" href="#awkward_zipper.EDM4HEP_v00_99_00.edm4hep_version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP_v00_99_01">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">EDM4HEP_v00_99_01</span></span><a class="headerlink" href="#awkward_zipper.EDM4HEP_v00_99_01" title="Link to this definition"></a></dt>
+<dd><p>EDM4HEP layout builder for edm4hep version 00.99.01</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP_v00_99_01.edm4hep_version">
+<span class="sig-name descname"><span class="pre">edm4hep_version</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'00-99-01'</span></em><a class="headerlink" href="#awkward_zipper.EDM4HEP_v00_99_01.edm4hep_version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP_v00_99_02">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">EDM4HEP_v00_99_02</span></span><a class="headerlink" href="#awkward_zipper.EDM4HEP_v00_99_02" title="Link to this definition"></a></dt>
+<dd><p>EDM4HEP layout builder for edm4hep version 00.99.02</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP_v00_99_02.edm4hep_version">
+<span class="sig-name descname"><span class="pre">edm4hep_version</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'00-99-02'</span></em><a class="headerlink" href="#awkward_zipper.EDM4HEP_v00_99_02.edm4hep_version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP_v00_99_03">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">EDM4HEP_v00_99_03</span></span><a class="headerlink" href="#awkward_zipper.EDM4HEP_v00_99_03" title="Link to this definition"></a></dt>
+<dd><p>EDM4HEP layout builder for edm4hep version 00.99.03</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP_v00_99_03.edm4hep_version">
+<span class="sig-name descname"><span class="pre">edm4hep_version</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'00-99-03'</span></em><a class="headerlink" href="#awkward_zipper.EDM4HEP_v00_99_03.edm4hep_version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP_v00_99_04">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">EDM4HEP_v00_99_04</span></span><a class="headerlink" href="#awkward_zipper.EDM4HEP_v00_99_04" title="Link to this definition"></a></dt>
+<dd><p>EDM4HEP layout builder for edm4hep version 00.99.04</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP_v00_99_04.edm4hep_version">
+<span class="sig-name descname"><span class="pre">edm4hep_version</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'00-99-04'</span></em><a class="headerlink" href="#awkward_zipper.EDM4HEP_v00_99_04.edm4hep_version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP_v01_00">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">EDM4HEP_v01_00</span></span><a class="headerlink" href="#awkward_zipper.EDM4HEP_v01_00" title="Link to this definition"></a></dt>
+<dd><p>EDM4HEP layout builder for edm4hep version 01.00</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP_v01_00.edm4hep_version">
+<span class="sig-name descname"><span class="pre">edm4hep_version</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'01-00'</span></em><a class="headerlink" href="#awkward_zipper.EDM4HEP_v01_00.edm4hep_version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP_v01_01">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">EDM4HEP_v01_01</span></span><a class="headerlink" href="#awkward_zipper.EDM4HEP_v01_01" title="Link to this definition"></a></dt>
+<dd><p>EDM4HEP layout builder for edm4hep version 01.01</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.EDM4HEP_v01_01.edm4hep_version">
+<span class="sig-name descname"><span class="pre">edm4hep_version</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'01-01'</span></em><a class="headerlink" href="#awkward_zipper.EDM4HEP_v01_01.edm4hep_version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="awkward_zipper.FCC">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">FCC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'latest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/fcc.html#FCC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.FCC" title="Link to this definition"></a></dt>
+<dd><p>Choose the required variant of the FCC layout builder.</p>
+<p>Example usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper</span><span class="w"> </span><span class="kn">import</span> <span class="n">FCC</span>
+<span class="n">FCC</span><span class="o">.</span><span class="n">get_schema</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="s2">"latest"</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Available versions:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;latest&quot;</span></code> -&gt; <a class="reference internal" href="#awkward_zipper.FCCSchema_edm4hep1" title="awkward_zipper.FCCSchema_edm4hep1"><code class="xref py py-class docutils literal notranslate"><span class="pre">FCCSchema_edm4hep1</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;pre-edm4hep1&quot;</span></code> -&gt; <a class="reference internal" href="#awkward_zipper.FCCSchema" title="awkward_zipper.FCCSchema"><code class="xref py py-class docutils literal notranslate"><span class="pre">FCCSchema</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;edm4hep1&quot;</span></code> -&gt; <a class="reference internal" href="#awkward_zipper.FCCSchema_edm4hep1" title="awkward_zipper.FCCSchema_edm4hep1"><code class="xref py py-class docutils literal notranslate"><span class="pre">FCCSchema_edm4hep1</span></code></a></p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="awkward_zipper.FCC.get_schema">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_schema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'latest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/fcc.html#FCC.get_schema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.FCC.get_schema" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="awkward_zipper.FCCSchema">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">FCCSchema</span></span><a class="reference internal" href="_modules/awkward_zipper/layouts/fcc.html#FCCSchema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.FCCSchema" title="Link to this definition"></a></dt>
+<dd><p>FCC (pre-edm4hep1) layout builder.</p>
+<p>Array-based re-implementation of coffea’s <code class="docutils literal notranslate"><span class="pre">FCCSchema</span></code>, tested against the
+Spring2021/Winter2023 pregenerated FCC samples (<a class="reference external" href="https://fcc-physics-events.web.cern.ch/">https://fcc-physics-events.web.cern.ch/</a>).
+These follow the edm4hep structure:</p>
+<ul class="simple">
+<li><p>vector components (<code class="docutils literal notranslate"><span class="pre">X.referencePoint.{x,y,z}</span></code>) are zipped into
+<code class="docutils literal notranslate"><span class="pre">X.referencePoint</span></code> sub-collections,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">*_begin</span></code>/<code class="docutils literal notranslate"><span class="pre">*_end</span></code> range pairs are zipped, and MC parent/daughter relations
+get <code class="docutils literal notranslate"><span class="pre">*_ranges</span></code> plus global (<code class="docutils literal notranslate"><span class="pre">G</span></code>) indexers,</p></li>
+<li><p>ObjectID branches (<code class="docutils literal notranslate"><span class="pre">X#0.index</span></code>/<code class="docutils literal notranslate"><span class="pre">X#0.collectionID</span></code>) become <code class="docutils literal notranslate"><span class="pre">Xidx0</span></code>
+collections,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">*_[0-9]</span></code> trailing-underscore branches form their own collections,</p></li>
+<li><p>the remaining <code class="docutils literal notranslate"><span class="pre">X.*</span></code> branches are zipped into the <code class="docutils literal notranslate"><span class="pre">X</span></code> collection, using
+<code class="docutils literal notranslate"><span class="pre">momentum.{x,y,z}</span></code> (+ <code class="docutils literal notranslate"><span class="pre">energy</span></code>) for the LorentzVector behavior.</p></li>
+</ul>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.FCCSchema.all_cross_references">
+<span class="sig-name descname"><span class="pre">all_cross_references</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'Electron#0.index':</span> <span class="pre">'ReconstructedParticles',</span> <span class="pre">'MCRecoAssociations#0.index':</span> <span class="pre">'ReconstructedParticles',</span> <span class="pre">'MCRecoAssociations#1.index':</span> <span class="pre">'Particle',</span> <span class="pre">'Muon#0.index':</span> <span class="pre">'ReconstructedParticles'}</span></em><a class="headerlink" href="#awkward_zipper.FCCSchema.all_cross_references" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="awkward_zipper.FCCSchema.behavior">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">behavior</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/fcc.html#FCCSchema.behavior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.FCCSchema.behavior" title="Link to this definition"></a></dt>
+<dd><p>Behaviors necessary to implement this schema (dict)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.FCCSchema.extra_mixins">
+<span class="sig-name descname"><span class="pre">extra_mixins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'*idx':</span> <span class="pre">'ObjectID'}</span></em><a class="headerlink" href="#awkward_zipper.FCCSchema.extra_mixins" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.FCCSchema.mc_relations">
+<span class="sig-name descname"><span class="pre">mc_relations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'daughters':</span> <span class="pre">'Particle#1.index',</span> <span class="pre">'parents':</span> <span class="pre">'Particle#0.index'}</span></em><a class="headerlink" href="#awkward_zipper.FCCSchema.mc_relations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="awkward_zipper.FCCSchema_edm4hep1">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">FCCSchema_edm4hep1</span></span><a class="reference internal" href="_modules/awkward_zipper/layouts/fcc.html#FCCSchema_edm4hep1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.FCCSchema_edm4hep1" title="Link to this definition"></a></dt>
+<dd><p>FCC layout builder for samples produced with edm4hep &gt;= 1.</p>
+<p>Inherits from <a class="reference internal" href="#awkward_zipper.EDM4HEP" title="awkward_zipper.EDM4HEP"><code class="xref py py-class docutils literal notranslate"><span class="pre">EDM4HEP</span></code></a> version 00.99.01 (matching
+coffea’s <code class="docutils literal notranslate"><span class="pre">FCCSchema_edm4hep1(EDM4HEPSchema)</span></code>) and adds more functionality
+on top of it: the Links are also copied onto the collection they point to,
+with <code class="docutils literal notranslate"><span class="pre">_datatype_priority</span></code> choosing <code class="docutils literal notranslate"><span class="pre">ReconstructedParticles</span></code> among the
+collections sharing the <code class="docutils literal notranslate"><span class="pre">ReconstructedParticle</span></code> datatype (e.g. <code class="docutils literal notranslate"><span class="pre">Jet</span></code>).</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="awkward_zipper.FCCSchema_edm4hep1.behavior">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">behavior</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/fcc.html#FCCSchema_edm4hep1.behavior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.FCCSchema_edm4hep1.behavior" title="Link to this definition"></a></dt>
+<dd><p>Behaviors necessary to implement this schema (dict)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.FCCSchema_edm4hep1.copy_links_to_target_datatype">
+<span class="sig-name descname"><span class="pre">copy_links_to_target_datatype</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#awkward_zipper.FCCSchema_edm4hep1.copy_links_to_target_datatype" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.FCCSchema_edm4hep1.edm4hep_version">
+<span class="sig-name descname"><span class="pre">edm4hep_version</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'00-99-01'</span></em><a class="headerlink" href="#awkward_zipper.FCCSchema_edm4hep1.edm4hep_version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="awkward_zipper.NanoAOD">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">NanoAOD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'latest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/nanoaod.html#NanoAOD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.NanoAOD" title="Link to this definition"></a></dt>
+<dd><p>NanoAOD layout builder</p>
+<p>The NanoAOD layout is built from all branches found in the supplied file, based on
+the naming pattern of the branches. The following additional arrays are constructed:</p>
+<ul class="simple">
+<li><p>Any branches named <code class="docutils literal notranslate"><span class="pre">n{name}</span></code> are assumed to be counts branches and converted to offsets <code class="docutils literal notranslate"><span class="pre">o{name}</span></code></p></li>
+<li><p>Any local index branches with names matching <code class="docutils literal notranslate"><span class="pre">{source}_{target}Idx*</span></code> are converted to global indexes for the event chunk (postfix <code class="docutils literal notranslate"><span class="pre">G</span></code>)</p></li>
+<li><p>Any <a class="reference internal" href="#awkward_zipper.NanoAOD.nested_items" title="awkward_zipper.NanoAOD.nested_items"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">nested_items</span></code></a> are constructed, if the necessary branches are available</p></li>
+<li><p>Any <a class="reference internal" href="#awkward_zipper.NanoAOD.special_items" title="awkward_zipper.NanoAOD.special_items"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">special_items</span></code></a> are constructed, if the necessary branches are available</p></li>
+</ul>
+<p>From those arrays, NanoAOD collections are formed as collections of branches grouped by name, where:</p>
+<ul class="simple">
+<li><p>one branch exists named <code class="docutils literal notranslate"><span class="pre">name</span></code> and no branches start with <code class="docutils literal notranslate"><span class="pre">name_</span></code>, interpreted as a single flat array;</p></li>
+<li><p>one branch exists named <code class="docutils literal notranslate"><span class="pre">name</span></code>, one named <code class="docutils literal notranslate"><span class="pre">n{name}</span></code>, and no branches start with <code class="docutils literal notranslate"><span class="pre">name_</span></code>, interpreted as a single jagged array;</p></li>
+<li><p>no branch exists named <code class="docutils literal notranslate"><span class="pre">{name}</span></code> and many branches start with <code class="docutils literal notranslate"><span class="pre">name_*</span></code>, interpreted as a flat table; or</p></li>
+<li><p>one branch exists named <code class="docutils literal notranslate"><span class="pre">n{name}</span></code> and many branches start with <code class="docutils literal notranslate"><span class="pre">name_*</span></code>, interpreted as a jagged table.</p></li>
+</ul>
+<p>Collections are assigned mixin types according to the <a class="reference internal" href="#awkward_zipper.NanoAOD.mixins" title="awkward_zipper.NanoAOD.mixins"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">mixins</span></code></a> mapping.
+All collections are then zipped into one <a class="reference internal" href="awkward_zipper.behaviors.html#awkward_zipper.behaviors.base.NanoEvents" title="awkward_zipper.behaviors.base.NanoEvents"><code class="xref any py py-class docutils literal notranslate"><span class="pre">base.NanoEvents</span></code></a> record and returned.</p>
+<p>There is a class-level variable <code class="docutils literal notranslate"><span class="pre">warn_missing_crossrefs</span></code> which will alter the behavior of
+NanoAOD. If warn_missing_crossrefs is true then when a missing global index cross-ref
+target is encountered a warning will be issued. Regardless, the cross-reference is dropped.</p>
+<p>The same holds for <code class="docutils literal notranslate"><span class="pre">error_missing_events_id</span></code>. If error_missing_events_id is true, then when the ‘run’, ‘event’,
+or ‘luminosityBlock’ fields are missing, an exception will be thrown; if it is false, just a warning will be issued.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.NanoAOD.alias_items">
+<span class="sig-name descname"><span class="pre">alias_items</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'CorrT1METJet_mass':</span> <span class="pre">'CorrT1METJet_rawMass',</span> <span class="pre">'CorrT1METJet_pt':</span> <span class="pre">'CorrT1METJet_rawPt'}</span></em><a class="headerlink" href="#awkward_zipper.NanoAOD.alias_items" title="Link to this definition"></a></dt>
+<dd><p>Arrays that should be aliased to ensure proper 4-vector behavior</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.NanoAOD.all_cross_references">
+<span class="sig-name descname"><span class="pre">all_cross_references</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'Electron_genPartIdx':</span> <span class="pre">'GenPart',</span> <span class="pre">'Electron_jetIdx':</span> <span class="pre">'Jet',</span> <span class="pre">'Electron_photonIdx':</span> <span class="pre">'Photon',</span> <span class="pre">'FatJet_genJetAK8Idx':</span> <span class="pre">'GenJetAK8',</span> <span class="pre">'FatJet_subJetIdx1':</span> <span class="pre">'SubJet',</span> <span class="pre">'FatJet_subJetIdx2':</span> <span class="pre">'SubJet',</span> <span class="pre">'FsrPhoton_muonIdx':</span> <span class="pre">'Muon',</span> <span class="pre">'GenPart_genPartIdxMother':</span> <span class="pre">'GenPart',</span> <span class="pre">'GenVisTau_genPartIdxMother':</span> <span class="pre">'GenPart',</span> <span class="pre">'Jet_electronIdx1':</span> <span class="pre">'Electron',</span> <span class="pre">'Jet_electronIdx2':</span> <span class="pre">'Electron',</span> <span class="pre">'Jet_genJetIdx':</span> <span class="pre">'GenJet',</span> <span class="pre">'Jet_muonIdx1':</span> <span class="pre">'Muon',</span> <span class="pre">'Jet_muonIdx2':</span> <span class="pre">'Muon',</span> <span class="pre">'LowPtElectron_electronIdx':</span> <span class="pre">'Electron',</span> <span class="pre">'LowPtElectron_genPartIdx':</span> <span class="pre">'GenPart',</span> <span class="pre">'LowPtElectron_photonIdx':</span> <span class="pre">'Photon',</span> <span class="pre">'Muon_fsrPhotonIdx':</span> <span class="pre">'FsrPhoton',</span> <span class="pre">'Muon_genPartIdx':</span> <span class="pre">'GenPart',</span> <span class="pre">'Muon_jetIdx':</span> <span class="pre">'Jet',</span> <span class="pre">'Photon_electronIdx':</span> <span class="pre">'Electron',</span> <span class="pre">'Photon_genPartIdx':</span> <span class="pre">'GenPart',</span> <span class="pre">'Photon_jetIdx':</span> <span class="pre">'Jet',</span> <span class="pre">'Tau_genPartIdx':</span> <span class="pre">'GenPart',</span> <span class="pre">'Tau_jetIdx':</span> <span class="pre">'Jet'}</span></em><a class="headerlink" href="#awkward_zipper.NanoAOD.all_cross_references" title="Link to this definition"></a></dt>
+<dd><p>Cross-references, where an index is to be interpreted with respect to another collection</p>
+<p>Each such cross-reference will be converted to a global indexer, so that arbitrarily sliced events
+can still resolve the indirection back the parent events</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="awkward_zipper.NanoAOD.behavior">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">behavior</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/nanoaod.html#NanoAOD.behavior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.NanoAOD.behavior" title="Link to this definition"></a></dt>
+<dd><p>Behaviors necessary to implement this schema (dict)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.NanoAOD.error_missing_event_ids">
+<span class="sig-name descname"><span class="pre">error_missing_event_ids</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#awkward_zipper.NanoAOD.error_missing_event_ids" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.NanoAOD.event_ids">
+<span class="sig-name descname"><span class="pre">event_ids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['run',</span> <span class="pre">'luminosityBlock',</span> <span class="pre">'event']</span></em><a class="headerlink" href="#awkward_zipper.NanoAOD.event_ids" title="Link to this definition"></a></dt>
+<dd><p>List of NanoAOD event IDs</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.NanoAOD.full_like_items">
+<span class="sig-name descname"><span class="pre">full_like_items</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'CorrT1METJet_mass':</span> <span class="pre">('nCorrT1METJet',</span> <span class="pre">0.0),</span> <span class="pre">'FatJet_charge':</span> <span class="pre">('nFatJet',</span> <span class="pre">0.0),</span> <span class="pre">'FsrPhoton_charge':</span> <span class="pre">('nFsrPhoton',</span> <span class="pre">0.0),</span> <span class="pre">'FsrPhoton_mass':</span> <span class="pre">('nFsrPhoton',</span> <span class="pre">0.0),</span> <span class="pre">'IsoTrack_mass':</span> <span class="pre">('nIsoTrack',</span> <span class="pre">0.0),</span> <span class="pre">'Jet_charge':</span> <span class="pre">('nJet',</span> <span class="pre">0.0),</span> <span class="pre">'Photon_charge':</span> <span class="pre">('nPhoton',</span> <span class="pre">0.0),</span> <span class="pre">'Photon_mass':</span> <span class="pre">('nPhoton',</span> <span class="pre">0.0),</span> <span class="pre">'SoftActivityJet_mass':</span> <span class="pre">('nSoftActivityJet',</span> <span class="pre">0.0),</span> <span class="pre">'TrigObj_mass':</span> <span class="pre">('nTrigObj',</span> <span class="pre">0.0)}</span></em><a class="headerlink" href="#awkward_zipper.NanoAOD.full_like_items" title="Link to this definition"></a></dt>
+<dd><p>Arrays that should be filled with constant values if not present to satisfy 4-vector requirements.</p>
+<p>Each value is a <code class="docutils literal notranslate"><span class="pre">(counts_branch,</span> <span class="pre">fill_value)</span></code> pair; the array is built jagged
+from the <code class="docutils literal notranslate"><span class="pre">n{collection}</span></code> counts branch (mirrors coffea’s <code class="docutils literal notranslate"><span class="pre">full_like_items</span></code>,
+which uses the <code class="docutils literal notranslate"><span class="pre">o{collection}</span></code> offsets branch).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.NanoAOD.mixins">
+<span class="sig-name descname"><span class="pre">mixins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'CaloMET':</span> <span class="pre">'MissingET',</span> <span class="pre">'ChsMET':</span> <span class="pre">'MissingET',</span> <span class="pre">'CorrT1METJet':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'Electron':</span> <span class="pre">'Electron',</span> <span class="pre">'FatJet':</span> <span class="pre">'FatJet',</span> <span class="pre">'FsrPhoton':</span> <span class="pre">'FsrPhoton',</span> <span class="pre">'GenDressedLepton':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'GenIsolatedPhoton':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'GenJet':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'GenJetAK8':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'GenMET':</span> <span class="pre">'MissingET',</span> <span class="pre">'GenPart':</span> <span class="pre">'GenParticle',</span> <span class="pre">'GenVisTau':</span> <span class="pre">'GenVisTau',</span> <span class="pre">'IsoTrack':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'Jet':</span> <span class="pre">'Jet',</span> <span class="pre">'LHEPart':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'LowPtElectron':</span> <span class="pre">'LowPtElectron',</span> <span class="pre">'MET':</span> <span class="pre">'MissingET',</span> <span class="pre">'METFixEE2017':</span> <span class="pre">'MissingET',</span> <span class="pre">'Muon':</span> <span class="pre">'Muon',</span> <span class="pre">'PV':</span> <span class="pre">'Vertex',</span> <span class="pre">'Photon':</span> <span class="pre">'Photon',</span> <span class="pre">'PuppiMET':</span> <span class="pre">'MissingET',</span> <span class="pre">'RawMET':</span> <span class="pre">'MissingET',</span> <span class="pre">'RawPuppiMET':</span> <span class="pre">'MissingET',</span> <span class="pre">'SV':</span> <span class="pre">'SecondaryVertex',</span> <span class="pre">'SoftActivityJet':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'SubGenJetAK8':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'SubJet':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'Tau':</span> <span class="pre">'Tau',</span> <span class="pre">'TkMET':</span> <span class="pre">'MissingET',</span> <span class="pre">'TrigObj':</span> <span class="pre">'PtEtaPhiMCollection'}</span></em><a class="headerlink" href="#awkward_zipper.NanoAOD.mixins" title="Link to this definition"></a></dt>
+<dd><p>Default configuration for mixin types, based on the collection name.</p>
+<p>The types are implemented in the <a class="reference internal" href="awkward_zipper.behaviors.html#module-awkward_zipper.behaviors.nanoaod" title="awkward_zipper.behaviors.nanoaod"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">awkward_zipper.behaviors.nanoaod</span></code></a> module.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.NanoAOD.nested_index_items">
+<span class="sig-name descname"><span class="pre">nested_index_items</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'FatJet_pFCandsIdxG':</span> <span class="pre">('FatJet_nConstituents',</span> <span class="pre">'FatJetPFCands'),</span> <span class="pre">'GenFatJet_pFCandsIdxG':</span> <span class="pre">('GenJetAK8_nConstituents',</span> <span class="pre">'GenFatJetCands'),</span> <span class="pre">'GenJet_pFCandsIdxG':</span> <span class="pre">('GenJet_nConstituents',</span> <span class="pre">'GenJetCands'),</span> <span class="pre">'Jet_pFCandsIdxG':</span> <span class="pre">('Jet_nConstituents',</span> <span class="pre">'JetPFCands')}</span></em><a class="headerlink" href="#awkward_zipper.NanoAOD.nested_index_items" title="Link to this definition"></a></dt>
+<dd><p>Nested collections, where nesting is accomplished by assuming the target can be unflattened according to a source counts</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.NanoAOD.nested_items">
+<span class="sig-name descname"><span class="pre">nested_items</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'FatJet_subJetIdxG':</span> <span class="pre">['FatJet_subJetIdx1G',</span> <span class="pre">'FatJet_subJetIdx2G'],</span> <span class="pre">'Jet_electronIdxG':</span> <span class="pre">['Jet_electronIdx1G',</span> <span class="pre">'Jet_electronIdx2G'],</span> <span class="pre">'Jet_muonIdxG':</span> <span class="pre">['Jet_muonIdx1G',</span> <span class="pre">'Jet_muonIdx2G']}</span></em><a class="headerlink" href="#awkward_zipper.NanoAOD.nested_items" title="Link to this definition"></a></dt>
+<dd><p>Nested collections, where nesting is accomplished by a fixed-length set of indexers</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.NanoAOD.rename_items">
+<span class="sig-name descname"><span class="pre">rename_items</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'Electron_regrEnergy':</span> <span class="pre">'Electron_energy',</span> <span class="pre">'Photon_regrEnergy':</span> <span class="pre">'Photon_energy'}</span></em><a class="headerlink" href="#awkward_zipper.NanoAOD.rename_items" title="Link to this definition"></a></dt>
+<dd><p>Arrays that should be renamed to ensure proper 4-vector behavior</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.NanoAOD.special_items">
+<span class="sig-name descname"><span class="pre">special_items</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'GenPart_childrenIdxG':</span> <span class="pre">(&lt;function</span> <span class="pre">children&gt;,</span> <span class="pre">('nGenPart',</span> <span class="pre">'GenPart_genPartIdxMotherG')),</span> <span class="pre">'GenPart_distinctChildrenDeepIdxG':</span> <span class="pre">(&lt;function</span> <span class="pre">distinct_children_deep&gt;,</span> <span class="pre">('nGenPart',</span> <span class="pre">'GenPart_genPartIdxMotherG',</span> <span class="pre">'GenPart_pdgId')),</span> <span class="pre">'GenPart_distinctChildrenIdxG':</span> <span class="pre">(&lt;function</span> <span class="pre">children&gt;,</span> <span class="pre">('nGenPart',</span> <span class="pre">'GenPart_distinctParentIdxG')),</span> <span class="pre">'GenPart_distinctParentIdxG':</span> <span class="pre">(&lt;function</span> <span class="pre">distinct_parent&gt;,</span> <span class="pre">('GenPart_genPartIdxMotherG',</span> <span class="pre">'GenPart_pdgId'))}</span></em><a class="headerlink" href="#awkward_zipper.NanoAOD.special_items" title="Link to this definition"></a></dt>
+<dd><p>Special arrays, where the callable and input arrays are specified in the value</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="awkward_zipper.NanoAOD.v5">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">v5</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/nanoaod.html#NanoAOD.v5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.NanoAOD.v5" title="Link to this definition"></a></dt>
+<dd><p>Build the NanoEvents assuming NanoAODv5</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>out</strong> – Schema assuming NanoAODv5</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#awkward_zipper.NanoAOD" title="awkward_zipper.NanoAOD">NanoAOD</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="awkward_zipper.NanoAOD.v6">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">v6</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/nanoaod.html#NanoAOD.v6"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.NanoAOD.v6" title="Link to this definition"></a></dt>
+<dd><p>Build the NanoEvents assuming NanoAODv6</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>out</strong> – Schema assuming NanoAODv6</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#awkward_zipper.NanoAOD" title="awkward_zipper.NanoAOD">NanoAOD</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="awkward_zipper.NanoAOD.v7">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">v7</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/nanoaod.html#NanoAOD.v7"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.NanoAOD.v7" title="Link to this definition"></a></dt>
+<dd><p>Build the NanoEvents assuming NanoAODv7</p>
+<p>For example, one can use <code class="docutils literal notranslate"><span class="pre">NanoEventsFactory.from_root(&quot;file.root&quot;,</span> <span class="pre">schemaclass=NanoAOD.v7)</span></code>
+to ensure NanoAODv7 compatibility.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>out</strong> – Schema assuming NanoAODv7</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#awkward_zipper.NanoAOD" title="awkward_zipper.NanoAOD">NanoAOD</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.NanoAOD.warn_missing_crossrefs">
+<span class="sig-name descname"><span class="pre">warn_missing_crossrefs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#awkward_zipper.NanoAOD.warn_missing_crossrefs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="awkward_zipper.Ntuple">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">Ntuple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'latest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/atlas.html#Ntuple"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.Ntuple" title="Link to this definition"></a></dt>
+<dd><p>Builder for ATLAS ntuples following the typical centralized formats.</p>
+<p>Collections are built from all branches found in the tree, based on the naming
+pattern of the branches, which is assumed to be</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">{</span>collection:str<span class="o">}</span>_<span class="o">{</span>subcollection:str<span class="o">}</span>_<span class="o">{</span>systematic:str<span class="o">}</span>
+</pre></div>
+</div>
+<p>So <code class="docutils literal notranslate"><span class="pre">el_pt_NOSYS</span></code> is the <code class="docutils literal notranslate"><span class="pre">pt</span></code> subcollection of the <code class="docutils literal notranslate"><span class="pre">el</span></code> collection, for the
+nominal (<code class="docutils literal notranslate"><span class="pre">NOSYS</span></code>) systematic. Branches carrying a systematic variation are
+additionally gathered into one record per systematic, sitting alongside the
+nominal collections, so that <code class="docutils literal notranslate"><span class="pre">events.EG_SCALE_ALL__1up.el.pt</span></code> reads the varied
+electron transverse momentum while <code class="docutils literal notranslate"><span class="pre">events.el.pt</span></code> reads the nominal one.</p>
+<p>Collections are assigned mixin types according to the <a class="reference internal" href="#awkward_zipper.Ntuple.mixins" title="awkward_zipper.Ntuple.mixins"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">mixins</span></code></a> mapping; anything
+unrecognized falls back to <a class="reference internal" href="#awkward_zipper.Ntuple.suggested_behavior" title="awkward_zipper.Ntuple.suggested_behavior"><code class="xref any py py-meth docutils literal notranslate"><span class="pre">suggested_behavior</span></code></a>. All collections are then zipped
+into one <a class="reference internal" href="awkward_zipper.behaviors.html#awkward_zipper.behaviors.base.NanoEvents" title="awkward_zipper.behaviors.base.NanoEvents"><code class="xref any py py-class docutils literal notranslate"><span class="pre">base.NanoEvents</span></code></a> record and returned.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.Ntuple.alias_items">
+<span class="sig-name descname"><span class="pre">alias_items</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'MissingET':</span> <span class="pre">{'rho':</span> <span class="pre">'met'}}</span></em><a class="headerlink" href="#awkward_zipper.Ntuple.alias_items" title="Link to this definition"></a></dt>
+<dd><p>fields to alias, keyed by behavior name. Maps new_field -&gt; source_field.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="awkward_zipper.Ntuple.behavior">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">behavior</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/atlas.html#Ntuple.behavior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.Ntuple.behavior" title="Link to this definition"></a></dt>
+<dd><p>Behaviors necessary to implement this schema (dict)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.Ntuple.default_behavior">
+<span class="sig-name descname"><span class="pre">default_behavior</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'NanoCollection'</span></em><a class="headerlink" href="#awkward_zipper.Ntuple.default_behavior" title="Link to this definition"></a></dt>
+<dd><p>default behavior to use for any collection</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.Ntuple.docstrings">
+<span class="sig-name descname"><span class="pre">docstrings</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'charge':</span> <span class="pre">'charge',</span> <span class="pre">'eta':</span> <span class="pre">'pseudorapidity',</span> <span class="pre">'mass':</span> <span class="pre">'invariant</span> <span class="pre">mass</span> <span class="pre">[MeV]',</span> <span class="pre">'met':</span> <span class="pre">'missing</span> <span class="pre">transverse</span> <span class="pre">energy</span> <span class="pre">[MeV]',</span> <span class="pre">'phi':</span> <span class="pre">'azimuthal</span> <span class="pre">angle',</span> <span class="pre">'pt':</span> <span class="pre">'transverse</span> <span class="pre">momentum</span> <span class="pre">[MeV]'}</span></em><a class="headerlink" href="#awkward_zipper.Ntuple.docstrings" title="Link to this definition"></a></dt>
+<dd><p>docstrings to assign for specific subcollections across the collections</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.Ntuple.error_missing_event_ids">
+<span class="sig-name descname"><span class="pre">error_missing_event_ids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#awkward_zipper.Ntuple.error_missing_event_ids" title="Link to this definition"></a></dt>
+<dd><p>treat missing event-level branches as an error instead of a warning</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.Ntuple.event_ids">
+<span class="sig-name descname"><span class="pre">event_ids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'actualInteractionsPerCrossing',</span> <span class="pre">'averageInteractionsPerCrossing',</span> <span class="pre">'dataTakingYear',</span> <span class="pre">'eventNumber',</span> <span class="pre">'lumiBlock',</span> <span class="pre">'mcChannelNumber',</span> <span class="pre">'mcEventWeights',</span> <span class="pre">'runNumber'}</span></em><a class="headerlink" href="#awkward_zipper.Ntuple.event_ids" title="Link to this definition"></a></dt>
+<dd><p>all event IDs to expect in the dataset</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.Ntuple.event_ids_data">
+<span class="sig-name descname"><span class="pre">event_ids_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'actualInteractionsPerCrossing',</span> <span class="pre">'averageInteractionsPerCrossing',</span> <span class="pre">'dataTakingYear',</span> <span class="pre">'lumiBlock'}</span></em><a class="headerlink" href="#awkward_zipper.Ntuple.event_ids_data" title="Link to this definition"></a></dt>
+<dd><p>event IDs to expect in data datasets</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.Ntuple.event_ids_mc">
+<span class="sig-name descname"><span class="pre">event_ids_mc</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'eventNumber',</span> <span class="pre">'mcChannelNumber',</span> <span class="pre">'mcEventWeights',</span> <span class="pre">'runNumber'}</span></em><a class="headerlink" href="#awkward_zipper.Ntuple.event_ids_mc" title="Link to this definition"></a></dt>
+<dd><p>event IDs to expect in MC datasets</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.Ntuple.full_like_items">
+<span class="sig-name descname"><span class="pre">full_like_items</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'Electron':</span> <span class="pre">{'mass':</span> <span class="pre">('pt',</span> <span class="pre">0.51099895069)},</span> <span class="pre">'Muon':</span> <span class="pre">{'mass':</span> <span class="pre">('pt',</span> <span class="pre">105.6583755)},</span> <span class="pre">'Photon':</span> <span class="pre">{'charge':</span> <span class="pre">('pt',</span> <span class="pre">0.0),</span> <span class="pre">'mass':</span> <span class="pre">('pt',</span> <span class="pre">0.0)},</span> <span class="pre">'Tau':</span> <span class="pre">{'mass':</span> <span class="pre">('pt',</span> <span class="pre">1776.93)}}</span></em><a class="headerlink" href="#awkward_zipper.Ntuple.full_like_items" title="Link to this definition"></a></dt>
+<dd><p>fields to materialize as full_like arrays, keyed by behavior name.
+Each entry maps new_field -&gt; (source_field, fill_value).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.Ntuple.identify_closest_behavior">
+<span class="sig-name descname"><span class="pre">identify_closest_behavior</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#awkward_zipper.Ntuple.identify_closest_behavior" title="Link to this definition"></a></dt>
+<dd><p>determine closest behavior for a given branch, or use <a class="reference internal" href="#awkward_zipper.Ntuple.default_behavior" title="awkward_zipper.Ntuple.default_behavior"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">default_behavior</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.Ntuple.mixins">
+<span class="sig-name descname"><span class="pre">mixins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'el':</span> <span class="pre">'Electron',</span> <span class="pre">'jet':</span> <span class="pre">'Jet',</span> <span class="pre">'met':</span> <span class="pre">'MissingET',</span> <span class="pre">'mu':</span> <span class="pre">'Muon',</span> <span class="pre">'pass':</span> <span class="pre">'Pass',</span> <span class="pre">'ph':</span> <span class="pre">'Photon',</span> <span class="pre">'trigPassed':</span> <span class="pre">'Trigger',</span> <span class="pre">'weight':</span> <span class="pre">'Weight'}</span></em><a class="headerlink" href="#awkward_zipper.Ntuple.mixins" title="Link to this definition"></a></dt>
+<dd><p>mapping from collection name to the behavior to use for that collection</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.Ntuple.rename_items">
+<span class="sig-name descname"><span class="pre">rename_items</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'Jet':</span> <span class="pre">{'mass':</span> <span class="pre">'m'}}</span></em><a class="headerlink" href="#awkward_zipper.Ntuple.rename_items" title="Link to this definition"></a></dt>
+<dd><p>fields to rename, keyed by behavior name. Maps new_field -&gt; old_field.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.Ntuple.singletons">
+<span class="sig-name descname"><span class="pre">singletons</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#awkward_zipper.Ntuple.singletons" title="Link to this definition"></a></dt>
+<dd><p>additional branches to pass through with no zipping or interpretation</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="awkward_zipper.Ntuple.suggested_behavior">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">suggested_behavior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/atlas.html#Ntuple.suggested_behavior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.Ntuple.suggested_behavior" title="Link to this definition"></a></dt>
+<dd><p>Suggest a behavior to use for a provided collection or branch name.</p>
+<p>If <a class="reference internal" href="#awkward_zipper.Ntuple.identify_closest_behavior" title="awkward_zipper.Ntuple.identify_closest_behavior"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">identify_closest_behavior</span></code></a> is <code class="docutils literal notranslate"><span class="pre">False</span></code>, or nothing scores above <em>cutoff</em>,
+this returns <a class="reference internal" href="#awkward_zipper.Ntuple.default_behavior" title="awkward_zipper.Ntuple.default_behavior"><code class="xref any py py-attr docutils literal notranslate"><span class="pre">default_behavior</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="awkward_zipper.Ntuple.v1">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">v1</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/atlas.html#Ntuple.v1"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.Ntuple.v1" title="Link to this definition"></a></dt>
+<dd><p>Build the NtupleEvents for version 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.Ntuple.warn_missing_crossrefs">
+<span class="sig-name descname"><span class="pre">warn_missing_crossrefs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#awkward_zipper.Ntuple.warn_missing_crossrefs" title="Link to this definition"></a></dt>
+<dd><p>warn when a cross-reference index or target is missing</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="awkward_zipper.PDUNE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">PDUNE</span></span><a class="reference internal" href="_modules/awkward_zipper/layouts/pdune.html#PDUNE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.PDUNE" title="Link to this definition"></a></dt>
+<dd><p>ProtoDUNE-SP <code class="docutils literal notranslate"><span class="pre">pduneana</span></code> layout builder</p>
+<p>The branches (named <code class="docutils literal notranslate"><span class="pre">&lt;top_object&gt;_&lt;a&gt;_&lt;b&gt;_...</span></code>) are regrouped into nested
+records by splitting on <code class="docutils literal notranslate"><span class="pre">_</span></code>. Branches whose trailing token is a coordinate
+(<code class="docutils literal notranslate"><span class="pre">X</span></code>/<code class="docutils literal notranslate"><span class="pre">Y</span></code>/<code class="docutils literal notranslate"><span class="pre">Z</span></code> or <code class="docutils literal notranslate"><span class="pre">Px</span></code>/<code class="docutils literal notranslate"><span class="pre">Py</span></code>/<code class="docutils literal notranslate"><span class="pre">Pz</span></code>/<code class="docutils literal notranslate"><span class="pre">E</span></code>) are collected into
+<code class="docutils literal notranslate"><span class="pre">ThreeVector</span></code>/<code class="docutils literal notranslate"><span class="pre">LorentzVector</span></code> sub-records (<code class="docutils literal notranslate"><span class="pre">*3D</span></code>/<code class="docutils literal notranslate"><span class="pre">*4D</span></code>).</p>
+<p>This is an array-based re-implementation of coffea’s <code class="docutils literal notranslate"><span class="pre">PDUNESchema</span></code>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="awkward_zipper.PDUNE.behavior">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">behavior</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/pdune.html#PDUNE.behavior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.PDUNE.behavior" title="Link to this definition"></a></dt>
+<dd><p>Behaviors necessary to implement this schema (dict)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.PDUNE.mixins">
+<span class="sig-name descname"><span class="pre">mixins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'RecoBeam':</span> <span class="pre">'Beam',</span> <span class="pre">'Showers':</span> <span class="pre">'Showers',</span> <span class="pre">'Tracks':</span> <span class="pre">'Tracks',</span> <span class="pre">'end3D':</span> <span class="pre">'ThreeVector',</span> <span class="pre">'end4D':</span> <span class="pre">'LorentzVector',</span> <span class="pre">'reco_beam':</span> <span class="pre">'RecoBeam',</span> <span class="pre">'reco_daughter_allShower':</span> <span class="pre">'Showers',</span> <span class="pre">'reco_daughter_allTrack':</span> <span class="pre">'Tracks',</span> <span class="pre">'start3D':</span> <span class="pre">'ThreeVector',</span> <span class="pre">'start4D':</span> <span class="pre">'LorentzVector',</span> <span class="pre">'vtx3D':</span> <span class="pre">'ThreeVector'}</span></em><a class="headerlink" href="#awkward_zipper.PDUNE.mixins" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.PDUNE.top_objects">
+<span class="sig-name descname"><span class="pre">top_objects</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'reco_beam':</span> <span class="pre">'RecoBeam',</span> <span class="pre">'reco_daughter_allShower':</span> <span class="pre">'Showers',</span> <span class="pre">'reco_daughter_allTrack':</span> <span class="pre">'Tracks',</span> <span class="pre">'true_beam':</span> <span class="pre">'TrueBeam'}</span></em><a class="headerlink" href="#awkward_zipper.PDUNE.top_objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="awkward_zipper.PFNanoAOD">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">PFNanoAOD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'latest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/nanoaod.html#PFNanoAOD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.PFNanoAOD" title="Link to this definition"></a></dt>
+<dd><p>PFNano schema builder</p>
+<p>PFNano is an extended NanoAOD format that includes PF candidates and secondary vertices
+More info at <a class="reference external" href="https://github.com/cms-jet/PFNano">https://github.com/cms-jet/PFNano</a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.PFNanoAOD.all_cross_references">
+<span class="sig-name descname"><span class="pre">all_cross_references</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'Electron_genPartIdx':</span> <span class="pre">'GenPart',</span> <span class="pre">'Electron_jetIdx':</span> <span class="pre">'Jet',</span> <span class="pre">'Electron_photonIdx':</span> <span class="pre">'Photon',</span> <span class="pre">'FatJetPFCands_jetIdx':</span> <span class="pre">'FatJet',</span> <span class="pre">'FatJetPFCands_pFCandsIdx':</span> <span class="pre">'PFCands',</span> <span class="pre">'FatJetSVs_jetIdx':</span> <span class="pre">'FatJet',</span> <span class="pre">'FatJetSVs_sVIdx':</span> <span class="pre">'SV',</span> <span class="pre">'FatJet_electronIdx3SJ':</span> <span class="pre">'Electron',</span> <span class="pre">'FatJet_genJetAK8Idx':</span> <span class="pre">'GenJetAK8',</span> <span class="pre">'FatJet_muonIdx3SJ':</span> <span class="pre">'Muon',</span> <span class="pre">'FatJet_subJetIdx1':</span> <span class="pre">'SubJet',</span> <span class="pre">'FatJet_subJetIdx2':</span> <span class="pre">'SubJet',</span> <span class="pre">'FsrPhoton_muonIdx':</span> <span class="pre">'Muon',</span> <span class="pre">'GenFatJetCands_jetIdx':</span> <span class="pre">'GenJetAK8',</span> <span class="pre">'GenFatJetCands_pFCandsIdx':</span> <span class="pre">'GenCands',</span> <span class="pre">'GenFatJetSVs_jetIdx':</span> <span class="pre">'GenJetAK8',</span> <span class="pre">'GenFatJetSVs_sVIdx':</span> <span class="pre">'SV',</span> <span class="pre">'GenJetCands_jetIdx':</span> <span class="pre">'GenJet',</span> <span class="pre">'GenJetCands_pFCandsIdx':</span> <span class="pre">'GenCands',</span> <span class="pre">'GenJetSVs_jetIdx':</span> <span class="pre">'GenJet',</span> <span class="pre">'GenJetSVs_sVIdx':</span> <span class="pre">'SV',</span> <span class="pre">'GenPart_genPartIdxMother':</span> <span class="pre">'GenPart',</span> <span class="pre">'GenVisTau_genPartIdxMother':</span> <span class="pre">'GenPart',</span> <span class="pre">'JetPFCands_jetIdx':</span> <span class="pre">'Jet',</span> <span class="pre">'JetPFCands_pFCandsIdx':</span> <span class="pre">'PFCands',</span> <span class="pre">'JetSVs_jetIdx':</span> <span class="pre">'Jet',</span> <span class="pre">'JetSVs_sVIdx':</span> <span class="pre">'SV',</span> <span class="pre">'Jet_electronIdx1':</span> <span class="pre">'Electron',</span> <span class="pre">'Jet_electronIdx2':</span> <span class="pre">'Electron',</span> <span class="pre">'Jet_genJetIdx':</span> <span class="pre">'GenJet',</span> <span class="pre">'Jet_muonIdx1':</span> <span class="pre">'Muon',</span> <span class="pre">'Jet_muonIdx2':</span> <span class="pre">'Muon',</span> <span class="pre">'LowPtElectron_electronIdx':</span> <span class="pre">'Electron',</span> <span class="pre">'LowPtElectron_genPartIdx':</span> <span class="pre">'GenPart',</span> <span class="pre">'LowPtElectron_photonIdx':</span> <span class="pre">'Photon',</span> <span class="pre">'Muon_fsrPhotonIdx':</span> <span class="pre">'FsrPhoton',</span> <span class="pre">'Muon_genPartIdx':</span> <span class="pre">'GenPart',</span> <span class="pre">'Muon_jetIdx':</span> <span class="pre">'Jet',</span> <span class="pre">'Photon_electronIdx':</span> <span class="pre">'Electron',</span> <span class="pre">'Photon_genPartIdx':</span> <span class="pre">'GenPart',</span> <span class="pre">'Photon_jetIdx':</span> <span class="pre">'Jet',</span> <span class="pre">'SubJet_subGenJetAK8Idx':</span> <span class="pre">'SubGenJetAK8',</span> <span class="pre">'Tau_genPartIdx':</span> <span class="pre">'GenPart',</span> <span class="pre">'Tau_jetIdx':</span> <span class="pre">'Jet'}</span></em><a class="headerlink" href="#awkward_zipper.PFNanoAOD.all_cross_references" title="Link to this definition"></a></dt>
+<dd><p>Cross-references, where an index is to be interpreted with respect to another collection</p>
+<p>Each such cross-reference will be converted to a global indexer, so that arbitrarily sliced events
+can still resolve the indirection back the parent events</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.PFNanoAOD.mixins">
+<span class="sig-name descname"><span class="pre">mixins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'CaloMET':</span> <span class="pre">'MissingET',</span> <span class="pre">'ChsMET':</span> <span class="pre">'MissingET',</span> <span class="pre">'CorrT1METJet':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'Electron':</span> <span class="pre">'Electron',</span> <span class="pre">'FatJet':</span> <span class="pre">'FatJet',</span> <span class="pre">'FatJetPFCands':</span> <span class="pre">'AssociatedPFCand',</span> <span class="pre">'FatJetSVs':</span> <span class="pre">'AssociatedSV',</span> <span class="pre">'FsrPhoton':</span> <span class="pre">'FsrPhoton',</span> <span class="pre">'GenCands':</span> <span class="pre">'PFCand',</span> <span class="pre">'GenDressedLepton':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'GenFatJetCands':</span> <span class="pre">'AssociatedPFCand',</span> <span class="pre">'GenFatJetSVs':</span> <span class="pre">'AssociatedSV',</span> <span class="pre">'GenIsolatedPhoton':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'GenJet':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'GenJetAK8':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'GenJetCands':</span> <span class="pre">'AssociatedPFCand',</span> <span class="pre">'GenJetSVs':</span> <span class="pre">'AssociatedSV',</span> <span class="pre">'GenMET':</span> <span class="pre">'MissingET',</span> <span class="pre">'GenPart':</span> <span class="pre">'GenParticle',</span> <span class="pre">'GenVisTau':</span> <span class="pre">'GenVisTau',</span> <span class="pre">'IsoTrack':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'Jet':</span> <span class="pre">'Jet',</span> <span class="pre">'JetPFCands':</span> <span class="pre">'AssociatedPFCand',</span> <span class="pre">'JetSVs':</span> <span class="pre">'AssociatedSV',</span> <span class="pre">'LHEPart':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'LowPtElectron':</span> <span class="pre">'LowPtElectron',</span> <span class="pre">'MET':</span> <span class="pre">'MissingET',</span> <span class="pre">'METFixEE2017':</span> <span class="pre">'MissingET',</span> <span class="pre">'Muon':</span> <span class="pre">'Muon',</span> <span class="pre">'PFCands':</span> <span class="pre">'PFCand',</span> <span class="pre">'PV':</span> <span class="pre">'Vertex',</span> <span class="pre">'Photon':</span> <span class="pre">'Photon',</span> <span class="pre">'PuppiMET':</span> <span class="pre">'MissingET',</span> <span class="pre">'RawMET':</span> <span class="pre">'MissingET',</span> <span class="pre">'RawPuppiMET':</span> <span class="pre">'MissingET',</span> <span class="pre">'SV':</span> <span class="pre">'SecondaryVertex',</span> <span class="pre">'SoftActivityJet':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'SubGenJetAK8':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'SubJet':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'Tau':</span> <span class="pre">'Tau',</span> <span class="pre">'TkMET':</span> <span class="pre">'MissingET',</span> <span class="pre">'TrigObj':</span> <span class="pre">'PtEtaPhiMCollection'}</span></em><a class="headerlink" href="#awkward_zipper.PFNanoAOD.mixins" title="Link to this definition"></a></dt>
+<dd><p>Default configuration for mixin types, based on the collection name.</p>
+<p>The types are implemented in the <a class="reference internal" href="awkward_zipper.behaviors.html#module-awkward_zipper.behaviors.nanoaod" title="awkward_zipper.behaviors.nanoaod"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">awkward_zipper.behaviors.nanoaod</span></code></a> module.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="awkward_zipper.PHYSLITE">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">PHYSLITE</span></span><a class="reference internal" href="_modules/awkward_zipper/layouts/physlite.html#PHYSLITE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.PHYSLITE" title="Link to this definition"></a></dt>
+<dd><p>ATLAS DAOD_PHYSLITE layout builder</p>
+<p>Array-based re-implementation of coffea’s <code class="docutils literal notranslate"><span class="pre">PHYSLITESchema</span></code>. Branches named
+<code class="docutils literal notranslate"><span class="pre">&lt;Collection&gt;Aux[Dyn].&lt;field&gt;</span></code> are grouped by collection (with the
+<code class="docutils literal notranslate"><span class="pre">Analysis</span></code>/<code class="docutils literal notranslate"><span class="pre">Aux</span></code>/<code class="docutils literal notranslate"><span class="pre">AuxDyn</span></code> affixes stripped) and zipped into jagged
+records. Split <code class="docutils literal notranslate"><span class="pre">ElementLink</span></code> members (<code class="docutils literal notranslate"><span class="pre">link.m_persKey</span></code>/<code class="docutils literal notranslate"><span class="pre">link.m_persIndex</span></code>)
+are reconstituted into sub-records, a synthetic <code class="docutils literal notranslate"><span class="pre">_eventindex</span></code> column is added
+per collection, and <code class="docutils literal notranslate"><span class="pre">TrackParticle</span></code>/<code class="docutils literal notranslate"><span class="pre">Muon</span></code> collections get their derived
+<code class="docutils literal notranslate"><span class="pre">p</span></code>/<code class="docutils literal notranslate"><span class="pre">pt</span></code>/<code class="docutils literal notranslate"><span class="pre">tau</span></code>/<code class="docutils literal notranslate"><span class="pre">m</span></code> fields.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="awkward_zipper.PHYSLITE.behavior">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">behavior</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/physlite.html#PHYSLITE.behavior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.PHYSLITE.behavior" title="Link to this definition"></a></dt>
+<dd><p>Behaviors necessary to implement this schema (dict)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.PHYSLITE.mixins">
+<span class="sig-name descname"><span class="pre">mixins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'CombinedMuonTrackParticles':</span> <span class="pre">'TrackParticle',</span> <span class="pre">'Electrons':</span> <span class="pre">'Electron',</span> <span class="pre">'ExtrapolatedMuonTrackParticles':</span> <span class="pre">'TrackParticle',</span> <span class="pre">'GSFTrackParticles':</span> <span class="pre">'TrackParticle',</span> <span class="pre">'InDetTrackParticles':</span> <span class="pre">'TrackParticle',</span> <span class="pre">'Jets':</span> <span class="pre">'Particle',</span> <span class="pre">'MuonSpectrometerTrackParticles':</span> <span class="pre">'TrackParticle',</span> <span class="pre">'Muons':</span> <span class="pre">'Muon',</span> <span class="pre">'Photons':</span> <span class="pre">'Particle',</span> <span class="pre">'TauJets':</span> <span class="pre">'Particle',</span> <span class="pre">'TruthBoson':</span> <span class="pre">'TruthParticle',</span> <span class="pre">'TruthBottom':</span> <span class="pre">'TruthParticle',</span> <span class="pre">'TruthElectrons':</span> <span class="pre">'TruthParticle',</span> <span class="pre">'TruthMuons':</span> <span class="pre">'TruthParticle',</span> <span class="pre">'TruthNeutrinos':</span> <span class="pre">'TruthParticle',</span> <span class="pre">'TruthPhotons':</span> <span class="pre">'TruthParticle',</span> <span class="pre">'TruthTaus':</span> <span class="pre">'TruthParticle',</span> <span class="pre">'TruthTop':</span> <span class="pre">'TruthParticle',</span> <span class="pre">'egammaClusters':</span> <span class="pre">'NanoCollection'}</span></em><a class="headerlink" href="#awkward_zipper.PHYSLITE.mixins" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.PHYSLITE.truth_collections">
+<span class="sig-name descname"><span class="pre">truth_collections</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['TruthPhotons',</span> <span class="pre">'TruthMuons',</span> <span class="pre">'TruthNeutrinos',</span> <span class="pre">'TruthTaus',</span> <span class="pre">'TruthElectrons',</span> <span class="pre">'TruthBoson',</span> <span class="pre">'TruthBottom',</span> <span class="pre">'TruthTop']</span></em><a class="headerlink" href="#awkward_zipper.PHYSLITE.truth_collections" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="awkward_zipper.ScoutingNanoAOD">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">ScoutingNanoAOD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'latest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/nanoaod.html#ScoutingNanoAOD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.ScoutingNanoAOD" title="Link to this definition"></a></dt>
+<dd><p>ScoutingNano schema builder</p>
+<p>ScoutingNano is a NanoAOD format that includes Scouting objects</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.ScoutingNanoAOD.alias_items">
+<span class="sig-name descname"><span class="pre">alias_items</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'CorrT1METJet_mass':</span> <span class="pre">'CorrT1METJet_rawMass',</span> <span class="pre">'CorrT1METJet_pt':</span> <span class="pre">'CorrT1METJet_rawPt',</span> <span class="pre">'MET_phi':</span> <span class="pre">'MET_fiducialGenPhi',</span> <span class="pre">'MET_pt':</span> <span class="pre">'MET_fiducialGenPt'}</span></em><a class="headerlink" href="#awkward_zipper.ScoutingNanoAOD.alias_items" title="Link to this definition"></a></dt>
+<dd><p>Arrays that should be aliased to ensure proper 4-vector behavior</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.ScoutingNanoAOD.all_cross_references">
+<span class="sig-name descname"><span class="pre">all_cross_references</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'Electron_genPartIdx':</span> <span class="pre">'GenPart',</span> <span class="pre">'Electron_jetIdx':</span> <span class="pre">'Jet',</span> <span class="pre">'Electron_photonIdx':</span> <span class="pre">'Photon',</span> <span class="pre">'FatJet_genJetAK8Idx':</span> <span class="pre">'GenJetAK8',</span> <span class="pre">'FatJet_subJetIdx1':</span> <span class="pre">'SubJet',</span> <span class="pre">'FatJet_subJetIdx2':</span> <span class="pre">'SubJet',</span> <span class="pre">'FsrPhoton_muonIdx':</span> <span class="pre">'Muon',</span> <span class="pre">'GenPart_genPartIdxMother':</span> <span class="pre">'GenPart',</span> <span class="pre">'GenVisTau_genPartIdxMother':</span> <span class="pre">'GenPart',</span> <span class="pre">'Jet_electronIdx1':</span> <span class="pre">'Electron',</span> <span class="pre">'Jet_electronIdx2':</span> <span class="pre">'Electron',</span> <span class="pre">'Jet_genJetIdx':</span> <span class="pre">'GenJet',</span> <span class="pre">'Jet_muonIdx1':</span> <span class="pre">'Muon',</span> <span class="pre">'Jet_muonIdx2':</span> <span class="pre">'Muon',</span> <span class="pre">'LowPtElectron_electronIdx':</span> <span class="pre">'Electron',</span> <span class="pre">'LowPtElectron_genPartIdx':</span> <span class="pre">'GenPart',</span> <span class="pre">'LowPtElectron_photonIdx':</span> <span class="pre">'Photon',</span> <span class="pre">'Muon_fsrPhotonIdx':</span> <span class="pre">'FsrPhoton',</span> <span class="pre">'Muon_genPartIdx':</span> <span class="pre">'GenPart',</span> <span class="pre">'Muon_jetIdx':</span> <span class="pre">'Jet',</span> <span class="pre">'Photon_electronIdx':</span> <span class="pre">'Electron',</span> <span class="pre">'Photon_genPartIdx':</span> <span class="pre">'GenPart',</span> <span class="pre">'Photon_jetIdx':</span> <span class="pre">'Jet',</span> <span class="pre">'Tau_genPartIdx':</span> <span class="pre">'GenPart',</span> <span class="pre">'Tau_jetIdx':</span> <span class="pre">'Jet'}</span></em><a class="headerlink" href="#awkward_zipper.ScoutingNanoAOD.all_cross_references" title="Link to this definition"></a></dt>
+<dd><p>Cross-references, where an index is to be interpreted with respect to another collection</p>
+<p>Each such cross-reference will be converted to a global indexer, so that arbitrarily sliced events
+can still resolve the indirection back the parent events</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.ScoutingNanoAOD.full_like_items">
+<span class="sig-name descname"><span class="pre">full_like_items</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'CorrT1METJet_mass':</span> <span class="pre">('nCorrT1METJet',</span> <span class="pre">0.0),</span> <span class="pre">'FatJet_charge':</span> <span class="pre">('nFatJet',</span> <span class="pre">0.0),</span> <span class="pre">'FsrPhoton_charge':</span> <span class="pre">('nFsrPhoton',</span> <span class="pre">0.0),</span> <span class="pre">'FsrPhoton_mass':</span> <span class="pre">('nFsrPhoton',</span> <span class="pre">0.0),</span> <span class="pre">'IsoTrack_mass':</span> <span class="pre">('nIsoTrack',</span> <span class="pre">0.0),</span> <span class="pre">'Jet_charge':</span> <span class="pre">('nJet',</span> <span class="pre">0.0),</span> <span class="pre">'Photon_charge':</span> <span class="pre">('nPhoton',</span> <span class="pre">0.0),</span> <span class="pre">'Photon_mass':</span> <span class="pre">('nPhoton',</span> <span class="pre">0.0),</span> <span class="pre">'ScoutingFatJet_charge':</span> <span class="pre">('nScoutingFatJet',</span> <span class="pre">0.0),</span> <span class="pre">'ScoutingJet_charge':</span> <span class="pre">('nScoutingJet',</span> <span class="pre">0.0),</span> <span class="pre">'ScoutingPhoton_charge':</span> <span class="pre">('nScoutingPhoton',</span> <span class="pre">0.0),</span> <span class="pre">'ScoutingPhoton_m':</span> <span class="pre">('nScoutingPhoton',</span> <span class="pre">0.0),</span> <span class="pre">'SoftActivityJet_mass':</span> <span class="pre">('nSoftActivityJet',</span> <span class="pre">0.0),</span> <span class="pre">'TrigObj_mass':</span> <span class="pre">('nTrigObj',</span> <span class="pre">0.0)}</span></em><a class="headerlink" href="#awkward_zipper.ScoutingNanoAOD.full_like_items" title="Link to this definition"></a></dt>
+<dd><p>Arrays that should be filled with constant values if not present to satisfy 4-vector requirements.</p>
+<p>Each value is a <code class="docutils literal notranslate"><span class="pre">(counts_branch,</span> <span class="pre">fill_value)</span></code> pair; the array is built jagged
+from the <code class="docutils literal notranslate"><span class="pre">n{collection}</span></code> counts branch (mirrors coffea’s <code class="docutils literal notranslate"><span class="pre">full_like_items</span></code>,
+which uses the <code class="docutils literal notranslate"><span class="pre">o{collection}</span></code> offsets branch).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="awkward_zipper.ScoutingNanoAOD.mixins">
+<span class="sig-name descname"><span class="pre">mixins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'CaloMET':</span> <span class="pre">'MissingET',</span> <span class="pre">'ChsMET':</span> <span class="pre">'MissingET',</span> <span class="pre">'CorrT1METJet':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'Electron':</span> <span class="pre">'Electron',</span> <span class="pre">'FatJet':</span> <span class="pre">'FatJet',</span> <span class="pre">'FsrPhoton':</span> <span class="pre">'FsrPhoton',</span> <span class="pre">'GenDressedLepton':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'GenIsolatedPhoton':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'GenJet':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'GenJetAK8':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'GenMET':</span> <span class="pre">'MissingET',</span> <span class="pre">'GenPart':</span> <span class="pre">'GenParticle',</span> <span class="pre">'GenVisTau':</span> <span class="pre">'GenVisTau',</span> <span class="pre">'IsoTrack':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'Jet':</span> <span class="pre">'Jet',</span> <span class="pre">'LHEPart':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'LowPtElectron':</span> <span class="pre">'LowPtElectron',</span> <span class="pre">'MET':</span> <span class="pre">'MissingET',</span> <span class="pre">'METFixEE2017':</span> <span class="pre">'MissingET',</span> <span class="pre">'Muon':</span> <span class="pre">'Muon',</span> <span class="pre">'PV':</span> <span class="pre">'Vertex',</span> <span class="pre">'Photon':</span> <span class="pre">'Photon',</span> <span class="pre">'PuppiMET':</span> <span class="pre">'MissingET',</span> <span class="pre">'RawMET':</span> <span class="pre">'MissingET',</span> <span class="pre">'RawPuppiMET':</span> <span class="pre">'MissingET',</span> <span class="pre">'SV':</span> <span class="pre">'SecondaryVertex',</span> <span class="pre">'ScoutingElectron':</span> <span class="pre">'Electron',</span> <span class="pre">'ScoutingFatJet':</span> <span class="pre">'FatJet',</span> <span class="pre">'ScoutingJet':</span> <span class="pre">'Jet',</span> <span class="pre">'ScoutingMET':</span> <span class="pre">'MissingET',</span> <span class="pre">'ScoutingMuonNoVtx':</span> <span class="pre">'Muon',</span> <span class="pre">'ScoutingMuonNoVtxDisplacedVertex':</span> <span class="pre">'Vertex',</span> <span class="pre">'ScoutingMuonVtx':</span> <span class="pre">'Muon',</span> <span class="pre">'ScoutingMuonVtxDisplacedVertex':</span> <span class="pre">'Vertex',</span> <span class="pre">'ScoutingPhoton':</span> <span class="pre">'Photon',</span> <span class="pre">'ScoutingPrimaryVertex':</span> <span class="pre">'Vertex',</span> <span class="pre">'SoftActivityJet':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'SubGenJetAK8':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'SubJet':</span> <span class="pre">'PtEtaPhiMCollection',</span> <span class="pre">'Tau':</span> <span class="pre">'Tau',</span> <span class="pre">'TkMET':</span> <span class="pre">'MissingET',</span> <span class="pre">'TrigObj':</span> <span class="pre">'PtEtaPhiMCollection'}</span></em><a class="headerlink" href="#awkward_zipper.ScoutingNanoAOD.mixins" title="Link to this definition"></a></dt>
+<dd><p>Default configuration for mixin types, based on the collection name.</p>
+<p>The types are implemented in the <a class="reference internal" href="awkward_zipper.behaviors.html#module-awkward_zipper.behaviors.nanoaod" title="awkward_zipper.behaviors.nanoaod"><code class="xref any py py-mod docutils literal notranslate"><span class="pre">awkward_zipper.behaviors.nanoaod</span></code></a> module.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="awkward_zipper.TreeMaker">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">TreeMaker</span></span><a class="reference internal" href="_modules/awkward_zipper/layouts/treemaker.html#TreeMaker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.TreeMaker" title="Link to this definition"></a></dt>
+<dd><p>TreeMaker layout builder</p>
+<p>The TreeMaker layout is built from all branches found in the supplied file,
+based on the naming pattern of the branches. There are two steps to the
+generation of the array collections:</p>
+<ul class="simple">
+<li><p>Objects with vector-like quantities (momentum, coordinate points) in the
+TreeMaker n-tuples are stored using ROOT <code class="docutils literal notranslate"><span class="pre">PtEtaPhiEVector</span></code> and
+<code class="docutils literal notranslate"><span class="pre">XYZPoint</span></code> classes with maximum TTree splitting. These split branches
+(<code class="docutils literal notranslate"><span class="pre">&lt;Object&gt;.fCoordinates.f{Pt,Eta,Phi,E}</span></code> and
+<code class="docutils literal notranslate"><span class="pre">&lt;Object&gt;.fCoordinates.f{X,Y,Z}</span></code>) are grouped into a single collection
+with the original object name, mapping the coordinate variables to the
+standard names used by the vector behaviors (<code class="docutils literal notranslate"><span class="pre">pt</span></code>, <code class="docutils literal notranslate"><span class="pre">eta</span></code>, <code class="docutils literal notranslate"><span class="pre">phi</span></code>,
+<code class="docutils literal notranslate"><span class="pre">energy</span></code> and <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code>, <code class="docutils literal notranslate"><span class="pre">z</span></code>).</p></li>
+<li><p>Extended quantities of physics objects are stored as <code class="docutils literal notranslate"><span class="pre">&lt;Object&gt;_&lt;variable&gt;</span></code>
+(e.g. <code class="docutils literal notranslate"><span class="pre">Jets_jecFactor</span></code>) and are merged into the collection <code class="docutils literal notranslate"><span class="pre">&lt;Object&gt;</span></code>.</p></li>
+</ul>
+<p>Sub-collections, signalled by a <code class="docutils literal notranslate"><span class="pre">&lt;Object&gt;_&lt;subcol&gt;Counts</span></code> branch, are
+nested as doubly-jagged arrays inside their parent collection.</p>
+<p>All collections are then zipped into one <code class="docutils literal notranslate"><span class="pre">base.NanoEvents</span></code> record.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="awkward_zipper.TreeMaker.behavior">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">behavior</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/treemaker.html#TreeMaker.behavior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.TreeMaker.behavior" title="Link to this definition"></a></dt>
+<dd><p>Behaviors necessary to implement this schema (dict)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="awkward_zipper.edm4hep_version">
+<span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">edm4hep_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'latest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/edm4hep.html#edm4hep_version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.edm4hep_version" title="Link to this definition"></a></dt>
+<dd><p>Return the EDM4HEP layout builder class for a given edm4hep.yaml version.</p>
+<p><code class="docutils literal notranslate"><span class="pre">ver</span></code> is written either as <code class="docutils literal notranslate"><span class="pre">&quot;00.99.04&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;00-99-04&quot;</span></code>; <code class="docutils literal notranslate"><span class="pre">&quot;latest&quot;</span></code>
+(default) selects the newest bundled version. The available versions are
+listed in <code class="docutils literal notranslate"><span class="pre">awkward_zipper.assets.versions</span></code>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="awkward_zipper.podio_collection_types">
+<span class="sig-prename descclassname"><span class="pre">awkward_zipper.</span></span><span class="sig-name descname"><span class="pre">podio_collection_types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/awkward_zipper/layouts/edm4hep.html#podio_collection_types"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#awkward_zipper.podio_collection_types" title="Link to this definition"></a></dt>
+<dd><p>Map collection name to podio dataType from the file’s <code class="docutils literal notranslate"><span class="pre">podio_metadata</span></code> tree.</p>
+<p>Returns None when the file has no metadata or predates the named leaf layout
+(podio &lt; 1.3 writes positional <code class="docutils literal notranslate"><span class="pre">_0.._3</span></code> leaves).</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="awkward_zipper.behaviors.html" class="btn btn-neutral float-right" title="awkward_zipper.behaviors" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Peter Fackeldey, Maxym Naumchyk.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

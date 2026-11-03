@@ -1,0 +1,1202 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>awkward_zipper.kernels &mdash; awkward-zipper 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+
+  
+    <link rel="shortcut icon" href="../../_static/logo_unfilled_with_text.png"/>
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            awkward-zipper
+              <img src="../../_static/logo_unfilled_with_black_text.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">awkward-zipper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">awkward_zipper.kernels</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for awkward_zipper.kernels</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">functools</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">awkward</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numba</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+
+<div class="viewcode-block" id="ensure_array">
+<a class="viewcode-back" href="../../awkward_zipper.html#awkward_zipper.kernels.ensure_array">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ensure_array</span><span class="p">(</span><span class="n">arraylike</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Converts arraylike to a Numpy array</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arraylike</span><span class="p">,</span> <span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">Content</span> <span class="o">|</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="n">arraylike</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arraylike</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">Index</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">arraylike</span><span class="o">.</span><span class="n">data</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">arraylike</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># function: tp.Callable[[],]</span>
+<div class="viewcode-block" id="dispatch_wrap">
+<a class="viewcode-back" href="../../awkward_zipper.html#awkward_zipper.kernels.dispatch_wrap">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">dispatch_wrap</span><span class="p">(</span><span class="n">function</span><span class="p">):</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">input_arrays</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Calls a function and passes it input_arrays as parameters. Returns a function result in eager case.</span>
+<span class="sd">         In virtual case returns a result from a function wrapped in a Virtual Array.</span>
+<span class="sd">        Args:</span>
+<span class="sd">            input_arrays: function parameters. Awkward arrays and integers are accepted.</span>
+<span class="sd">             This is a VirtualNDArray generator limitation.</span>
+<span class="sd">            data: additional parameter for VirtualNDArray creation</span>
+<span class="sd">            function: function to return</span>
+<span class="sd">            dtype: additional parameter for VirtualNDArray creation</span>
+
+<span class="sd">        Returns: function(input_arrays) or</span>
+<span class="sd">         awkward.VirtualNDArray(generator=lambda: function(input_arrays))</span>
+
+<span class="sd">        """</span>
+        <span class="c1"># Virtual array</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">_nplikes</span><span class="o">.</span><span class="n">virtual</span><span class="o">.</span><span class="n">VirtualNDArray</span><span class="p">(</span>
+                <span class="n">nplike</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">_nplike</span><span class="p">,</span>
+                <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">_nplikes</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">unknown_length</span><span class="p">,),</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
+                <span class="n">generator</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">function</span><span class="p">(</span>
+                    <span class="o">*</span><span class="p">(</span>
+                        <span class="p">(</span>
+                            <span class="n">array</span>
+                            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+                            <span class="k">else</span> <span class="n">awkward</span><span class="o">.</span><span class="n">materialize</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+                        <span class="p">)</span>
+                        <span class="k">for</span> <span class="n">array</span> <span class="ow">in</span> <span class="n">input_arrays</span>
+                    <span class="p">)</span>
+                <span class="p">),</span>
+                <span class="n">shape_generator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="c1"># concrete array</span>
+        <span class="k">return</span> <span class="n">function</span><span class="p">(</span><span class="o">*</span><span class="n">input_arrays</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_wrapper</span></div>
+
+
+
+<div class="viewcode-block" id="local2globalindex">
+<a class="viewcode-back" href="../../awkward_zipper.html#awkward_zipper.kernels.local2globalindex">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">local2globalindex</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">counts</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Convert a jagged local index to a global index</span>
+
+<span class="sd">    This is the same as local2global(index, counts2offsets(counts))</span>
+<span class="sd">    where local2global and counts2offsets are as in coffea.nanoevents.transforms</span>
+
+<span class="sd">    Example usage:</span>
+<span class="sd">    Index array</span>
+<span class="sd">    [[], [1], [], [2, 3]]</span>
+<span class="sd">    Counts array</span>
+<span class="sd">    [8, 7, 4, 7]</span>
+<span class="sd">    Output array will be:</span>
+<span class="sd">    [[], [9], [], [21, 22]]</span>
+<span class="sd">    (here 21=8+7+4+2)</span>
+<span class="sd">    """</span>
+
+    <span class="nd">@dispatch_wrap</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_local2globalindex</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">counts</span><span class="p">):</span>
+        <span class="n">offsets</span> <span class="o">=</span> <span class="n">counts2offsets</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
+        <span class="c1"># make sure that offsets is always a Numpy array</span>
+        <span class="n">offsets</span> <span class="o">=</span> <span class="n">ensure_array</span><span class="p">(</span><span class="n">offsets</span><span class="p">)</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">mask</span><span class="p">[</span><span class="n">index</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">offsets</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">mask</span><span class="p">[</span><span class="n">index</span> <span class="o">&lt;</span> <span class="n">offsets</span><span class="p">[</span><span class="mi">1</span><span class="p">:]]</span>  <span class="c1"># guard against out of bounds</span>
+        <span class="c1"># workaround ValueError: can not (unsafe) zip ListOffsetArrays with non-NumpyArray contents</span>
+        <span class="c1"># index.type is N * var * int32?</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">fill_none</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="c1"># make sure that output is always Numpy array</span>
+        <span class="k">return</span> <span class="n">ensure_array</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+    <span class="c1"># Check if VirtualNDArray</span>
+    <span class="n">index_data</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">to_layout</span><span class="p">(</span><span class="n">_</span><span class="p">)</span><span class="o">.</span><span class="n">is_all_materialized</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">counts</span><span class="p">)):</span>
+        <span class="n">index_data</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">data</span>
+
+    <span class="c1"># resulting global index will have the same offsets as local index</span>
+    <span class="n">index_offsets</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">offsets</span>
+
+    <span class="n">index_content</span> <span class="o">=</span> <span class="n">_local2globalindex</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">counts</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">index_data</span><span class="p">)</span>
+    <span class="c1"># index_content shape would be index_data.shape</span>
+    <span class="n">index_content</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">numpyarray</span><span class="o">.</span><span class="n">NumpyArray</span><span class="p">(</span><span class="n">index_content</span><span class="p">)</span>
+    <span class="c1"># create new parameters for the final array</span>
+    <span class="n">parameters</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">parameters</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+    <span class="n">parameters</span><span class="p">[</span><span class="s2">"__doc__"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"global "</span> <span class="o">+</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"__doc__"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+            <span class="n">offsets</span><span class="o">=</span><span class="n">index_offsets</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="n">index_content</span><span class="p">,</span>
+            <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="nestedindex">
+<a class="viewcode-back" href="../../awkward_zipper.html#awkward_zipper.kernels.nestedindex">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">nestedindex</span><span class="p">(</span><span class="n">indices</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Concatenate a list of indices along a new axis</span>
+<span class="sd">    Outputs a jagged array with same outer shape as index arrays</span>
+
+<span class="sd">    Example usage:</span>
+<span class="sd">    First index array</span>
+<span class="sd">    [[0, 2, 4],</span>
+<span class="sd">     [8, 6]]</span>
+<span class="sd">    Second index array</span>
+<span class="sd">    [[1, 3, 5],</span>
+<span class="sd">     [-1, 7]]</span>
+<span class="sd">    Output</span>
+<span class="sd">    [[[0, 1], [2, 3], [4, 5]],</span>
+<span class="sd">     [[8, -1], [6, 7]]]</span>
+<span class="sd">    """</span>
+
+    <span class="nd">@dispatch_wrap</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_nestedindex_content</span><span class="p">(</span><span class="o">*</span><span class="n">indices</span><span class="p">):</span>
+        <span class="c1"># return awkward.concatenate([idx[:, None] for idx in indexers], axis=1)</span>
+        <span class="n">flat_indices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+            <span class="c1"># flatten the index</span>
+            <span class="n">flat_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span><span class="n">idx</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">content</span><span class="p">))</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">flat_indices</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">flat_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">"int64"</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">flat_indices</span><span class="p">):</span>
+            <span class="c1">#  index arrays should all be same shape flat arrays</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">::</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx</span>
+
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="nd">@dispatch_wrap</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_nested_index_offsets</span><span class="p">(</span><span class="n">nested_index_content</span><span class="p">,</span> <span class="n">n_indices</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">nested_index_content</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_indices</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_combine_parameters</span><span class="p">(</span><span class="n">indices</span><span class="p">):</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">"__doc__"</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+                <span class="n">parameters</span><span class="p">[</span><span class="s2">"__doc__"</span><span class="p">]</span> <span class="o">+=</span> <span class="s2">" and "</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">parameters</span><span class="p">[</span><span class="s2">"__doc__"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"nested from "</span>
+
+            <span class="n">parameters</span><span class="p">[</span><span class="s2">"__doc__"</span><span class="p">]</span> <span class="o">+=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">parameters</span><span class="p">(</span><span class="n">idx</span><span class="p">)[</span><span class="s2">"__doc__"</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">parameters</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
+        <span class="nb">isinstance</span><span class="p">(</span>
+            <span class="n">awkward</span><span class="o">.</span><span class="n">to_layout</span><span class="p">(</span><span class="n">index</span><span class="p">),</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">listoffsetarray</span><span class="o">.</span><span class="n">ListOffsetArray</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">indices</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span>
+
+    <span class="c1"># Check if VirtualNDArray</span>
+    <span class="n">index_data</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">to_layout</span><span class="p">(</span><span class="n">_</span><span class="p">)</span><span class="o">.</span><span class="n">is_all_materialized</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">):</span>
+        <span class="n">index_data</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">data</span>
+
+    <span class="c1"># store offsets to later reapply them to the arrays</span>
+    <span class="n">offsets_stored</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">offsets</span>
+    <span class="n">nested_index_content</span> <span class="o">=</span> <span class="n">_nestedindex_content</span><span class="p">(</span>
+        <span class="o">*</span><span class="n">indices</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">index_data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span>
+    <span class="p">)</span>
+    <span class="n">nested_index_content</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">NumpyArray</span><span class="p">(</span><span class="n">nested_index_content</span><span class="p">)</span>
+    <span class="n">nested_index_offsets</span> <span class="o">=</span> <span class="n">_get_nested_index_offsets</span><span class="p">(</span>
+        <span class="n">nested_index_content</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">),</span> <span class="n">data</span><span class="o">=</span><span class="n">index_data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span>
+    <span class="p">)</span>
+
+    <span class="c1"># combine offsets and content</span>
+    <span class="n">nested_index</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">Index64</span><span class="p">(</span><span class="n">nested_index_offsets</span><span class="p">),</span>
+        <span class="n">nested_index_content</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># combine the parameters</span>
+    <span class="n">parameters</span> <span class="o">=</span> <span class="n">_combine_parameters</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
+    <span class="c1"># reapply the offsets</span>
+    <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+            <span class="n">offsets_stored</span><span class="p">,</span>
+            <span class="n">nested_index</span><span class="p">,</span>
+            <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="counts2nestedindex">
+<a class="viewcode-back" href="../../awkward_zipper.html#awkward_zipper.kernels.counts2nestedindex">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">counts2nestedindex</span><span class="p">(</span><span class="n">local_counts</span><span class="p">,</span> <span class="n">target_offsets</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Turn jagged local counts into doubly-jagged global index into a target</span>
+<span class="sd">    Outputs a jagged array with same axis-0 shape as counts axis-1</span>
+
+<span class="sd">    Example usage:</span>
+<span class="sd">    Local counts</span>
+<span class="sd">    [[4, 3, 2],</span>
+<span class="sd">     [4, 2]]</span>
+<span class="sd">    Target offsets</span>
+<span class="sd">    [9, 6]</span>
+<span class="sd">    Target output</span>
+<span class="sd">    [[[0, 1, 2, 3], [4, 5, 6], [7, 8]],</span>
+<span class="sd">     [[9, 10, 11, 12], [13, 14]]]</span>
+<span class="sd">    """</span>
+
+    <span class="nd">@dispatch_wrap</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_arange</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+
+    <span class="nd">@dispatch_wrap</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_flatten</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
+        <span class="n">local_counts</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">listoffsetarray</span><span class="o">.</span><span class="n">ListOffsetArray</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target_offsets</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">numpyarray</span><span class="o">.</span><span class="n">NumpyArray</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span>
+
+    <span class="c1"># count offsets the same way as with counts2offsets in coffea.nanoevents.transforms</span>
+    <span class="n">offsets</span> <span class="o">=</span> <span class="n">counts2offsets</span><span class="p">(</span><span class="n">target_offsets</span><span class="p">)</span>
+
+    <span class="c1"># store offsets to later reapply them to the arrays</span>
+    <span class="n">offsets_stored</span> <span class="o">=</span> <span class="n">local_counts</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">offsets</span>
+
+    <span class="c1"># Check if VirtualNDArray</span>
+    <span class="n">local_counts_data</span> <span class="o">=</span> <span class="n">local_counts_data_dtype</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">to_layout</span><span class="p">(</span><span class="n">_</span><span class="p">)</span><span class="o">.</span><span class="n">is_all_materialized</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="p">(</span><span class="n">local_counts</span><span class="p">,</span> <span class="n">target_offsets</span><span class="p">)</span>
+    <span class="p">):</span>
+        <span class="n">local_counts_data</span> <span class="o">=</span> <span class="n">local_counts</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">local_counts_data_dtype</span> <span class="o">=</span> <span class="n">local_counts_data</span><span class="o">.</span><span class="n">dtype</span>
+
+    <span class="n">nested_index_content</span> <span class="o">=</span> <span class="n">_arange</span><span class="p">(</span><span class="n">offsets</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">local_counts_data</span><span class="p">)</span>
+    <span class="n">flat_counts</span> <span class="o">=</span> <span class="n">_flatten</span><span class="p">(</span>
+        <span class="n">local_counts</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">local_counts_data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">local_counts_data_dtype</span>
+    <span class="p">)</span>
+
+    <span class="n">nested_index_offsets</span> <span class="o">=</span> <span class="n">counts2offsets</span><span class="p">(</span><span class="n">flat_counts</span><span class="p">)</span>
+    <span class="c1"># combine offsets and content</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">Index64</span><span class="p">(</span><span class="n">nested_index_offsets</span><span class="p">),</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">NumpyArray</span><span class="p">(</span><span class="n">nested_index_content</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="c1"># reapply the offsets</span>
+    <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+            <span class="n">offsets_stored</span><span class="p">,</span>
+            <span class="n">out</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="c1"># TODO: add dispatch_wrapper decorator for this function too</span>
+<div class="viewcode-block" id="counts2offsets">
+<a class="viewcode-back" href="../../awkward_zipper.html#awkward_zipper.kernels.counts2offsets">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">counts2offsets</span><span class="p">(</span><span class="n">counts</span><span class="p">):</span>
+    <span class="c1"># Cumulative sum of counts</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_counts2offsets</span><span class="p">(</span><span class="n">counts</span><span class="p">):</span>
+        <span class="c1"># make sure that input is always Numpy array</span>
+        <span class="n">counts</span> <span class="o">=</span> <span class="n">ensure_array</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
+        <span class="c1"># awkward index default type is int64, so we use the same type for new arrays</span>
+        <span class="n">offsets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="n">offsets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">offsets</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="k">return</span> <span class="n">offsets</span>
+
+    <span class="c1"># VirtualNDArray</span>
+    <span class="c1"># if isinstance(counts.layout.data, awkward._nplikes.virtual.VirtualNDArray):</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">_nplikes</span><span class="o">.</span><span class="n">virtual</span><span class="o">.</span><span class="n">VirtualNDArray</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="ow">not</span> <span class="n">counts</span><span class="o">.</span><span class="n">is_materialized</span>
+    <span class="p">):</span>
+        <span class="n">virtual_array</span> <span class="o">=</span> <span class="n">counts</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">counts</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">is_all_materialized</span><span class="p">:</span>
+        <span class="n">virtual_array</span> <span class="o">=</span> <span class="n">counts</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">data</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">virtual_array</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">virtual_array</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">_nplikes</span><span class="o">.</span><span class="n">virtual</span><span class="o">.</span><span class="n">VirtualNDArray</span><span class="p">(</span>
+            <span class="n">nplike</span><span class="o">=</span><span class="n">virtual_array</span><span class="o">.</span><span class="n">_nplike</span><span class="p">,</span>
+            <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">_nplikes</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">unknown_length</span><span class="p">,),</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+            <span class="n">generator</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_counts2offsets</span><span class="p">(</span><span class="n">virtual_array</span><span class="o">.</span><span class="n">materialize</span><span class="p">()),</span>
+            <span class="n">shape_generator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="c1"># concrete array</span>
+    <span class="k">return</span> <span class="n">_counts2offsets</span><span class="p">(</span><span class="n">counts</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">data</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="full_like_from_counts">
+<a class="viewcode-back" href="../../awkward_zipper.html#awkward_zipper.kernels.full_like_from_counts">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">full_like_from_counts</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Create a jagged array shaped like a collection with ``counts`` elements per</span>
+<span class="sd">    event, with every element set to ``fill_value`` (as float32).</span>
+
+<span class="sd">    This mirrors coffea's ``full_like_from_offsets`` transform, but works from the</span>
+<span class="sd">    ``n{collection}`` counts branch instead of the ``o{collection}`` offsets branch.</span>
+<span class="sd">    It is used to synthesize branches (e.g. ``Photon_mass``, ``Jet_charge``) that</span>
+<span class="sd">    must be present for the 4-vector behaviors to work.</span>
+
+<span class="sd">    Only the flat content of the returned array is ultimately consumed by the</span>
+<span class="sd">    schema (the collection re-wraps it with its own offsets), but a valid</span>
+<span class="sd">    ``ListOffsetArray`` is returned so that ``awkward.to_buffers`` yields the</span>
+<span class="sd">    expected ``{"node0-offsets", "node1-data"}`` buffers.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_offsets_from_counts</span><span class="p">(</span><span class="n">counts_arr</span><span class="p">):</span>
+        <span class="n">counts_arr</span> <span class="o">=</span> <span class="n">ensure_array</span><span class="p">(</span><span class="n">counts_arr</span><span class="p">)</span>
+        <span class="n">offsets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">counts_arr</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="n">offsets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">counts_arr</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">offsets</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="k">return</span> <span class="n">offsets</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_content_from_counts</span><span class="p">(</span><span class="n">counts_arr</span><span class="p">):</span>
+        <span class="n">counts_arr</span> <span class="o">=</span> <span class="n">ensure_array</span><span class="p">(</span><span class="n">counts_arr</span><span class="p">)</span>
+        <span class="n">n_elements</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">counts_arr</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">n_elements</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">counts</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">is_all_materialized</span><span class="p">:</span>
+        <span class="n">virtual_array</span> <span class="o">=</span> <span class="n">counts</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">data</span>
+        <span class="c1"># the outer (per-event) length is known even when the data is virtual, so</span>
+        <span class="c1"># give the offsets a concrete shape: this keeps awkward.to_buffers from</span>
+        <span class="c1"># having to materialize the counts just to learn the list length</span>
+        <span class="n">n_events</span> <span class="o">=</span> <span class="n">counts</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">length</span>
+        <span class="n">offsets</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">_nplikes</span><span class="o">.</span><span class="n">virtual</span><span class="o">.</span><span class="n">VirtualNDArray</span><span class="p">(</span>
+            <span class="n">nplike</span><span class="o">=</span><span class="n">virtual_array</span><span class="o">.</span><span class="n">_nplike</span><span class="p">,</span>
+            <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">n_events</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,),</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+            <span class="n">generator</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_offsets_from_counts</span><span class="p">(</span><span class="n">virtual_array</span><span class="o">.</span><span class="n">materialize</span><span class="p">()),</span>
+            <span class="n">shape_generator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">_nplikes</span><span class="o">.</span><span class="n">virtual</span><span class="o">.</span><span class="n">VirtualNDArray</span><span class="p">(</span>
+            <span class="n">nplike</span><span class="o">=</span><span class="n">virtual_array</span><span class="o">.</span><span class="n">_nplike</span><span class="p">,</span>
+            <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">_nplikes</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">unknown_length</span><span class="p">,),</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+            <span class="n">generator</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_content_from_counts</span><span class="p">(</span><span class="n">virtual_array</span><span class="o">.</span><span class="n">materialize</span><span class="p">()),</span>
+            <span class="n">shape_generator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">offsets</span> <span class="o">=</span> <span class="n">_offsets_from_counts</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="n">_content_from_counts</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+            <span class="n">awkward</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">offsets</span><span class="p">),</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">NumpyArray</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="met_to_rho">
+<a class="viewcode-back" href="../../awkward_zipper.html#awkward_zipper.kernels.met_to_rho">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">met_to_rho</span><span class="p">(</span><span class="n">met_content</span><span class="p">,</span> <span class="n">eta_content</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Compute ``rho = met * cosh(eta)`` on flat contents, lazily.</span>
+
+<span class="sd">    Mirrors coffea's ``met_to_rho`` transform. ``met_content`` and</span>
+<span class="sd">    ``eta_content`` are flat ``NumpyArray`` contents; the result is returned as a</span>
+<span class="sd">    flat ``NumpyArray`` content and is only evaluated when the buffer is read.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_compute</span><span class="p">(</span><span class="n">met</span><span class="p">,</span> <span class="n">eta</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ensure_array</span><span class="p">(</span><span class="n">met</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cosh</span><span class="p">(</span><span class="n">ensure_array</span><span class="p">(</span><span class="n">eta</span><span class="p">))</span>
+
+    <span class="n">met_data</span> <span class="o">=</span> <span class="n">met_content</span><span class="o">.</span><span class="n">data</span>
+    <span class="n">eta_data</span> <span class="o">=</span> <span class="n">eta_content</span><span class="o">.</span><span class="n">data</span>
+    <span class="n">is_virtual</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">_nplikes</span><span class="o">.</span><span class="n">virtual</span><span class="o">.</span><span class="n">VirtualNDArray</span>
+    <span class="n">met_virtual</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">met_data</span><span class="p">,</span> <span class="n">is_virtual</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">met_data</span><span class="o">.</span><span class="n">is_materialized</span>
+    <span class="n">eta_virtual</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">eta_data</span><span class="p">,</span> <span class="n">is_virtual</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">eta_data</span><span class="o">.</span><span class="n">is_materialized</span>
+
+    <span class="k">if</span> <span class="n">met_virtual</span> <span class="ow">or</span> <span class="n">eta_virtual</span><span class="p">:</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">met_data</span> <span class="k">if</span> <span class="n">met_virtual</span> <span class="k">else</span> <span class="n">eta_data</span>
+        <span class="n">result_dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">result_type</span><span class="p">(</span><span class="n">met_content</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">eta_content</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_materialize</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">materialize</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">is_virtual</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">_nplikes</span><span class="o">.</span><span class="n">virtual</span><span class="o">.</span><span class="n">VirtualNDArray</span><span class="p">(</span>
+            <span class="n">nplike</span><span class="o">=</span><span class="n">base</span><span class="o">.</span><span class="n">_nplike</span><span class="p">,</span>
+            <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">_nplikes</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">unknown_length</span><span class="p">,),</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">result_dtype</span><span class="p">,</span>
+            <span class="n">generator</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_compute</span><span class="p">(</span><span class="n">_materialize</span><span class="p">(</span><span class="n">met_data</span><span class="p">),</span> <span class="n">_materialize</span><span class="p">(</span><span class="n">eta_data</span><span class="p">)),</span>
+            <span class="n">shape_generator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">_compute</span><span class="p">(</span><span class="n">met_data</span><span class="p">,</span> <span class="n">eta_data</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">NumpyArray</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
+
+
+
+<span class="nd">@dispatch_wrap</span>
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_distinct_parent_kernel</span><span class="p">(</span><span class="n">allpart_parent</span><span class="p">,</span> <span class="n">allpart_pdg</span><span class="p">):</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">allpart_pdg</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">allpart_pdg</span><span class="p">)):</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="n">allpart_parent</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">parent</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">continue</span>
+        <span class="n">thispdg</span> <span class="o">=</span> <span class="n">allpart_pdg</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">while</span> <span class="n">parent</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">allpart_pdg</span><span class="p">[</span><span class="n">parent</span><span class="p">]</span> <span class="o">==</span> <span class="n">thispdg</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">parent</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">allpart_pdg</span><span class="p">):</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">"parent index beyond length of array!"</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="n">allpart_parent</span><span class="p">[</span><span class="n">parent</span><span class="p">]</span>
+        <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">parent</span>
+    <span class="k">return</span> <span class="n">out</span>
+
+
+<div class="viewcode-block" id="distinct_parent">
+<a class="viewcode-back" href="../../awkward_zipper.html#awkward_zipper.kernels.distinct_parent">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">distinct_parent</span><span class="p">(</span><span class="n">parents</span><span class="p">,</span> <span class="n">pdg</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Compute first parent with distinct PDG id</span>
+
+<span class="sd">    Signature: globalparents,globalpdgs,!distinctParent</span>
+<span class="sd">    Expects global indexes, flat arrays, which should be same length</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pdg</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">listoffsetarray</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parents</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">listoffsetarray</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span>
+
+    <span class="c1"># Check if VirtualNDArray</span>
+    <span class="n">parents_data</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">to_layout</span><span class="p">(</span><span class="n">_</span><span class="p">)</span><span class="o">.</span><span class="n">is_all_materialized</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="p">(</span><span class="n">parents</span><span class="p">,</span> <span class="n">pdg</span><span class="p">)):</span>
+        <span class="n">parents_data</span> <span class="o">=</span> <span class="n">parents</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">data</span>
+
+    <span class="c1"># store offsets to later reapply them</span>
+    <span class="n">result_offsets</span> <span class="o">=</span> <span class="n">parents</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">offsets</span>
+    <span class="c1"># calculate the contents</span>
+    <span class="n">result_content</span> <span class="o">=</span> <span class="n">_distinct_parent_kernel</span><span class="p">(</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span><span class="n">parents</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">content</span><span class="p">),</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span><span class="n">pdg</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">content</span><span class="p">),</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">parents_data</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+            <span class="n">result_offsets</span><span class="p">,</span>
+            <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">NumpyArray</span><span class="p">(</span><span class="n">result_content</span><span class="p">),</span>
+        <span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="nd">@dispatch_wrap</span>
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_children_kernel_content</span><span class="p">(</span><span class="n">offsets_in</span><span class="p">,</span> <span class="n">parentidx</span><span class="p">):</span>
+    <span class="n">content1_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">parentidx</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+
+    <span class="n">offset1</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">record_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">offsets_in</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">start_src</span><span class="p">,</span> <span class="n">stop_src</span> <span class="o">=</span> <span class="n">offsets_in</span><span class="p">[</span><span class="n">record_index</span><span class="p">],</span> <span class="n">offsets_in</span><span class="p">[</span><span class="n">record_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start_src</span><span class="p">,</span> <span class="n">stop_src</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">possible_child</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">stop_src</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">parentidx</span><span class="p">[</span><span class="n">possible_child</span><span class="p">]</span> <span class="o">==</span> <span class="n">index</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">offset1</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">content1_out</span><span class="p">):</span>
+                        <span class="n">msg</span> <span class="o">=</span> <span class="s2">"offset1 went out of bounds!"</span>
+                        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="n">content1_out</span><span class="p">[</span><span class="n">offset1</span><span class="p">]</span> <span class="o">=</span> <span class="n">possible_child</span>
+                    <span class="n">offset1</span> <span class="o">=</span> <span class="n">offset1</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">content1_out</span><span class="p">[:</span><span class="n">offset1</span><span class="p">]</span>
+
+
+<span class="nd">@dispatch_wrap</span>
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_children_kernel_offsets</span><span class="p">(</span><span class="n">offsets_in</span><span class="p">,</span> <span class="n">parentidx</span><span class="p">,</span> <span class="n">content1_out</span><span class="p">):</span>
+    <span class="n">offsets1_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">parentidx</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="c1"># content1_out = np.empty(len(parentidx), dtype=np.int64)</span>
+    <span class="n">offsets1_out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">offset0</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">offset1</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">record_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">offsets_in</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">start_src</span><span class="p">,</span> <span class="n">stop_src</span> <span class="o">=</span> <span class="n">offsets_in</span><span class="p">[</span><span class="n">record_index</span><span class="p">],</span> <span class="n">offsets_in</span><span class="p">[</span><span class="n">record_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start_src</span><span class="p">,</span> <span class="n">stop_src</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">possible_child</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">stop_src</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">parentidx</span><span class="p">[</span><span class="n">possible_child</span><span class="p">]</span> <span class="o">==</span> <span class="n">index</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">offset1</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">content1_out</span><span class="p">):</span>
+                        <span class="n">msg</span> <span class="o">=</span> <span class="s2">"offset1 went out of bounds!"</span>
+                        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="c1"># content1_out[offset1] = possible_child</span>
+                    <span class="n">offset1</span> <span class="o">=</span> <span class="n">offset1</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">offset0</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">offsets1_out</span><span class="p">):</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">"offset0 went out of bounds!"</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">offsets1_out</span><span class="p">[</span><span class="n">offset0</span><span class="p">]</span> <span class="o">=</span> <span class="n">offset1</span>
+            <span class="n">offset0</span> <span class="o">=</span> <span class="n">offset0</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">offsets1_out</span>
+
+
+<div class="viewcode-block" id="children">
+<a class="viewcode-back" href="../../awkward_zipper.html#awkward_zipper.kernels.children">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">children</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">globalparents</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Compute children</span>
+
+<span class="sd">    Signature: offsets,globalparents,!children</span>
+<span class="sd">    Output will be a jagged array with same outer shape as globalparents content</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
+        <span class="n">globalparents</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">listoffsetarray</span><span class="o">.</span><span class="n">ListOffsetArray</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span>
+    <span class="n">offsets</span> <span class="o">=</span> <span class="n">counts2offsets</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
+
+    <span class="c1"># Check if VirtualNDArray</span>
+    <span class="n">globalparents_data</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">to_layout</span><span class="p">(</span><span class="n">_</span><span class="p">)</span><span class="o">.</span><span class="n">is_all_materialized</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">globalparents</span><span class="p">)</span>
+    <span class="p">):</span>
+        <span class="n">globalparents_data</span> <span class="o">=</span> <span class="n">globalparents</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">data</span>
+    <span class="c1"># store offsets to later reapply them</span>
+    <span class="n">result_offsets</span> <span class="o">=</span> <span class="n">globalparents</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">offsets</span>
+    <span class="c1"># Numba can't accept Virtual arrays directly, so wrap them with awkward</span>
+    <span class="n">ccontent</span> <span class="o">=</span> <span class="n">_children_kernel_content</span><span class="p">(</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">NumpyArray</span><span class="p">(</span><span class="n">offsets</span><span class="p">)),</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span><span class="n">globalparents</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">content</span><span class="p">),</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">globalparents_data</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">ccontent</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">NumpyArray</span><span class="p">(</span><span class="n">ccontent</span><span class="p">)</span>
+    <span class="n">coffsets</span> <span class="o">=</span> <span class="n">_children_kernel_offsets</span><span class="p">(</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">NumpyArray</span><span class="p">(</span><span class="n">offsets</span><span class="p">)),</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span><span class="n">globalparents</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">content</span><span class="p">),</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span><span class="n">ccontent</span><span class="p">),</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">globalparents_data</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">out</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">Index64</span><span class="p">(</span><span class="n">coffsets</span><span class="p">),</span>
+        <span class="n">ccontent</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># reapply the offsets</span>
+    <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+            <span class="n">result_offsets</span><span class="p">,</span>
+            <span class="n">out</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="nd">@dispatch_wrap</span>
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_distinct_children_deep_kernel_content</span><span class="p">(</span><span class="n">offsets_in</span><span class="p">,</span> <span class="n">global_parents</span><span class="p">,</span> <span class="n">global_pdgs</span><span class="p">):</span>
+    <span class="c1"># offsets_out = np.empty(len(global_parents) + 1, dtype=np.int64)</span>
+    <span class="n">content_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">global_parents</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="c1"># offsets_out[0] = 0</span>
+
+    <span class="c1"># offset0 = 1</span>
+    <span class="n">offset1</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">record_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">offsets_in</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">start_src</span><span class="p">,</span> <span class="n">stop_src</span> <span class="o">=</span> <span class="n">offsets_in</span><span class="p">[</span><span class="n">record_index</span><span class="p">],</span> <span class="n">offsets_in</span><span class="p">[</span><span class="n">record_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start_src</span><span class="p">,</span> <span class="n">stop_src</span><span class="p">):</span>
+            <span class="n">this_pdg</span> <span class="o">=</span> <span class="n">global_pdgs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+
+            <span class="c1"># only perform the deep lookup when this particle is not already part of a decay chain</span>
+            <span class="c1"># otherwise, the same child indices would be repeated for every parent in the chain</span>
+            <span class="c1"># which would require content_out to have a length that isa-priori unknown</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">global_parents</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+                <span class="ow">and</span> <span class="n">this_pdg</span> <span class="o">!=</span> <span class="n">global_pdgs</span><span class="p">[</span><span class="n">global_parents</span><span class="p">[</span><span class="n">index</span><span class="p">]]</span>
+            <span class="p">):</span>
+                <span class="c1"># keep an index of parents with same pdg id</span>
+                <span class="n">parents</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">stop_src</span> <span class="o">-</span> <span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+                <span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span>
+                <span class="n">offset2</span> <span class="o">=</span> <span class="mi">1</span>
+
+                <span class="c1"># keep an additional index with parents that have at least one child</span>
+                <span class="n">parents_with_children</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">stop_src</span> <span class="o">-</span> <span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+                <span class="n">offset3</span> <span class="o">=</span> <span class="mi">0</span>
+
+                <span class="k">for</span> <span class="n">possible_child</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">stop_src</span><span class="p">):</span>
+                    <span class="n">possible_parent</span> <span class="o">=</span> <span class="n">global_parents</span><span class="p">[</span><span class="n">possible_child</span><span class="p">]</span>
+                    <span class="n">possibe_child_pdg</span> <span class="o">=</span> <span class="n">global_pdgs</span><span class="p">[</span><span class="n">possible_child</span><span class="p">]</span>
+
+                    <span class="c1"># compare with seen parents</span>
+                    <span class="k">for</span> <span class="n">parent_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">offset2</span><span class="p">):</span>
+                        <span class="c1"># check if we found a new child</span>
+                        <span class="k">if</span> <span class="n">parents</span><span class="p">[</span><span class="n">parent_index</span><span class="p">]</span> <span class="o">==</span> <span class="n">possible_parent</span><span class="p">:</span>
+                            <span class="c1"># first, remember that the parent has at least one child</span>
+                            <span class="k">if</span> <span class="n">offset3</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">parents_with_children</span><span class="p">):</span>
+                                <span class="n">msg</span> <span class="o">=</span> <span class="s2">"offset3 went out of bounds!"</span>
+                                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                            <span class="n">parents_with_children</span><span class="p">[</span><span class="n">offset3</span><span class="p">]</span> <span class="o">=</span> <span class="n">possible_parent</span>
+                            <span class="n">offset3</span> <span class="o">=</span> <span class="n">offset3</span> <span class="o">+</span> <span class="mi">1</span>
+
+                            <span class="c1"># then, depending on the pdg id, add to parents or content</span>
+                            <span class="k">if</span> <span class="n">possibe_child_pdg</span> <span class="o">==</span> <span class="n">this_pdg</span><span class="p">:</span>
+                                <span class="c1"># has the same pdg id, add to parents</span>
+                                <span class="k">if</span> <span class="n">offset2</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">parents</span><span class="p">):</span>
+                                    <span class="n">msg</span> <span class="o">=</span> <span class="s2">"offset2 went out of bounds!"</span>
+                                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                                <span class="n">parents</span><span class="p">[</span><span class="n">offset2</span><span class="p">]</span> <span class="o">=</span> <span class="n">possible_child</span>
+                                <span class="n">offset2</span> <span class="o">=</span> <span class="n">offset2</span> <span class="o">+</span> <span class="mi">1</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="c1"># has a different pdg id, add to content</span>
+                                <span class="k">if</span> <span class="n">offset1</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">content_out</span><span class="p">):</span>
+                                    <span class="n">msg</span> <span class="o">=</span> <span class="s2">"offset1 went out of bounds!"</span>
+                                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                                <span class="n">content_out</span><span class="p">[</span><span class="n">offset1</span><span class="p">]</span> <span class="o">=</span> <span class="n">possible_child</span>
+                                <span class="n">offset1</span> <span class="o">=</span> <span class="n">offset1</span> <span class="o">+</span> <span class="mi">1</span>
+                            <span class="k">break</span>
+
+                <span class="c1"># add parents with same pdg id that have no children</span>
+                <span class="k">for</span> <span class="n">parent_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">offset2</span><span class="p">):</span>
+                    <span class="n">possible_child</span> <span class="o">=</span> <span class="n">parents</span><span class="p">[</span><span class="n">parent_index</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">possible_child</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">parents_with_children</span><span class="p">[:</span><span class="n">offset3</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="n">offset1</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">content_out</span><span class="p">):</span>
+                            <span class="n">msg</span> <span class="o">=</span> <span class="s2">"offset1 went out of bounds! pt2"</span>
+                            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                        <span class="n">content_out</span><span class="p">[</span><span class="n">offset1</span><span class="p">]</span> <span class="o">=</span> <span class="n">possible_child</span>
+
+                        <span class="n">offset1</span> <span class="o">=</span> <span class="n">offset1</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">content_out</span><span class="p">[:</span><span class="n">offset1</span><span class="p">]</span>
+
+
+<span class="nd">@dispatch_wrap</span>
+<span class="nd">@numba</span><span class="o">.</span><span class="n">njit</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_distinct_children_deep_kernel_offsets</span><span class="p">(</span>
+    <span class="n">offsets_in</span><span class="p">,</span> <span class="n">global_parents</span><span class="p">,</span> <span class="n">global_pdgs</span><span class="p">,</span> <span class="n">content_out</span>
+<span class="p">):</span>
+    <span class="n">offsets_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">global_parents</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="n">offsets_out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">offset0</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">offset1</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">record_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">offsets_in</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">start_src</span><span class="p">,</span> <span class="n">stop_src</span> <span class="o">=</span> <span class="n">offsets_in</span><span class="p">[</span><span class="n">record_index</span><span class="p">],</span> <span class="n">offsets_in</span><span class="p">[</span><span class="n">record_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start_src</span><span class="p">,</span> <span class="n">stop_src</span><span class="p">):</span>
+            <span class="n">this_pdg</span> <span class="o">=</span> <span class="n">global_pdgs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+
+            <span class="c1"># only perform the deep lookup when this particle is not already part of a decay chain</span>
+            <span class="c1"># otherwise, the same child indices would be repeated for every parent in the chain</span>
+            <span class="c1"># which would require content_out to have a length that isa-priori unknown</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">global_parents</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+                <span class="ow">and</span> <span class="n">this_pdg</span> <span class="o">!=</span> <span class="n">global_pdgs</span><span class="p">[</span><span class="n">global_parents</span><span class="p">[</span><span class="n">index</span><span class="p">]]</span>
+            <span class="p">):</span>
+                <span class="c1"># keep an index of parents with same pdg id</span>
+                <span class="n">parents</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">stop_src</span> <span class="o">-</span> <span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+                <span class="n">parents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span>
+                <span class="n">offset2</span> <span class="o">=</span> <span class="mi">1</span>
+
+                <span class="c1"># keep an additional index with parents that have at least one child</span>
+                <span class="n">parents_with_children</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">stop_src</span> <span class="o">-</span> <span class="n">index</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+                <span class="n">offset3</span> <span class="o">=</span> <span class="mi">0</span>
+
+                <span class="k">for</span> <span class="n">possible_child</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">stop_src</span><span class="p">):</span>
+                    <span class="n">possible_parent</span> <span class="o">=</span> <span class="n">global_parents</span><span class="p">[</span><span class="n">possible_child</span><span class="p">]</span>
+                    <span class="n">possibe_child_pdg</span> <span class="o">=</span> <span class="n">global_pdgs</span><span class="p">[</span><span class="n">possible_child</span><span class="p">]</span>
+
+                    <span class="c1"># compare with seen parents</span>
+                    <span class="k">for</span> <span class="n">parent_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">offset2</span><span class="p">):</span>
+                        <span class="c1"># check if we found a new child</span>
+                        <span class="k">if</span> <span class="n">parents</span><span class="p">[</span><span class="n">parent_index</span><span class="p">]</span> <span class="o">==</span> <span class="n">possible_parent</span><span class="p">:</span>
+                            <span class="c1"># first, remember that the parent has at least one child</span>
+                            <span class="k">if</span> <span class="n">offset3</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">parents_with_children</span><span class="p">):</span>
+                                <span class="n">msg</span> <span class="o">=</span> <span class="s2">"offset3 went out of bounds!"</span>
+                                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                            <span class="n">parents_with_children</span><span class="p">[</span><span class="n">offset3</span><span class="p">]</span> <span class="o">=</span> <span class="n">possible_parent</span>
+                            <span class="n">offset3</span> <span class="o">=</span> <span class="n">offset3</span> <span class="o">+</span> <span class="mi">1</span>
+
+                            <span class="c1"># then, depending on the pdg id, add to parents or content</span>
+                            <span class="k">if</span> <span class="n">possibe_child_pdg</span> <span class="o">==</span> <span class="n">this_pdg</span><span class="p">:</span>
+                                <span class="c1"># has the same pdg id, add to parents</span>
+                                <span class="k">if</span> <span class="n">offset2</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">parents</span><span class="p">):</span>
+                                    <span class="n">msg</span> <span class="o">=</span> <span class="s2">"offset2 went out of bounds!"</span>
+                                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                                <span class="n">parents</span><span class="p">[</span><span class="n">offset2</span><span class="p">]</span> <span class="o">=</span> <span class="n">possible_child</span>
+                                <span class="n">offset2</span> <span class="o">=</span> <span class="n">offset2</span> <span class="o">+</span> <span class="mi">1</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="c1"># has a different pdg id, add to content</span>
+                                <span class="k">if</span> <span class="n">offset1</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">content_out</span><span class="p">):</span>
+                                    <span class="n">msg</span> <span class="o">=</span> <span class="s2">"offset1 went out of bounds!"</span>
+                                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                                <span class="n">offset1</span> <span class="o">=</span> <span class="n">offset1</span> <span class="o">+</span> <span class="mi">1</span>
+                            <span class="k">break</span>
+
+                <span class="c1"># add parents with same pdg id that have no children</span>
+                <span class="k">for</span> <span class="n">parent_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">offset2</span><span class="p">):</span>
+                    <span class="n">possible_child</span> <span class="o">=</span> <span class="n">parents</span><span class="p">[</span><span class="n">parent_index</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">possible_child</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">parents_with_children</span><span class="p">[:</span><span class="n">offset3</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="n">offset1</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">content_out</span><span class="p">):</span>
+                            <span class="n">msg</span> <span class="o">=</span> <span class="s2">"offset1 went out of bounds! pt2"</span>
+                            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+                        <span class="n">offset1</span> <span class="o">=</span> <span class="n">offset1</span> <span class="o">+</span> <span class="mi">1</span>
+
+            <span class="c1"># finish this item by adding an offset</span>
+            <span class="k">if</span> <span class="n">offset0</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">offsets_out</span><span class="p">):</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">"offset0 went out of bounds!"</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">offsets_out</span><span class="p">[</span><span class="n">offset0</span><span class="p">]</span> <span class="o">=</span> <span class="n">offset1</span>
+            <span class="n">offset0</span> <span class="o">=</span> <span class="n">offset0</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">offsets_out</span>
+
+
+<div class="viewcode-block" id="distinct_children_deep">
+<a class="viewcode-back" href="../../awkward_zipper.html#awkward_zipper.kernels.distinct_children_deep">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">distinct_children_deep</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">global_parents</span><span class="p">,</span> <span class="n">global_pdgs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Compute all distinct children, skipping children with same pdg id in between.</span>
+
+<span class="sd">    Signature: offsets,global_parents,global_pdgs,!distinctChildrenDeep</span>
+<span class="sd">    Expects global indexes, flat arrays, which should be same length</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
+        <span class="n">global_parents</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">listoffsetarray</span><span class="o">.</span><span class="n">ListOffsetArray</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
+        <span class="n">global_pdgs</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">listoffsetarray</span><span class="o">.</span><span class="n">ListOffsetArray</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span>
+    <span class="n">offsets</span> <span class="o">=</span> <span class="n">counts2offsets</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span>
+
+    <span class="c1"># Check if VirtualNDArray</span>
+    <span class="n">global_parents_data</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">to_layout</span><span class="p">(</span><span class="n">_</span><span class="p">)</span><span class="o">.</span><span class="n">is_all_materialized</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">global_parents</span><span class="p">,</span> <span class="n">global_pdgs</span><span class="p">)</span>
+    <span class="p">):</span>
+        <span class="n">global_parents_data</span> <span class="o">=</span> <span class="n">global_parents</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">data</span>
+
+    <span class="c1"># store offsets to later reapply them</span>
+    <span class="n">result_offsets</span> <span class="o">=</span> <span class="n">global_parents</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">offsets</span>
+    <span class="n">ccontent</span> <span class="o">=</span> <span class="n">_distinct_children_deep_kernel_content</span><span class="p">(</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">NumpyArray</span><span class="p">(</span><span class="n">offsets</span><span class="p">)),</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span><span class="n">global_parents</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">content</span><span class="p">),</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span><span class="n">global_pdgs</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">content</span><span class="p">),</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">global_parents_data</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">ccontent</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">NumpyArray</span><span class="p">(</span><span class="n">ccontent</span><span class="p">)</span>
+    <span class="n">coffsets</span> <span class="o">=</span> <span class="n">_distinct_children_deep_kernel_offsets</span><span class="p">(</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">NumpyArray</span><span class="p">(</span><span class="n">offsets</span><span class="p">)),</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span><span class="n">global_parents</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">content</span><span class="p">),</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span><span class="n">global_pdgs</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">content</span><span class="p">),</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span><span class="n">ccontent</span><span class="p">),</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">global_parents_data</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">out</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">Index64</span><span class="p">(</span><span class="n">coffsets</span><span class="p">),</span>
+        <span class="n">ccontent</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># reapply the offsets</span>
+    <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+            <span class="n">result_offsets</span><span class="p">,</span>
+            <span class="n">out</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_lazy_flat_content</span><span class="p">(</span><span class="n">datas</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Apply ``fn`` to flat buffers lazily, returning a ``NumpyArray`` content.</span>
+
+<span class="sd">    Each element of ``datas`` is a raw buffer (numpy array or ``VirtualNDArray``).</span>
+<span class="sd">    If any is an unmaterialized virtual buffer the result is a ``VirtualNDArray``</span>
+<span class="sd">    whose generator runs ``fn`` on the materialized inputs; otherwise ``fn`` runs</span>
+<span class="sd">    eagerly. Used for the PHYSLITE derived columns.</span>
+<span class="sd">    """</span>
+    <span class="n">is_virtual</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">_nplikes</span><span class="o">.</span><span class="n">virtual</span><span class="o">.</span><span class="n">VirtualNDArray</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_materialize</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">materialize</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">is_virtual</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span>
+
+    <span class="n">virtuals</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">datas</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">is_virtual</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">d</span><span class="o">.</span><span class="n">is_materialized</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">virtuals</span><span class="p">:</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">virtuals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">_nplikes</span><span class="o">.</span><span class="n">virtual</span><span class="o">.</span><span class="n">VirtualNDArray</span><span class="p">(</span>
+            <span class="n">nplike</span><span class="o">=</span><span class="n">base</span><span class="o">.</span><span class="n">_nplike</span><span class="p">,</span>
+            <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">_nplikes</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">unknown_length</span><span class="p">,),</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
+            <span class="n">generator</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">ensure_array</span><span class="p">(</span><span class="n">_materialize</span><span class="p">(</span><span class="n">d</span><span class="p">))</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">datas</span><span class="p">)),</span>
+            <span class="n">shape_generator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">ensure_array</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">datas</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">NumpyArray</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="qoverp_to_p">
+<a class="viewcode-back" href="../../awkward_zipper.html#awkward_zipper.kernels.qoverp_to_p">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">qoverp_to_p</span><span class="p">(</span><span class="n">qoverp_content</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""p = 1 / |qOverP| (cast to the source dtype, matching coffea)."""</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">qoverp_content</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="k">return</span> <span class="n">_lazy_flat_content</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">qoverp_content</span><span class="o">.</span><span class="n">data</span><span class="p">],</span>
+        <span class="k">lambda</span> <span class="n">q</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">q</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">),</span>
+        <span class="n">dtype</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="qoverp_theta_to_pt">
+<a class="viewcode-back" href="../../awkward_zipper.html#awkward_zipper.kernels.qoverp_theta_to_pt">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">qoverp_theta_to_pt</span><span class="p">(</span><span class="n">qoverp_content</span><span class="p">,</span> <span class="n">theta_content</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""pt = sin(theta) / |qOverP|."""</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">qoverp_content</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="k">return</span> <span class="n">_lazy_flat_content</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">qoverp_content</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">theta_content</span><span class="o">.</span><span class="n">data</span><span class="p">],</span>
+        <span class="k">lambda</span> <span class="n">q</span><span class="p">,</span> <span class="n">t</span><span class="p">:</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">q</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">),</span>
+        <span class="n">dtype</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="full_like_from_content">
+<a class="viewcode-back" href="../../awkward_zipper.html#awkward_zipper.kernels.full_like_from_content">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">full_like_from_content</span><span class="p">(</span><span class="n">source_content</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""A flat content shaped like ``source_content``, filled with ``fill_value``."""</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">source_content</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="k">return</span> <span class="n">_lazy_flat_content</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">source_content</span><span class="o">.</span><span class="n">data</span><span class="p">],</span>
+        <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">),</span>
+        <span class="n">dtype</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="eventindex_content">
+<a class="viewcode-back" href="../../awkward_zipper.html#awkward_zipper.kernels.eventindex_content">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">eventindex_content</span><span class="p">(</span><span class="n">offsets_index</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Flat int64 content giving each element's event index (from offsets)."""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_compute</span><span class="p">(</span><span class="n">offsets</span><span class="p">):</span>
+        <span class="n">offsets</span> <span class="o">=</span> <span class="n">ensure_array</span><span class="p">(</span><span class="n">offsets</span><span class="p">)</span>
+        <span class="n">counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">offsets</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">counts</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span> <span class="n">counts</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_lazy_flat_content</span><span class="p">([</span><span class="n">offsets_index</span><span class="o">.</span><span class="n">data</span><span class="p">],</span> <span class="n">_compute</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="full_like_from_array">
+<a class="viewcode-back" href="../../awkward_zipper.html#awkward_zipper.kernels.full_like_from_array">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">full_like_from_array</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Create a flat content shaped like ``content`` with every element set to</span>
+<span class="sd">    ``fill_value``.</span>
+
+<span class="sd">    Mirrors coffea's ``full_like_from_content`` transform (the ATLAS ntuple</span>
+<span class="sd">    variant: takes a possibly jagged array, fills float32). Unlike</span>
+<span class="sd">    :func:`full_like_from_counts` this works from an existing flat content, which is</span>
+<span class="sd">    what the ATLAS ntuple schema needs: its collections carry their own offsets and</span>
+<span class="sd">    there is no ``n{collection}`` counts branch to derive a shape from.</span>
+
+<span class="sd">    A jagged source keeps its offsets, so the result lines up element-for-element</span>
+<span class="sd">    with the collection it was derived from.</span>
+
+<span class="sd">    Stays lazy: when the source buffer is virtual the result is a virtual buffer that</span>
+<span class="sd">    only materializes the source to learn how many elements to fill.</span>
+<span class="sd">    """</span>
+    <span class="n">layout</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">to_layout</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">layout</span><span class="o">.</span><span class="n">is_list</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">layout</span><span class="p">)(</span>
+            <span class="n">layout</span><span class="o">.</span><span class="n">offsets</span><span class="p">,</span>
+            <span class="n">full_like_from_array</span><span class="p">(</span><span class="n">layout</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="n">buffer</span> <span class="o">=</span> <span class="n">layout</span><span class="o">.</span><span class="n">data</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">_nplikes</span><span class="o">.</span><span class="n">virtual</span><span class="o">.</span><span class="n">VirtualNDArray</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">NumpyArray</span><span class="p">(</span>
+            <span class="n">awkward</span><span class="o">.</span><span class="n">_nplikes</span><span class="o">.</span><span class="n">virtual</span><span class="o">.</span><span class="n">VirtualNDArray</span><span class="p">(</span>
+                <span class="n">nplike</span><span class="o">=</span><span class="n">buffer</span><span class="o">.</span><span class="n">_nplike</span><span class="p">,</span>
+                <span class="c1"># reuse the source shape so that consumers never have to materialize</span>
+                <span class="c1"># the source just to learn the length</span>
+                <span class="n">shape</span><span class="o">=</span><span class="n">buffer</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">),</span>
+                <span class="n">generator</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
+                    <span class="nb">len</span><span class="p">(</span><span class="n">buffer</span><span class="o">.</span><span class="n">materialize</span><span class="p">()),</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span>
+                <span class="p">),</span>
+                <span class="n">shape_generator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">NumpyArray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">buffer</span><span class="p">),</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="begin_end_counts">
+<a class="viewcode-back" href="../../awkward_zipper.html#awkward_zipper.kernels.begin_end_counts">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">begin_end_counts</span><span class="p">(</span><span class="n">begin_content</span><span class="p">,</span> <span class="n">end_content</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Flat ``end - begin`` counts for EDM4HEP begin/end index ranges (lazy)."""</span>
+    <span class="k">return</span> <span class="n">_lazy_flat_content</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">begin_content</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">end_content</span><span class="o">.</span><span class="n">data</span><span class="p">],</span>
+        <span class="k">lambda</span> <span class="n">b</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span> <span class="n">e</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span> <span class="o">-</span> <span class="n">b</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="begin_end_mapping">
+<a class="viewcode-back" href="../../awkward_zipper.html#awkward_zipper.kernels.begin_end_mapping">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">begin_end_mapping</span><span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">target_content</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Group ``target_content`` into per-item lists using begin/end index ranges.</span>
+
+<span class="sd">    EDM4HEP stores OneToMany relations and VectorMembers as flat per-event arrays</span>
+<span class="sd">    plus per-item ``{member}_begin`` / ``{member}_end`` ranges. Those ranges are</span>
+<span class="sd">    contiguous and exactly cover the target, so the mapping reduces to regrouping</span>
+<span class="sd">    the target by ``counts = end - begin``.</span>
+
+<span class="sd">    ``begin``/``end`` are the per-event jagged range arrays (``ListOffsetArray``);</span>
+<span class="sd">    ``target_content`` is the flat content of the per-event target array. Returns</span>
+<span class="sd">    a doubly-jagged ``ListOffsetArray`` (event -&gt; item -&gt; sub-items).</span>
+<span class="sd">    """</span>
+    <span class="n">counts</span> <span class="o">=</span> <span class="n">begin_end_counts</span><span class="p">(</span><span class="n">begin</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="n">end</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+    <span class="n">inner_offsets</span> <span class="o">=</span> <span class="n">counts2offsets</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span><span class="n">counts</span><span class="p">))</span>
+    <span class="c1"># coffea builds this via awkward.ArrayBuilder, which yields float64 regardless</span>
+    <span class="c1"># of the target dtype; match that so the layouts compare equal</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target_content</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">NumpyArray</span><span class="p">):</span>
+        <span class="n">target_content</span> <span class="o">=</span> <span class="n">_lazy_flat_content</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">target_content</span><span class="o">.</span><span class="n">data</span><span class="p">],</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="n">inner</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+        <span class="n">awkward</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">inner_offsets</span><span class="p">),</span> <span class="n">target_content</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span><span class="n">begin</span><span class="o">.</span><span class="n">offsets</span><span class="p">,</span> <span class="n">inner</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_local2global_compute</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">index_offsets</span><span class="p">,</span> <span class="n">target_offsets</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""``index + target_offsets[:-1]`` per event, -1 where out of range."""</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="n">index_offsets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">index_offsets</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="n">target_offsets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">target_offsets</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="n">counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">index_offsets</span><span class="p">)</span>
+    <span class="n">starts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">target_offsets</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">counts</span><span class="p">)</span>
+    <span class="n">stops</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">target_offsets</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">counts</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">index</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">index</span> <span class="o">+</span> <span class="n">starts</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">out</span> <span class="o">&lt;</span> <span class="n">stops</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="regular_to_jagged">
+<a class="viewcode-back" href="../../awkward_zipper.html#awkward_zipper.kernels.regular_to_jagged">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">regular_to_jagged</span><span class="p">(</span><span class="n">regular</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Convert a ``RegularArray(size, NumpyArray)`` to a jagged list of ``dtype``.</span>
+
+<span class="sd">    EDM4HEP stores fixed-size members (e.g. ``covMatrix.values[21]``) as a regular</span>
+<span class="sd">    array; coffea's ArrayBuilder-based transform turns them into variable-length</span>
+<span class="sd">    lists of float64. Evaluated lazily.</span>
+<span class="sd">    """</span>
+    <span class="n">inner</span> <span class="o">=</span> <span class="n">regular</span><span class="o">.</span><span class="n">content</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">regular</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">offsets</span> <span class="o">=</span> <span class="n">_lazy_flat_content</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">inner</span><span class="o">.</span><span class="n">data</span><span class="p">],</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">_lazy_flat_content</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">inner</span><span class="o">.</span><span class="n">data</span><span class="p">],</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">),</span> <span class="n">dtype</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">offsets</span><span class="o">.</span><span class="n">data</span><span class="p">),</span> <span class="n">content</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="local2global">
+<a class="viewcode-back" href="../../awkward_zipper.html#awkward_zipper.kernels.local2global">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">local2global</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">target_offsets</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Turn a jagged local index into a global index into a target collection.</span>
+
+<span class="sd">    Mirrors coffea's ``local2global`` transform. ``index`` is a per-event jagged</span>
+<span class="sd">    ``ListOffsetArray``; ``target_offsets`` is the target collection's per-event</span>
+<span class="sd">    offsets buffer. Returns the flat (global) index content, evaluated lazily.</span>
+<span class="sd">    """</span>
+    <span class="n">target_data</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">target_offsets</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target_offsets</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">Index</span><span class="p">)</span>
+        <span class="k">else</span> <span class="n">target_offsets</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">_lazy_flat_content</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">index</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="o">.</span><span class="n">offsets</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">target_data</span><span class="p">],</span>
+        <span class="n">_local2global_compute</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="nested_local2global">
+<a class="viewcode-back" href="../../awkward_zipper.html#awkward_zipper.kernels.nested_local2global">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">nested_local2global</span><span class="p">(</span><span class="n">nested_index</span><span class="p">,</span> <span class="n">target_offsets</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""``local2global`` for a doubly-jagged index (event -&gt; item -&gt; indices).</span>
+
+<span class="sd">    ``nested_index`` is ``ListOffsetArray(ListOffsetArray(NumpyArray))``; the</span>
+<span class="sd">    per-event grouping used for the offset lookup is the OUTER list.</span>
+<span class="sd">    """</span>
+    <span class="n">inner</span> <span class="o">=</span> <span class="n">nested_index</span><span class="o">.</span><span class="n">content</span>
+    <span class="n">target_data</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">target_offsets</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target_offsets</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">Index</span><span class="p">)</span>
+        <span class="k">else</span> <span class="n">target_offsets</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_compute</span><span class="p">(</span><span class="n">flat_index</span><span class="p">,</span> <span class="n">outer_offsets</span><span class="p">,</span> <span class="n">inner_offsets</span><span class="p">,</span> <span class="n">target_offs</span><span class="p">):</span>
+        <span class="n">outer_offsets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">outer_offsets</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="n">inner_offsets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">inner_offsets</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="c1"># number of flat elements per event = inner_offsets[outer[e+1]] - inner_offsets[outer[e]]</span>
+        <span class="n">per_event</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">inner_offsets</span><span class="p">[</span><span class="n">outer_offsets</span><span class="p">])</span>
+        <span class="n">event_offsets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">per_event</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="n">event_offsets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">per_event</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">event_offsets</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="k">return</span> <span class="n">_local2global_compute</span><span class="p">(</span><span class="n">flat_index</span><span class="p">,</span> <span class="n">event_offsets</span><span class="p">,</span> <span class="n">target_offs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_lazy_flat_content</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">inner</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">nested_index</span><span class="o">.</span><span class="n">offsets</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">inner</span><span class="o">.</span><span class="n">offsets</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">target_data</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">_compute</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="grow_local_index_to_target_shape">
+<a class="viewcode-back" href="../../awkward_zipper.html#awkward_zipper.kernels.grow_local_index_to_target_shape">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">grow_local_index_to_target_shape</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">target_offsets</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Grow a local index to the target's shape, filling unreferenced slots with -1.</span>
+
+<span class="sd">    Mirrors coffea's ``grow_local_index_to_target_shape``: for every element of the</span>
+<span class="sd">    target, emit its local index if that index appears in ``index`` for the event,</span>
+<span class="sd">    otherwise -1. Returns the flat content, evaluated lazily.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_compute</span><span class="p">(</span><span class="n">idx_content</span><span class="p">,</span> <span class="n">idx_offsets</span><span class="p">,</span> <span class="n">tgt_offsets</span><span class="p">):</span>
+        <span class="n">idx_content</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">idx_content</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="n">idx_offsets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">idx_offsets</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="n">tgt_offsets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">tgt_offsets</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">tgt_offsets</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tgt_offsets</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">start</span><span class="p">,</span> <span class="n">stop</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">tgt_offsets</span><span class="p">[</span><span class="n">event</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">tgt_offsets</span><span class="p">[</span><span class="n">event</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">all_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">stop</span> <span class="o">-</span> <span class="n">start</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+            <span class="n">present</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span>
+                <span class="n">all_index</span><span class="p">,</span> <span class="n">idx_content</span><span class="p">[</span><span class="n">idx_offsets</span><span class="p">[</span><span class="n">event</span><span class="p">]</span> <span class="p">:</span> <span class="n">idx_offsets</span><span class="p">[</span><span class="n">event</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]]</span>
+            <span class="p">)</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">stop</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">present</span><span class="p">,</span> <span class="n">all_index</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="n">target_data</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">target_offsets</span><span class="o">.</span><span class="n">data</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target_offsets</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">Index</span><span class="p">)</span>
+        <span class="k">else</span> <span class="n">target_offsets</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">_lazy_flat_content</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">index</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">index</span><span class="o">.</span><span class="n">offsets</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">target_data</span><span class="p">],</span> <span class="n">_compute</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Peter Fackeldey, Maxym Naumchyk.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

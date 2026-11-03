@@ -1,0 +1,283 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quick start &mdash; awkward-zipper 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=fd3f3429" />
+
+  
+    <link rel="shortcut icon" href="_static/logo_unfilled_with_text.png"/>
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Awkward-zipper example usage" href="notebooks/Usage_example_of_awkward_zipper.html" />
+    <link rel="prev" title="Examples" href="notebooks.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            awkward-zipper
+              <img src="_static/logo_unfilled_with_black_text.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="notebooks.html">Examples</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="notebooks.html#how-awkward-zipper-works">How awkward_zipper works</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Quick start</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#how-awkward-zipper-works-internally">How awkward-zipper works internally</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#adding-new-fields">Adding new fields</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#grouping-zipping-all-the-fields-together">Grouping(zipping) all the fields together</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks.html#usage-example-of-awkward-zipper">Usage example of awkward_zipper</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">awkward-zipper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="notebooks.html">Examples</a></li>
+      <li class="breadcrumb-item active">Quick start</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/usage_example.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="quick-start">
+<h1>Quick start<a class="headerlink" href="#quick-start" title="Link to this heading"></a></h1>
+<p><em>NOTE: You can find this whole page as a jupyter notebook and try it out yourself •⩊• here:</em> <code class="docutils literal notranslate"><span class="pre">notebooks/Usage_example_of_awkward_zipper.ipynb</span></code> <br> <br>
+Before even starting to work with awkward-zipper we have to use <code class="docutils literal notranslate"><span class="pre">uproot</span></code> library to load the data. First we load our root file:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a TTree from root</span>
+<span class="nv">tree</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>uproot.open<span class="o">(</span><span class="s2">"nano_dy.root"</span><span class="o">)[</span><span class="s2">"Events"</span><span class="o">]</span>
+</pre></div>
+</div>
+<p>Then we use <code class="docutils literal notranslate"><span class="pre">TBranch.arrays</span></code> function to conver the TTree format we got
+form the root file into an awkward array:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># TTree -&gt; awkward.Array[awkward.Record[str, awkward.Array]]</span>
+<span class="nv">array</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>tree.arrays<span class="o">(</span><span class="nv">ak_add_doc</span><span class="o">=</span>True<span class="o">)</span>
+</pre></div>
+</div>
+<p>Finally we can pass the resulting array to awkward-zipper.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>from<span class="w"> </span>awkward_zipper<span class="w"> </span>import<span class="w"> </span>NanoAOD
+<span class="nv">restructure</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>NanoAOD<span class="o">(</span><span class="nv">version</span><span class="o">=</span><span class="s2">"latest"</span><span class="o">)</span>
+<span class="nv">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>restructure<span class="o">(</span>array<span class="o">)</span>
+</pre></div>
+</div>
+<p>This whole process we can picture on a diagram:</p>
+<div class="graphviz"><img src="_images/graphviz-6308a652806151c6367d185836d2c192ed6afb32.png" alt="digraph {
+   &quot;Root file&quot; -&gt; &quot;TTree&quot; -&gt;
+     &quot;awkward.Array[awkward.Record[str, awkward.Array]]&quot;
+     -&gt; &quot;awkward-zipper&quot;;
+}" class="graphviz" /></div>
+</section>
+<section id="how-awkward-zipper-works-internally">
+<h1>How awkward-zipper works internally<a class="headerlink" href="#how-awkward-zipper-works-internally" title="Link to this heading"></a></h1>
+<p>Now let’s see how awkward-zipper restructures arrays internally,
+using Nanoaod schema(layout) as an example.
+The whole process can be broken down into two big steps.</p>
+<section id="adding-new-fields">
+<h2>Adding new fields<a class="headerlink" href="#adding-new-fields" title="Link to this heading"></a></h2>
+<p>Any branches named <code class="docutils literal notranslate"><span class="pre">n{name}</span></code> are assumed to be counts branches
+and can converted to offsets using this helper function:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>counts2offsets(counts)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Counts <br>
+[5, 8, 5, 3, 5]</p></td>
+</tr>
+<tr class="row-odd"><td><p>Result <br>
+[0,  5, 13, 18, 21, 26]</p></td>
+</tr>
+</tbody>
+</table>
+<p>Any local index branches with names matching <code class="docutils literal notranslate"><span class="pre">{source}_{target}Idx*</span></code> are converted to global indexes for the event chunk (postfix <code class="docutils literal notranslate"><span class="pre">G</span></code>).
+All local indices and their correlating global indices are taken from <a class="reference internal" href="awkward_zipper.html#awkward_zipper.NanoAOD.all_cross_references" title="awkward_zipper.NanoAOD.all_cross_references"><code class="xref py py-class docutils literal notranslate"><span class="pre">awkward_zipper.NanoAOD.all_cross_references</span></code></a> dictionary.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>local2globalindex(index, counts)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Index array <br>
+[[], [1], [], [2, 3]]
+<br> <br>
+Counts array <br>
+[8, 7, 4, 7]</p></td>
+</tr>
+<tr class="row-odd"><td><p>Result <br>
+[[], [9], [], [21, 22]]</p></td>
+</tr>
+</tbody>
+</table>
+<p>Any <code class="docutils literal notranslate"><span class="pre">nested_items</span></code> are constructed, if the necessary branches are available.
+All the input indices are taken from the <a class="reference internal" href="awkward_zipper.html#awkward_zipper.NanoAOD.nested_items" title="awkward_zipper.NanoAOD.nested_items"><code class="xref py py-class docutils literal notranslate"><span class="pre">awkward_zipper.NanoAOD.nested_items</span></code></a> dictionary.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>nestedindex(indices)</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>First index array <br>
+[[0, 2, 4], [8, 6]]
+<br> <br>
+Second index array <br>
+[[1, 3, 5], [-1, 7]]</p></td>
+</tr>
+<tr class="row-odd"><td><p>Result <br>
+[[[0, 1], [2, 3], [4, 5]], <br>
+[[8, -1], [6, 7]]]</p></td>
+</tr>
+</tbody>
+</table>
+<p>In the same manner any <a class="reference internal" href="awkward_zipper.html#awkward_zipper.NanoAOD.nested_index_items" title="awkward_zipper.NanoAOD.nested_index_items"><code class="xref py py-class docutils literal notranslate"><span class="pre">awkward_zipper.NanoAOD.nested_index_items</span></code></a> and <a class="reference internal" href="awkward_zipper.html#awkward_zipper.NanoAOD.special_items" title="awkward_zipper.NanoAOD.special_items"><code class="xref py py-class docutils literal notranslate"><span class="pre">awkward_zipper.NanoAOD.special_items</span></code></a> are constructed,
+if the necessary branches are available. You can find all these functions in the documentation for <a class="reference internal" href="awkward_zipper.html#module-awkward_zipper.kernels" title="awkward_zipper.kernels"><code class="xref py py-class docutils literal notranslate"><span class="pre">awkward_zipper.kernels</span></code></a></p>
+</section>
+<section id="grouping-zipping-all-the-fields-together">
+<h2>Grouping(zipping) all the fields together<a class="headerlink" href="#grouping-zipping-all-the-fields-together" title="Link to this heading"></a></h2>
+<p>From those arrays, NanoAOD collections are formed as collections of branches grouped by name, where:</p>
+<ul class="simple">
+<li><p>one branch exists named <code class="docutils literal notranslate"><span class="pre">name</span></code> and no branches start with <code class="docutils literal notranslate"><span class="pre">name_</span></code>, interpreted as a single flat array;</p></li>
+</ul>
+<table class="docutils align-center">
+<tbody>
+<tr class="row-odd"><td><p>Example: Each event has only one Run Id. Interpreted flat array will look look like this: <br>
+&lt;Array [1, 1, 1, 1, 1, 1, …, 1, 1, 1, 1, 1] type=’40 * uint32 <br>
+[parameters={“__doc__”: “run/i”}]’&gt; <br></p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p>one branch exists named <code class="docutils literal notranslate"><span class="pre">name</span></code>, one named <code class="docutils literal notranslate"><span class="pre">n{name}</span></code>, and no branches start with <code class="docutils literal notranslate"><span class="pre">name_</span></code>,
+interpreted as a single jagged array;</p></li>
+</ul>
+<table class="docutils align-center">
+<tbody>
+<tr class="row-odd"><td><p>Example: Each event has a flat array of PS Weights. Interpreted single jagged array will look look like this: <br>
+&lt;Array                                                                                                        <br>
+[[1.01, 1.26, 0.99, 0.791],                                                                                   <br>
+[2.06, 0.872, 0.535, 0.962],                                                                                  <br>
+[1.07, 0.887, 0.933, 1.02],                                                                                   <br>
+[0.833, 0.827, 1.15, 1.1],                                                                                    <br>
+…]                                                                                                          <br>
+type=’40 * [var * float32, …’&gt;</p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p>no branch exists named <code class="docutils literal notranslate"><span class="pre">{name}</span></code> and many branches start with <code class="docutils literal notranslate"><span class="pre">name_*</span></code>, interpreted as a flat table; or</p></li>
+</ul>
+<table class="docutils align-center">
+<tbody>
+<tr class="row-odd"><td><p>Example: Each event has a SINGLE Generator. Each Generator consists of a record of Generator parameters.
+These parameters can be scalars or flat arrays. Interpreted flat table will look look like this:              <br>
+&lt;Array                                                                                                        <br>
+[{id2: -1, x1: 0.214, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: 1, …},                                     <br>
+{id2: 1, x1: 0.0142, xpdf2: 0, xpdf1: 0, weight: 2.63e+04, id1: -1, …},                                     <br>
+…]                                                                                                          <br>
+type=’40 * NanoCollection[xpd…’&gt;</p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p>one branch exists named <code class="docutils literal notranslate"><span class="pre">n{name}</span></code> and many branches start with <code class="docutils literal notranslate"><span class="pre">name_*</span></code>, interpreted as a jagged table.</p></li>
+</ul>
+<table class="docutils align-center">
+<tbody>
+<tr class="row-odd"><td><p>Example: Each event has an array of Jets. Each Jet consists of a record of Jet parameters.
+These parameters can be scalars or flat arrays. Interpreted jagged table will look look like this:            <br>
+&lt;Array                                                                                                        <br>
+[[Jet, …, Jet],                                                                                             <br>
+[Jet, …],                                                                                                   <br>
+[Jet, …],                                                                                                   <br>
+…]                                                                                                          <br>
+type=’40 * var * Jet[area: f…’&gt;</p></td>
+</tr>
+</tbody>
+</table>
+<p>Collections are assigned mixin types according to the <code class="docutils literal notranslate"><span class="pre">mixins</span></code> <a class="reference internal" href="awkward_zipper.html#awkward_zipper.NanoAOD.mixins" title="awkward_zipper.NanoAOD.mixins"><code class="xref py py-class docutils literal notranslate"><span class="pre">awkward_zipper.NanoAOD.mixins</span></code></a> mapping.
+Finally, all collections are then zipped into one <a class="reference internal" href="awkward_zipper.behaviors.html#awkward_zipper.behaviors.base.NanoEvents" title="awkward_zipper.behaviors.base.NanoEvents"><code class="xref any py py-class docutils literal notranslate"><span class="pre">NanoEvents</span></code></a> record and returned.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="notebooks.html" class="btn btn-neutral float-left" title="Examples" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="notebooks/Usage_example_of_awkward_zipper.html" class="btn btn-neutral float-right" title="Awkward-zipper example usage" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Peter Fackeldey, Maxym Naumchyk.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
