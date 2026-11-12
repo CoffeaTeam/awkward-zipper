@@ -16,6 +16,15 @@ def ensure_array(arraylike):
     return np.asarray(arraylike)
 
 
+def _materialize_input(array):
+    if isinstance(array, int):
+        return array
+    # buffers such as the offsets from counts2offsets are not awkward arrays
+    if isinstance(array, awkward._nplikes.virtual.VirtualNDArray):
+        return array.materialize()
+    return awkward.materialize(array)
+
+
 # function: tp.Callable[[],]
 def dispatch_wrap(function):
     @functools.wraps(function)
@@ -41,14 +50,7 @@ def dispatch_wrap(function):
                 shape=(awkward._nplikes.shape.unknown_length,),
                 dtype=dtype,
                 generator=lambda: function(
-                    *(
-                        (
-                            array
-                            if isinstance(array, int)
-                            else awkward.materialize(array)
-                        )
-                        for array in input_arrays
-                    )
+                    *(_materialize_input(array) for array in input_arrays)
                 ),
                 shape_generator=None,
             )

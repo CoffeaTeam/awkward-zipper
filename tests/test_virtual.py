@@ -79,10 +79,6 @@ def test_nano_dy_kernels():
     print(awkward.materialize(zipper_array.Jet.muonIdxG))
     print(awkward.materialize(zipper_array.Jet.electronIdxG))
 
-    # test counts2nestedindex function
-    # should use pfnano.root for this
-    # print(awkward.materialize(zipper_array.Jet.pFCandsIdxG))
-
     # test distinct_parent function
     assert awkward.array_equal(
         zipper_array.GenPart.distinctParentIdxG, coffea_array.GenPart.distinctParentIdxG
