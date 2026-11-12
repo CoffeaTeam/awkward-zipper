@@ -154,6 +154,108 @@ def _zip_arrays(members, record_name=None):
     )
 
 
+def _materialized(buffer):
+    """The concrete array behind ``buffer``, materializing it if it is virtual."""
+    if isinstance(buffer, awkward._nplikes.virtual.VirtualNDArray):
+        return buffer.materialize()
+    return buffer
+
+
+def _lazy_buffer(nplike, shape, dtype, generator):
+    return awkward._nplikes.virtual.VirtualNDArray(
+        nplike=nplike, shape=shape, dtype=dtype, generator=generator
+    )
+
+
+def _slice_content(content, bounds):
+    """Slice ``content`` to ``bounds()`` lazily; ``None`` if its layout is not supported."""
+    nplike = content.backend.nplike
+    unknown_length = awkward._nplikes.shape.unknown_length
+    if isinstance(content, awkward.contents.NumpyArray):
+        data = content.data
+        # `.shape` would materialize a virtual buffer whose length is not known yet
+        inner_shape = (
+            data.inner_shape
+            if isinstance(data, awkward._nplikes.virtual.VirtualNDArray)
+            else data.shape[1:]
+        )
+
+        def generator():
+            start, stop = bounds()
+            return _materialized(data)[start:stop]
+
+        return awkward.contents.NumpyArray(
+            _lazy_buffer(nplike, (unknown_length, *inner_shape), data.dtype, generator),
+            parameters=content.parameters,
+        )
+    if isinstance(content, awkward.contents.RecordArray):
+        contents = [_slice_content(c, bounds) for c in content.contents]
+        if any(c is None for c in contents):
+            return None
+        return awkward.contents.RecordArray(
+            contents,
+            content.fields,
+            length=unknown_length,
+            parameters=content.parameters,
+        )
+    return None
+
+
+def _start_at_zero(layout, length):
+    """Pack a ``ListOffsetArray`` of ``length`` lists so its offsets start at 0 and its content ends at the last one.
+
+    uproot reads an RNTuple entry range in whole clusters, so a list read past
+    entry 0 has offsets that start past 0, and its content runs on past the last
+    entry read. The layouts take a list's content as flat data and pair it with
+    offsets built from counts, which needs the packed lists a TTree read gives.
+    Virtual lists are packed when their buffers are materialized.
+    """
+    if layout.is_all_materialized:
+        return layout.to_packed(False)
+
+    offsets = layout.offsets.data
+
+    def bounds():
+        materialized = _materialized(offsets)
+        return int(materialized[0]), int(materialized[-1])
+
+    content = _slice_content(layout.content, bounds)
+    if content is None:
+        return layout
+
+    def zero_based_offsets():
+        materialized = _materialized(offsets)
+        return materialized - materialized[0]
+
+    return awkward.contents.ListOffsetArray(
+        awkward.index.Index(
+            _lazy_buffer(
+                layout.backend.nplike, (length + 1,), offsets.dtype, zero_based_offsets
+            )
+        ),
+        content,
+        parameters=layout.parameters,
+    )
+
+
+def _counts_from_offsets(offsets, length, parameters):
+    """Counts of the ``length`` lists of an offsets ``Index``, computed lazily if it is virtual."""
+    import numpy as np
+
+    data = offsets.data
+    if not isinstance(data, awkward._nplikes.virtual.VirtualNDArray):
+        return awkward.contents.NumpyArray(np.diff(data), parameters=parameters)
+    return awkward.contents.NumpyArray(
+        _lazy_buffer(
+            data.nplike,
+            (length,),
+            data.dtype,
+            lambda: np.diff(_materialized(data)),
+        ),
+        parameters=parameters,
+    )
+
+
 def _total_items(offsets):
     """Number of flat items implied by an offsets array (``offsets[-1]``).
 
