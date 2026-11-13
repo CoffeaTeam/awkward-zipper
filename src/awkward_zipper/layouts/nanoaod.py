@@ -5,8 +5,10 @@ import awkward
 
 from awkward_zipper.awkward_util import (
     _check_equal_lengths,
+    _counts_from_offsets,
     _non_materializing_get_field,
     _rewrap,
+    _start_at_zero,
 )
 from awkward_zipper.kernels import (
     children,
@@ -19,6 +21,50 @@ from awkward_zipper.kernels import (
     nestedindex,
 )
 from awkward_zipper.layouts.base import BaseLayoutBuilder
+
+
+def _as_ttree_fields(array: awkward.Array) -> awkward.Array:
+    """Bring RNTuple input to the fields and list packing of a NanoAOD TTree read."""
+    layout = array.layout
+    names = set(layout.fields)
+    out = {}
+    for name, content in zip(layout.fields, layout.contents, strict=True):
+        if name.startswith("_collection"):
+            # collections made by the RNTuple importer; their members are also projected as flat fields
+            continue
+        jagged = isinstance(content, awkward.contents.ListOffsetArray)
+        record = content.content if jagged else content
+        if not isinstance(record, awkward.contents.RecordArray) or record.is_tuple:
+            out[name] = content
+            continue
+        # a collection stored as one record field: split it into fields as a TTree stores it
+        for subname, subcontent in zip(record.fields, record.contents, strict=True):
+            if jagged:
+                # a TTree read documents the list rather than its content
+                out[f"{name}_{subname}"] = awkward.contents.ListOffsetArray(
+                    content.offsets,
+                    subcontent.copy(parameters=None),
+                    parameters=subcontent.parameters,
+                )
+            else:
+                out[f"{name}_{subname}"] = subcontent
+        if jagged and f"n{name}" not in names:
+            out[f"n{name}"] = _counts_from_offsets(
+                content.offsets, layout.length, content.parameters
+            )
+    for name, content in out.items():
+        if isinstance(content, awkward.contents.ListOffsetArray):
+            out[name] = _start_at_zero(content, layout.length)
+    return awkward.Array(
+        awkward.contents.RecordArray(
+            list(out.values()),
+            list(out.keys()),
+            length=layout.length,
+            parameters=layout.parameters,
+        ),
+        behavior=array.behavior,
+        attrs=array.attrs,
+    )
 
 
 class NanoAOD(BaseLayoutBuilder):
@@ -41,6 +87,11 @@ class NanoAOD(BaseLayoutBuilder):
 
     Collections are assigned mixin types according to the `mixins` mapping.
     All collections are then zipped into one `base.NanoEvents` record and returned.
+
+    RNTuple input is first brought to the layout of a TTree read: a collection stored
+    as one record field ``name`` is split into ``name_*`` fields with ``n{name}``
+    counts, the ``_collection*`` fields made by the RNTuple importer are dropped, and
+    lists read from an entry range are packed to start at offset 0.
 
     There is a class-level variable ``warn_missing_crossrefs`` which will alter the behavior of
     NanoAOD. If warn_missing_crossrefs is true then when a missing global index cross-ref
@@ -251,6 +302,7 @@ class NanoAOD(BaseLayoutBuilder):
         return cls(version="5")
 
     def __call__(self, array: awkward.Array) -> awkward.Array:
+        array = _as_ttree_fields(array)
         fields = set(array.fields)
 
         def _get_collection_fields(name, collection):
@@ -261,7 +313,7 @@ class NanoAOD(BaseLayoutBuilder):
 
         # parse into high-level records (collections, list collections, and singletons)
         # Split on the first _ to get the collection prefix — e.g. "Electron_pt" → "Electron"
-        # If that index is empty (field starts with _, like "_collection0"), use "_collection0" instead
+        # If that index is empty (field starts with _), use the whole field name instead
         collections = {
             k.split("_", maxsplit=1)[0] or k for k in fields - counter_fields
         }
