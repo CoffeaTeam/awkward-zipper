@@ -1,0 +1,924 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Install libraries &mdash; awkward-zipper 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+    <link rel="shortcut icon" href="../_static/logo_unfilled_with_text.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Install libraries" href="simple_test_of_coffea_and_zipper_speeds.html" />
+    <link rel="prev" title="Benchmarks" href="../benchmarks.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            awkward-zipper
+              <img src="../_static/logo_unfilled_with_black_text.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../notebooks.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../benchmarks.html">Benchmarks</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../benchmarks.html#compare-histograms-made-with-coffea-and-zipper">Compare histograms made with coffea and zipper</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Install libraries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Helper-functions-for-data-loading">Helper functions for data loading</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Plot-the-diagrams">Plot the diagrams</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../benchmarks.html#simple-test-of-coffea-and-zipper-speeds">Simple test of coffea and zipper speeds</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">awkward-zipper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../benchmarks.html">Benchmarks</a></li>
+      <li class="breadcrumb-item active">Install libraries</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/benchmarks/compare_histograms_made_with_coffea_and_zipper.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <p>Original jupyter notebook by Iason Krommydas: <a class="reference external" href="https://github.com/ikrommyd/coffea-virtual-array-demo/blob/main/coffea_ADL_and_docs.ipynb">https://github.com/ikrommyd/coffea-virtual-array-demo/blob/main/coffea_ADL_and_docs.ipynb</a></p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># to get the test root file manually</span>
+<span class="c1"># !wget {'https://github.com/ikrommyd/coffea-virtual-array-demo/raw/de75f6d8a17be5cb1c71dbbf962b366fc92dc251/data/DYto2E.root'}</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+--2025-07-14 14:29:35--  https://github.com/ikrommyd/coffea-virtual-array-demo/raw/de75f6d8a17be5cb1c71dbbf962b366fc92dc251/data/DYto2E.root
+Resolving github.com (github.com)... 140.82.116.3
+Connecting to github.com (github.com)|140.82.116.3|:443... connected.
+HTTP request sent, awaiting response... 302 Found
+Location: https://media.githubusercontent.com/media/ikrommyd/coffea-virtual-array-demo/de75f6d8a17be5cb1c71dbbf962b366fc92dc251/data/DYto2E.root [following]
+--2025-07-14 14:29:35--  https://media.githubusercontent.com/media/ikrommyd/coffea-virtual-array-demo/de75f6d8a17be5cb1c71dbbf962b366fc92dc251/data/DYto2E.root
+Resolving media.githubusercontent.com (media.githubusercontent.com)... 185.199.108.133, 185.199.109.133, 185.199.110.133, ...
+Connecting to media.githubusercontent.com (media.githubusercontent.com)|185.199.108.133|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 3376397 (3.2M) [application/octet-stream]
+Saving to: ‘DYto2E.root’
+
+DYto2E.root         100%[===================&gt;]   3.22M  --.-KB/s    in 0.05s
+
+2025-07-14 14:29:35 (60.3 MB/s) - ‘DYto2E.root’ saved [3376397/3376397]
+
+</pre></div></div>
+</div>
+<section id="Install-libraries">
+<h1>Install libraries<a class="headerlink" href="#Install-libraries" title="Link to this heading"></a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">awkward</span> <span class="n">hist</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Collecting awkward
+  Downloading awkward-2.8.5-py3-none-any.whl.metadata (6.9 kB)
+Collecting hist
+  Downloading hist-2.8.1-py3-none-any.whl.metadata (16 kB)
+Collecting awkward-cpp==47 (from awkward)
+  Downloading awkward_cpp-47-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (2.1 kB)
+Requirement already satisfied: fsspec&gt;=2022.11.0 in /usr/local/lib/python3.11/dist-packages (from awkward) (2025.3.2)
+Requirement already satisfied: importlib-metadata&gt;=4.13.0 in /usr/local/lib/python3.11/dist-packages (from awkward) (8.7.0)
+Requirement already satisfied: numpy&gt;=1.18.0 in /usr/local/lib/python3.11/dist-packages (from awkward) (2.0.2)
+Requirement already satisfied: packaging in /usr/local/lib/python3.11/dist-packages (from awkward) (24.2)
+Collecting boost-histogram&lt;1.6,&gt;=1.3.1 (from hist)
+  Downloading boost_histogram-1.5.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (23 kB)
+Collecting histoprint&gt;=2.2.0 (from hist)
+  Downloading histoprint-2.6.0-py3-none-any.whl.metadata (17 kB)
+Requirement already satisfied: click&gt;=7.0.0 in /usr/local/lib/python3.11/dist-packages (from histoprint&gt;=2.2.0-&gt;hist) (8.2.1)
+Collecting uhi&gt;=0.2.1 (from histoprint&gt;=2.2.0-&gt;hist)
+  Downloading uhi-0.5.0-py3-none-any.whl.metadata (7.5 kB)
+Requirement already satisfied: zipp&gt;=3.20 in /usr/local/lib/python3.11/dist-packages (from importlib-metadata&gt;=4.13.0-&gt;awkward) (3.23.0)
+Downloading awkward-2.8.5-py3-none-any.whl (886 kB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">886.8/886.8 kB</span> <span class="ansi-red-fg">23.7 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Downloading awkward_cpp-47-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (638 kB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">638.8/638.8 kB</span> <span class="ansi-red-fg">40.0 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Downloading hist-2.8.1-py3-none-any.whl (40 kB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">40.9/40.9 kB</span> <span class="ansi-red-fg">3.4 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Downloading boost_histogram-1.5.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.1 MB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">1.1/1.1 MB</span> <span class="ansi-red-fg">55.3 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Downloading histoprint-2.6.0-py3-none-any.whl (16 kB)
+Downloading uhi-0.5.0-py3-none-any.whl (13 kB)
+Installing collected packages: uhi, boost-histogram, awkward-cpp, histoprint, awkward, hist
+Successfully installed awkward-2.8.5 awkward-cpp-47 boost-histogram-1.5.2 hist-2.8.1 histoprint-2.6.0 uhi-0.5.0
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">git</span><span class="o">+</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">scikit</span><span class="o">-</span><span class="n">hep</span><span class="o">/</span><span class="n">coffea</span><span class="o">.</span><span class="n">git</span><span class="nd">@master</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Collecting git+https://github.com/scikit-hep/coffea.git@master
+  Cloning https://github.com/scikit-hep/coffea.git (to revision master) to /tmp/pip-req-build-tjuiov85
+  Running command git clone --filter=blob:none --quiet https://github.com/scikit-hep/coffea.git /tmp/pip-req-build-tjuiov85
+  Resolved https://github.com/scikit-hep/coffea.git to commit 12ef1a59c815af36bdafdd36f1090c7123331fec
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... done
+  Preparing metadata (pyproject.toml) ... done
+Requirement already satisfied: aiohttp in /usr/local/lib/python3.11/dist-packages (from coffea==2025.7.0rc1.dev3+g12ef1a5) (3.11.15)
+Requirement already satisfied: awkward&gt;=2.8.2 in /usr/local/lib/python3.11/dist-packages (from coffea==2025.7.0rc1.dev3+g12ef1a5) (2.8.5)
+Requirement already satisfied: cachetools in /usr/local/lib/python3.11/dist-packages (from coffea==2025.7.0rc1.dev3+g12ef1a5) (5.5.2)
+Requirement already satisfied: cloudpickle&gt;=1.2.3 in /usr/local/lib/python3.11/dist-packages (from coffea==2025.7.0rc1.dev3+g12ef1a5) (3.1.1)
+Collecting correctionlib&gt;=2.6.0 (from coffea==2025.7.0rc1.dev3+g12ef1a5)
+  Downloading correctionlib-2.7.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.3 kB)
+Collecting dask-awkward&gt;=2025.5.0 (from coffea==2025.7.0rc1.dev3+g12ef1a5)
+  Downloading dask_awkward-2025.5.0-py3-none-any.whl.metadata (3.9 kB)
+Collecting dask-histogram&gt;=2025.2.0 (from coffea==2025.7.0rc1.dev3+g12ef1a5)
+  Downloading dask_histogram-2025.2.0-py3-none-any.whl.metadata (3.8 kB)
+Requirement already satisfied: dask&gt;=2024.3.0 in /usr/local/lib/python3.11/dist-packages (from dask[array]&gt;=2024.3.0-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (2024.12.1)
+Collecting fsspec-xrootd&gt;=0.2.3 (from coffea==2025.7.0rc1.dev3+g12ef1a5)
+  Downloading fsspec_xrootd-0.5.1-py3-none-any.whl.metadata (4.0 kB)
+Requirement already satisfied: hist&gt;=2 in /usr/local/lib/python3.11/dist-packages (from coffea==2025.7.0rc1.dev3+g12ef1a5) (2.8.1)
+Collecting lz4 (from coffea==2025.7.0rc1.dev3+g12ef1a5)
+  Downloading lz4-4.4.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (3.8 kB)
+Requirement already satisfied: matplotlib&gt;=3 in /usr/local/lib/python3.11/dist-packages (from coffea==2025.7.0rc1.dev3+g12ef1a5) (3.10.0)
+Collecting mplhep&gt;=0.1.18 (from coffea==2025.7.0rc1.dev3+g12ef1a5)
+  Downloading mplhep-0.4.0-py3-none-any.whl.metadata (10 kB)
+Requirement already satisfied: numba&gt;=0.58.1 in /usr/local/lib/python3.11/dist-packages (from coffea==2025.7.0rc1.dev3+g12ef1a5) (0.60.0)
+Requirement already satisfied: numpy&gt;=1.22 in /usr/local/lib/python3.11/dist-packages (from coffea==2025.7.0rc1.dev3+g12ef1a5) (2.0.2)
+Requirement already satisfied: packaging in /usr/local/lib/python3.11/dist-packages (from coffea==2025.7.0rc1.dev3+g12ef1a5) (24.2)
+Requirement already satisfied: pandas in /usr/local/lib/python3.11/dist-packages (from coffea==2025.7.0rc1.dev3+g12ef1a5) (2.2.2)
+Requirement already satisfied: pyarrow&gt;=6.0.0 in /usr/local/lib/python3.11/dist-packages (from coffea==2025.7.0rc1.dev3+g12ef1a5) (18.1.0)
+Requirement already satisfied: requests in /usr/local/lib/python3.11/dist-packages (from coffea==2025.7.0rc1.dev3+g12ef1a5) (2.32.3)
+Requirement already satisfied: scipy&gt;=1.1.0 in /usr/local/lib/python3.11/dist-packages (from coffea==2025.7.0rc1.dev3+g12ef1a5) (1.15.3)
+Requirement already satisfied: toml&gt;=0.10.2 in /usr/local/lib/python3.11/dist-packages (from coffea==2025.7.0rc1.dev3+g12ef1a5) (0.10.2)
+Requirement already satisfied: tqdm&gt;=4.27.0 in /usr/local/lib/python3.11/dist-packages (from coffea==2025.7.0rc1.dev3+g12ef1a5) (4.67.1)
+Collecting uproot&gt;=5.6.0 (from coffea==2025.7.0rc1.dev3+g12ef1a5)
+  Downloading uproot-5.6.3-py3-none-any.whl.metadata (33 kB)
+Collecting vector!=1.6.0,&gt;=1.4.1 (from coffea==2025.7.0rc1.dev3+g12ef1a5)
+  Downloading vector-1.6.2-py3-none-any.whl.metadata (15 kB)
+Requirement already satisfied: awkward-cpp==47 in /usr/local/lib/python3.11/dist-packages (from awkward&gt;=2.8.2-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (47)
+Requirement already satisfied: fsspec&gt;=2022.11.0 in /usr/local/lib/python3.11/dist-packages (from awkward&gt;=2.8.2-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (2025.3.2)
+Requirement already satisfied: importlib-metadata&gt;=4.13.0 in /usr/local/lib/python3.11/dist-packages (from awkward&gt;=2.8.2-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (8.7.0)
+Requirement already satisfied: pydantic&gt;=2 in /usr/local/lib/python3.11/dist-packages (from correctionlib&gt;=2.6.0-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (2.11.7)
+Requirement already satisfied: rich in /usr/local/lib/python3.11/dist-packages (from correctionlib&gt;=2.6.0-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (13.9.4)
+Requirement already satisfied: click&gt;=8.1 in /usr/local/lib/python3.11/dist-packages (from dask&gt;=2024.3.0-&gt;dask[array]&gt;=2024.3.0-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (8.2.1)
+Requirement already satisfied: partd&gt;=1.4.0 in /usr/local/lib/python3.11/dist-packages (from dask&gt;=2024.3.0-&gt;dask[array]&gt;=2024.3.0-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (1.4.2)
+Requirement already satisfied: pyyaml&gt;=5.3.1 in /usr/local/lib/python3.11/dist-packages (from dask&gt;=2024.3.0-&gt;dask[array]&gt;=2024.3.0-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (6.0.2)
+Requirement already satisfied: toolz&gt;=0.10.0 in /usr/local/lib/python3.11/dist-packages (from dask&gt;=2024.3.0-&gt;dask[array]&gt;=2024.3.0-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (0.12.1)
+Requirement already satisfied: typing-extensions&gt;=4.8.0 in /usr/local/lib/python3.11/dist-packages (from dask-awkward&gt;=2025.5.0-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (4.14.1)
+Requirement already satisfied: boost-histogram&gt;=1.3.2 in /usr/local/lib/python3.11/dist-packages (from dask-histogram&gt;=2025.2.0-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (1.5.2)
+Requirement already satisfied: histoprint&gt;=2.2.0 in /usr/local/lib/python3.11/dist-packages (from hist&gt;=2-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (2.6.0)
+Requirement already satisfied: contourpy&gt;=1.0.1 in /usr/local/lib/python3.11/dist-packages (from matplotlib&gt;=3-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (1.3.2)
+Requirement already satisfied: cycler&gt;=0.10 in /usr/local/lib/python3.11/dist-packages (from matplotlib&gt;=3-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (0.12.1)
+Requirement already satisfied: fonttools&gt;=4.22.0 in /usr/local/lib/python3.11/dist-packages (from matplotlib&gt;=3-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (4.58.5)
+Requirement already satisfied: kiwisolver&gt;=1.3.1 in /usr/local/lib/python3.11/dist-packages (from matplotlib&gt;=3-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (1.4.8)
+Requirement already satisfied: pillow&gt;=8 in /usr/local/lib/python3.11/dist-packages (from matplotlib&gt;=3-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (11.2.1)
+Requirement already satisfied: pyparsing&gt;=2.3.1 in /usr/local/lib/python3.11/dist-packages (from matplotlib&gt;=3-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (3.2.3)
+Requirement already satisfied: python-dateutil&gt;=2.7 in /usr/local/lib/python3.11/dist-packages (from matplotlib&gt;=3-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (2.9.0.post0)
+Collecting mplhep-data&gt;=0.0.4 (from mplhep&gt;=0.1.18-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5)
+  Downloading mplhep_data-0.0.4-py3-none-any.whl.metadata (3.4 kB)
+Requirement already satisfied: uhi&gt;=0.2.0 in /usr/local/lib/python3.11/dist-packages (from mplhep&gt;=0.1.18-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (0.5.0)
+Requirement already satisfied: llvmlite&lt;0.44,&gt;=0.43.0dev0 in /usr/local/lib/python3.11/dist-packages (from numba&gt;=0.58.1-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (0.43.0)
+Requirement already satisfied: cramjam&gt;=2.5.0 in /usr/local/lib/python3.11/dist-packages (from uproot&gt;=5.6.0-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (2.10.0)
+Requirement already satisfied: xxhash in /usr/local/lib/python3.11/dist-packages (from uproot&gt;=5.6.0-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (3.5.0)
+Requirement already satisfied: aiohappyeyeballs&gt;=2.3.0 in /usr/local/lib/python3.11/dist-packages (from aiohttp-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (2.6.1)
+Requirement already satisfied: aiosignal&gt;=1.1.2 in /usr/local/lib/python3.11/dist-packages (from aiohttp-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (1.4.0)
+Requirement already satisfied: attrs&gt;=17.3.0 in /usr/local/lib/python3.11/dist-packages (from aiohttp-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (25.3.0)
+Requirement already satisfied: frozenlist&gt;=1.1.1 in /usr/local/lib/python3.11/dist-packages (from aiohttp-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (1.7.0)
+Requirement already satisfied: multidict&lt;7.0,&gt;=4.5 in /usr/local/lib/python3.11/dist-packages (from aiohttp-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (6.6.3)
+Requirement already satisfied: propcache&gt;=0.2.0 in /usr/local/lib/python3.11/dist-packages (from aiohttp-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (0.3.2)
+Requirement already satisfied: yarl&lt;2.0,&gt;=1.17.0 in /usr/local/lib/python3.11/dist-packages (from aiohttp-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (1.20.1)
+Requirement already satisfied: pytz&gt;=2020.1 in /usr/local/lib/python3.11/dist-packages (from pandas-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (2025.2)
+Requirement already satisfied: tzdata&gt;=2022.7 in /usr/local/lib/python3.11/dist-packages (from pandas-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (2025.2)
+Requirement already satisfied: charset-normalizer&lt;4,&gt;=2 in /usr/local/lib/python3.11/dist-packages (from requests-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (3.4.2)
+Requirement already satisfied: idna&lt;4,&gt;=2.5 in /usr/local/lib/python3.11/dist-packages (from requests-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (3.10)
+Requirement already satisfied: urllib3&lt;3,&gt;=1.21.1 in /usr/local/lib/python3.11/dist-packages (from requests-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (2.4.0)
+Requirement already satisfied: certifi&gt;=2017.4.17 in /usr/local/lib/python3.11/dist-packages (from requests-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (2025.7.9)
+Requirement already satisfied: zipp&gt;=3.20 in /usr/local/lib/python3.11/dist-packages (from importlib-metadata&gt;=4.13.0-&gt;awkward&gt;=2.8.2-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (3.23.0)
+Requirement already satisfied: locket in /usr/local/lib/python3.11/dist-packages (from partd&gt;=1.4.0-&gt;dask&gt;=2024.3.0-&gt;dask[array]&gt;=2024.3.0-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (1.0.0)
+Requirement already satisfied: annotated-types&gt;=0.6.0 in /usr/local/lib/python3.11/dist-packages (from pydantic&gt;=2-&gt;correctionlib&gt;=2.6.0-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (0.7.0)
+Requirement already satisfied: pydantic-core==2.33.2 in /usr/local/lib/python3.11/dist-packages (from pydantic&gt;=2-&gt;correctionlib&gt;=2.6.0-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (2.33.2)
+Requirement already satisfied: typing-inspection&gt;=0.4.0 in /usr/local/lib/python3.11/dist-packages (from pydantic&gt;=2-&gt;correctionlib&gt;=2.6.0-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (0.4.1)
+Requirement already satisfied: six&gt;=1.5 in /usr/local/lib/python3.11/dist-packages (from python-dateutil&gt;=2.7-&gt;matplotlib&gt;=3-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (1.17.0)
+Requirement already satisfied: markdown-it-py&gt;=2.2.0 in /usr/local/lib/python3.11/dist-packages (from rich-&gt;correctionlib&gt;=2.6.0-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (3.0.0)
+Requirement already satisfied: pygments&lt;3.0.0,&gt;=2.13.0 in /usr/local/lib/python3.11/dist-packages (from rich-&gt;correctionlib&gt;=2.6.0-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (2.19.2)
+Requirement already satisfied: mdurl~=0.1 in /usr/local/lib/python3.11/dist-packages (from markdown-it-py&gt;=2.2.0-&gt;rich-&gt;correctionlib&gt;=2.6.0-&gt;coffea==2025.7.0rc1.dev3+g12ef1a5) (0.1.2)
+Downloading correctionlib-2.7.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (436 kB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">436.1/436.1 kB</span> <span class="ansi-red-fg">17.5 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Downloading dask_awkward-2025.5.0-py3-none-any.whl (90 kB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">90.1/90.1 kB</span> <span class="ansi-red-fg">7.8 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Downloading dask_histogram-2025.2.0-py3-none-any.whl (27 kB)
+Downloading fsspec_xrootd-0.5.1-py3-none-any.whl (13 kB)
+Downloading mplhep-0.4.0-py3-none-any.whl (48 kB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">48.4/48.4 kB</span> <span class="ansi-red-fg">3.6 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Downloading uproot-5.6.3-py3-none-any.whl (382 kB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">382.8/382.8 kB</span> <span class="ansi-red-fg">28.1 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Downloading vector-1.6.2-py3-none-any.whl (177 kB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">177.8/177.8 kB</span> <span class="ansi-red-fg">14.5 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Downloading lz4-4.4.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.3 MB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">1.3/1.3 MB</span> <span class="ansi-red-fg">61.3 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Downloading mplhep_data-0.0.4-py3-none-any.whl (9.1 MB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">9.1/9.1 MB</span> <span class="ansi-red-fg">110.2 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Building wheels for collected packages: coffea
+  Building wheel for coffea (pyproject.toml) ... done
+  Created wheel for coffea: filename=coffea-2025.7.0rc1.dev3+g12ef1a5-py3-none-any.whl size=281743 sha256=d5a0d2aff5d60f2558fa396fc75d4c3d13900216d149792e5754164d0f555a9c
+  Stored in directory: /tmp/pip-ephem-wheel-cache-20nkjrt_/wheels/d3/ef/55/413cff710a7e9fbe7df5ea9455e638b150caacab96d52a8f9a
+Successfully built coffea
+Installing collected packages: vector, mplhep-data, lz4, fsspec-xrootd, uproot, mplhep, dask-awkward, correctionlib, dask-histogram, coffea
+Successfully installed coffea-2025.7.0rc1.dev3+g12ef1a5 correctionlib-2.7.0 dask-awkward-2025.5.0 dask-histogram-2025.2.0 fsspec-xrootd-0.5.1 lz4-4.4.4 mplhep-0.4.0 mplhep-data-0.0.4 uproot-5.6.3 vector-1.6.2
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">git</span><span class="o">+</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">CoffeaTeam</span><span class="o">/</span><span class="n">awkward</span><span class="o">-</span><span class="n">zipper</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Collecting git+https://github.com/maxymnaumchyk/awkward-zipper.git
+  Cloning https://github.com/maxymnaumchyk/awkward-zipper.git to /tmp/pip-req-build-69lhrk1w
+  Running command git clone --filter=blob:none --quiet https://github.com/maxymnaumchyk/awkward-zipper.git /tmp/pip-req-build-69lhrk1w
+  Resolved https://github.com/maxymnaumchyk/awkward-zipper.git to commit 7d7c94e3cd01bc78bf137d190431109a33fbdc9c
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... done
+  Preparing metadata (pyproject.toml) ... done
+Collecting awkward@ git+https://github.com/scikit-hep/awkward@main (from awkward-zipper==0.0.1)
+  Cloning https://github.com/scikit-hep/awkward (to revision main) to /tmp/pip-install-pgawn305/awkward_a506a61a23f0411ea76b466d984bf4b9
+  Running command git clone --filter=blob:none --quiet https://github.com/scikit-hep/awkward /tmp/pip-install-pgawn305/awkward_a506a61a23f0411ea76b466d984bf4b9
+  Resolved https://github.com/scikit-hep/awkward to commit 03688c265934e69cd0d255d0eeb8716dbaffc145
+  Running command git submodule update --init --recursive -q
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... done
+  Preparing metadata (pyproject.toml) ... done
+Requirement already satisfied: numba in /usr/local/lib/python3.11/dist-packages (from awkward-zipper==0.0.1) (0.60.0)
+Requirement already satisfied: vector in /usr/local/lib/python3.11/dist-packages (from awkward-zipper==0.0.1) (1.6.2)
+Requirement already satisfied: awkward-cpp==47 in /usr/local/lib/python3.11/dist-packages (from awkward@ git+https://github.com/scikit-hep/awkward@main-&gt;awkward-zipper==0.0.1) (47)
+Requirement already satisfied: fsspec&gt;=2022.11.0 in /usr/local/lib/python3.11/dist-packages (from awkward@ git+https://github.com/scikit-hep/awkward@main-&gt;awkward-zipper==0.0.1) (2025.3.2)
+Requirement already satisfied: importlib-metadata&gt;=4.13.0 in /usr/local/lib/python3.11/dist-packages (from awkward@ git+https://github.com/scikit-hep/awkward@main-&gt;awkward-zipper==0.0.1) (8.7.0)
+Requirement already satisfied: numpy&gt;=1.18.0 in /usr/local/lib/python3.11/dist-packages (from awkward@ git+https://github.com/scikit-hep/awkward@main-&gt;awkward-zipper==0.0.1) (2.0.2)
+Requirement already satisfied: packaging in /usr/local/lib/python3.11/dist-packages (from awkward@ git+https://github.com/scikit-hep/awkward@main-&gt;awkward-zipper==0.0.1) (24.2)
+Requirement already satisfied: llvmlite&lt;0.44,&gt;=0.43.0dev0 in /usr/local/lib/python3.11/dist-packages (from numba-&gt;awkward-zipper==0.0.1) (0.43.0)
+Requirement already satisfied: zipp&gt;=3.20 in /usr/local/lib/python3.11/dist-packages (from importlib-metadata&gt;=4.13.0-&gt;awkward@ git+https://github.com/scikit-hep/awkward@main-&gt;awkward-zipper==0.0.1) (3.23.0)
+Building wheels for collected packages: awkward-zipper
+  Building wheel for awkward-zipper (pyproject.toml) ... done
+  Created wheel for awkward-zipper: filename=awkward_zipper-0.0.1-py3-none-any.whl size=24548 sha256=f46e70a2016aabaff10dea18aadc1731b58bea784877a25f351344a876334852
+  Stored in directory: /tmp/pip-ephem-wheel-cache-7kpi1ltd/wheels/13/ff/6a/a86ac1ebbfd7f56ba74dec9ccffa35df23b6890fac28284fed
+Successfully built awkward-zipper
+Installing collected packages: awkward-zipper
+Successfully installed awkward-zipper-0.0.1
+</pre></div></div>
+</div>
+<p>Use a branch from main to load virtual arrays with uproot</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">uproot</span><span class="nd">@git</span><span class="o">+</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">scikit</span><span class="o">-</span><span class="n">hep</span><span class="o">/</span><span class="n">uproot5</span><span class="nd">@pfackeldey</span><span class="o">/</span><span class="n">uproot_lazy</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Collecting uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy
+  Cloning https://github.com/scikit-hep/uproot5 (to revision pfackeldey/uproot_lazy) to /tmp/pip-install-_849_ubv/uproot_3c48d46d02014551a8a1ab101baee933
+  Running command git clone --filter=blob:none --quiet https://github.com/scikit-hep/uproot5 /tmp/pip-install-_849_ubv/uproot_3c48d46d02014551a8a1ab101baee933
+  Running command git checkout -b pfackeldey/uproot_lazy --track origin/pfackeldey/uproot_lazy
+  Switched to a new branch &#39;pfackeldey/uproot_lazy&#39;
+  Branch &#39;pfackeldey/uproot_lazy&#39; set up to track remote branch &#39;pfackeldey/uproot_lazy&#39; from &#39;origin&#39;.
+  Resolved https://github.com/scikit-hep/uproot5 to commit f8a3461cdeba7ae5a909898ff14e881aa380d986
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... done
+  Preparing metadata (pyproject.toml) ... done
+Requirement already satisfied: awkward&gt;=2.8.2 in /usr/local/lib/python3.11/dist-packages (from uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (2.8.5)
+Requirement already satisfied: cramjam&gt;=2.5.0 in /usr/local/lib/python3.11/dist-packages (from uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (2.10.0)
+Requirement already satisfied: fsspec in /usr/local/lib/python3.11/dist-packages (from uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (2025.3.2)
+Requirement already satisfied: numpy in /usr/local/lib/python3.11/dist-packages (from uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (2.0.2)
+Requirement already satisfied: packaging in /usr/local/lib/python3.11/dist-packages (from uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (24.2)
+Requirement already satisfied: xxhash in /usr/local/lib/python3.11/dist-packages (from uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (3.5.0)
+Requirement already satisfied: awkward-cpp==47 in /usr/local/lib/python3.11/dist-packages (from awkward&gt;=2.8.2-&gt;uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (47)
+Requirement already satisfied: importlib-metadata&gt;=4.13.0 in /usr/local/lib/python3.11/dist-packages (from awkward&gt;=2.8.2-&gt;uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (8.7.0)
+Requirement already satisfied: zipp&gt;=3.20 in /usr/local/lib/python3.11/dist-packages (from importlib-metadata&gt;=4.13.0-&gt;awkward&gt;=2.8.2-&gt;uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (3.23.0)
+Building wheels for collected packages: uproot
+  Building wheel for uproot (pyproject.toml) ... done
+  Created wheel for uproot: filename=uproot-5.6.3.dev29+gf8a3461-py3-none-any.whl size=377233 sha256=04d5b597d5f7b0ff30ce100a94a88b11027b16608b0f4265a9766dd893936f1f
+  Stored in directory: /tmp/pip-ephem-wheel-cache-vmpxod2y/wheels/6d/4a/38/cca594ce698fdd158d6039640034edca9dda20c890c171703a
+Successfully built uproot
+Installing collected packages: uproot
+  Attempting uninstall: uproot
+    Found existing installation: uproot 5.6.3
+    Uninstalling uproot-5.6.3:
+      Successfully uninstalled uproot-5.6.3
+Successfully installed uproot-5.6.3.dev29+gf8a3461
+</pre></div></div>
+</div>
+</section>
+<section id="Helper-functions-for-data-loading">
+<h1>Helper functions for data loading<a class="headerlink" href="#Helper-functions-for-data-loading" title="Link to this heading"></a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">awkward</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ak</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">hist</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">coffea.nanoevents</span><span class="w"> </span><span class="kn">import</span> <span class="n">NanoEventsFactory</span><span class="p">,</span> <span class="n">NanoAODSchema</span><span class="p">,</span> <span class="n">BaseSchema</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">awkward_zipper</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uproot</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">make_events_coffea</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">schemaclass</span><span class="o">=</span><span class="n">NanoAODSchema</span><span class="p">):</span>
+    <span class="n">access_log</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">events</span> <span class="o">=</span> <span class="n">NanoEventsFactory</span><span class="o">.</span><span class="n">from_root</span><span class="p">(</span>
+        <span class="p">{</span><span class="n">file</span><span class="p">:</span> <span class="s2">"Events"</span><span class="p">},</span>
+        <span class="n">mode</span><span class="o">=</span><span class="s2">"virtual"</span><span class="p">,</span>
+        <span class="n">schemaclass</span><span class="o">=</span><span class="n">schemaclass</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"dataset"</span><span class="p">:</span> <span class="n">file</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">"data/"</span><span class="p">)</span><span class="o">.</span><span class="n">removesuffix</span><span class="p">(</span><span class="s2">".root"</span><span class="p">)},</span>
+        <span class="n">access_log</span><span class="o">=</span><span class="n">access_log</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">events</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">events</span><span class="p">,</span> <span class="n">access_log</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">make_events_zipper</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+    <span class="n">access_log</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># Create a TTree from root</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">uproot</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">file</span><span class="p">)[</span><span class="s2">"Events"</span><span class="p">]</span>
+    <span class="c1"># TTree -&gt; awkward.Array[awkward.Record[str, awkward.Array]]</span>
+    <span class="n">array</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">arrays</span><span class="p">(</span><span class="n">virtual</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ak_add_doc</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">access_log</span><span class="o">=</span><span class="n">access_log</span><span class="p">)</span>
+
+    <span class="c1"># construct an awkward array using awkward-zipper</span>
+    <span class="n">restructure</span> <span class="o">=</span> <span class="n">awkward_zipper</span><span class="o">.</span><span class="n">NanoAOD</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="s2">"latest"</span><span class="p">)</span>
+    <span class="n">zipper_array</span> <span class="o">=</span> <span class="n">restructure</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">zipper_array</span><span class="p">,</span> <span class="n">access_log</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">root_file</span> <span class="o">=</span> <span class="s2">"DYto2E.root"</span>
+<span class="n">events_coffea</span><span class="p">,</span> <span class="n">access_log_coffea</span> <span class="o">=</span> <span class="n">make_events_coffea</span><span class="p">(</span><span class="n">root_file</span><span class="p">)</span>
+<span class="n">access_log_coffea</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">events_zipper</span><span class="p">,</span> <span class="n">access_log_zipper</span> <span class="o">=</span> <span class="n">make_events_zipper</span><span class="p">(</span><span class="n">root_file</span><span class="p">)</span>
+<span class="n">access_log_zipper</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[]
+</pre></div></div>
+</div>
+</section>
+<section id="Plot-the-diagrams">
+<h1>Plot the diagrams<a class="headerlink" href="#Plot-the-diagrams" title="Link to this heading"></a></h1>
+<p>Here we will plot two histograms on top of each other to see if there are any differencies between zipper and coffea</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">events_coffea</span><span class="p">,</span> <span class="n">access_log_coffea</span> <span class="o">=</span> <span class="n">make_events_coffea</span><span class="p">(</span><span class="n">root_file</span><span class="p">)</span>
+<span class="n">events_zipper</span><span class="p">,</span> <span class="n">access_log_zipper</span> <span class="o">=</span> <span class="n">make_events_zipper</span><span class="p">(</span><span class="n">root_file</span><span class="p">)</span>
+
+<span class="n">q1_hist</span> <span class="o">=</span> <span class="n">hist</span><span class="o">.</span><span class="n">Hist</span><span class="o">.</span><span class="n">new</span><span class="o">.</span><span class="n">Reg</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"met"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"$E_</span><span class="si">{T}</span><span class="s2">^</span><span class="si">{miss}</span><span class="s2">$ [GeV]"</span><span class="p">)</span><span class="o">.</span><span class="n">Double</span><span class="p">()</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">events_coffea</span><span class="o">.</span><span class="n">MET</span><span class="o">.</span><span class="n">pt</span><span class="p">)</span>
+<span class="n">q12_hist</span> <span class="o">=</span> <span class="n">hist</span><span class="o">.</span><span class="n">Hist</span><span class="o">.</span><span class="n">new</span><span class="o">.</span><span class="n">Reg</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"met"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"$E_</span><span class="si">{T}</span><span class="s2">^</span><span class="si">{miss}</span><span class="s2">$ [GeV]"</span><span class="p">)</span><span class="o">.</span><span class="n">Double</span><span class="p">()</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">events_zipper</span><span class="o">.</span><span class="n">MET</span><span class="o">.</span><span class="n">pt</span><span class="p">)</span>
+
+<span class="n">q1_hist</span><span class="o">.</span><span class="n">plot1d</span><span class="p">(</span><span class="n">flow</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span>
+<span class="n">q12_hist</span><span class="o">.</span><span class="n">plot1d</span><span class="p">(</span><span class="n">flow</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'access_log_coffea:'</span><span class="p">,</span> <span class="n">access_log_coffea</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'access_log_zipper:'</span><span class="p">,</span> <span class="n">access_log_zipper</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/benchmarks_compare_histograms_made_with_coffea_and_zipper_14_0.png" src="../_images/benchmarks_compare_histograms_made_with_coffea_and_zipper_14_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+access_log_coffea: [&#39;MET_pt&#39;]
+access_log_zipper: [Accessed(branch=&#39;MET_pt&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;MET_pt&#39;)-data&#34;)]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot_two_hists</span><span class="p">(</span><span class="n">make_events</span><span class="p">):</span>
+    <span class="n">events</span><span class="p">,</span> <span class="n">access_log</span> <span class="o">=</span> <span class="n">make_events</span><span class="p">(</span><span class="n">root_file</span><span class="p">)</span>
+
+    <span class="n">q2_hist</span> <span class="o">=</span> <span class="n">hist</span><span class="o">.</span><span class="n">Hist</span><span class="o">.</span><span class="n">new</span><span class="o">.</span><span class="n">Reg</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"ptj"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Jet $p_</span><span class="si">{T}</span><span class="s2">$ [GeV]"</span><span class="p">)</span><span class="o">.</span><span class="n">Double</span><span class="p">()</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">ak</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">events</span><span class="o">.</span><span class="n">Jet</span><span class="o">.</span><span class="n">pt</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">access_log</span><span class="p">,</span> <span class="n">q2_hist</span>
+
+<span class="n">access_log_coffea</span><span class="p">,</span> <span class="n">q2_hist</span> <span class="o">=</span> <span class="n">plot_two_hists</span><span class="p">(</span><span class="n">make_events_coffea</span><span class="p">)</span>
+<span class="n">access_log_zipper</span><span class="p">,</span> <span class="n">q21_hist</span> <span class="o">=</span> <span class="n">plot_two_hists</span><span class="p">(</span><span class="n">make_events_zipper</span><span class="p">)</span>
+
+<span class="n">q2_hist</span><span class="o">.</span><span class="n">plot1d</span><span class="p">(</span><span class="n">flow</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span>
+<span class="n">q21_hist</span><span class="o">.</span><span class="n">plot1d</span><span class="p">(</span><span class="n">flow</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'access_log_coffea:'</span><span class="p">,</span> <span class="n">access_log_coffea</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'access_log_zipper:'</span><span class="p">,</span> <span class="n">access_log_zipper</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/benchmarks_compare_histograms_made_with_coffea_and_zipper_15_0.png" src="../_images/benchmarks_compare_histograms_made_with_coffea_and_zipper_15_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+access_log_coffea: [&#39;nJet&#39;, &#39;Jet_pt&#39;]
+access_log_zipper: [Accessed(branch=&#39;nJet&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;nJet&#39;)-data&#34;), Accessed(branch=&#39;Jet_pt&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Jet_pt&#39;, None)-data&#34;)]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot_two_hists</span><span class="p">(</span><span class="n">make_events</span><span class="p">):</span>
+    <span class="n">events</span><span class="p">,</span> <span class="n">access_log</span> <span class="o">=</span> <span class="n">make_events</span><span class="p">(</span><span class="n">root_file</span><span class="p">)</span>
+
+    <span class="n">q3_hist</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">hist</span><span class="o">.</span><span class="n">Hist</span><span class="o">.</span><span class="n">new</span><span class="o">.</span><span class="n">Reg</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"ptj"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Jet $p_</span><span class="si">{T}</span><span class="s2">$ [GeV]"</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">Double</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">ak</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">events</span><span class="o">.</span><span class="n">Jet</span><span class="p">[</span><span class="nb">abs</span><span class="p">(</span><span class="n">events</span><span class="o">.</span><span class="n">Jet</span><span class="o">.</span><span class="n">eta</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">pt</span><span class="p">))</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">access_log</span><span class="p">,</span> <span class="n">q3_hist</span>
+
+<span class="n">access_log_coffea</span><span class="p">,</span> <span class="n">q3_hist</span> <span class="o">=</span> <span class="n">plot_two_hists</span><span class="p">(</span><span class="n">make_events_coffea</span><span class="p">)</span>
+<span class="n">access_log_zipper</span><span class="p">,</span> <span class="n">q31_hist</span> <span class="o">=</span> <span class="n">plot_two_hists</span><span class="p">(</span><span class="n">make_events_zipper</span><span class="p">)</span>
+
+<span class="n">q3_hist</span><span class="o">.</span><span class="n">plot1d</span><span class="p">(</span><span class="n">flow</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span>
+<span class="n">q31_hist</span><span class="o">.</span><span class="n">plot1d</span><span class="p">(</span><span class="n">flow</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'access_log_coffea:'</span><span class="p">,</span> <span class="n">access_log_coffea</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'access_log_zipper:'</span><span class="p">,</span> <span class="n">access_log_zipper</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/benchmarks_compare_histograms_made_with_coffea_and_zipper_16_0.png" src="../_images/benchmarks_compare_histograms_made_with_coffea_and_zipper_16_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+access_log_coffea: [&#39;nJet&#39;, &#39;Jet_eta&#39;, &#39;Jet_pt&#39;]
+access_log_zipper: [Accessed(branch=&#39;nJet&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;nJet&#39;)-data&#34;), Accessed(branch=&#39;Jet_eta&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Jet_eta&#39;, None)-data&#34;), Accessed(branch=&#39;Jet_pt&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Jet_pt&#39;, None)-data&#34;)]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot_two_hists</span><span class="p">(</span><span class="n">make_events</span><span class="p">):</span>
+    <span class="n">events</span><span class="p">,</span> <span class="n">access_log</span> <span class="o">=</span> <span class="n">make_events</span><span class="p">(</span><span class="n">root_file</span><span class="p">)</span>
+
+    <span class="n">has2jets</span> <span class="o">=</span> <span class="n">ak</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">events</span><span class="o">.</span><span class="n">Jet</span><span class="o">.</span><span class="n">pt</span> <span class="o">&gt;</span> <span class="mi">40</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span>
+    <span class="n">q4_hist</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">hist</span><span class="o">.</span><span class="n">Hist</span><span class="o">.</span><span class="n">new</span><span class="o">.</span><span class="n">Reg</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"met"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"$E_</span><span class="si">{T}</span><span class="s2">^</span><span class="si">{miss}</span><span class="s2">$ [GeV]"</span><span class="p">)</span><span class="o">.</span><span class="n">Double</span><span class="p">()</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">events</span><span class="p">[</span><span class="n">has2jets</span><span class="p">]</span><span class="o">.</span><span class="n">MET</span><span class="o">.</span><span class="n">pt</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">access_log</span><span class="p">,</span> <span class="n">q4_hist</span>
+
+<span class="n">access_log_coffea</span><span class="p">,</span> <span class="n">q4_hist</span> <span class="o">=</span> <span class="n">plot_two_hists</span><span class="p">(</span><span class="n">make_events_coffea</span><span class="p">)</span>
+<span class="n">access_log_zipper</span><span class="p">,</span> <span class="n">q41_hist</span> <span class="o">=</span> <span class="n">plot_two_hists</span><span class="p">(</span><span class="n">make_events_zipper</span><span class="p">)</span>
+
+<span class="n">q4_hist</span><span class="o">.</span><span class="n">plot1d</span><span class="p">(</span><span class="n">flow</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span>
+<span class="n">q41_hist</span><span class="o">.</span><span class="n">plot1d</span><span class="p">(</span><span class="n">flow</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'access_log_coffea:'</span><span class="p">,</span> <span class="n">access_log_coffea</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'access_log_zipper:'</span><span class="p">,</span> <span class="n">access_log_zipper</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/benchmarks_compare_histograms_made_with_coffea_and_zipper_17_0.png" src="../_images/benchmarks_compare_histograms_made_with_coffea_and_zipper_17_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+access_log_coffea: [&#39;nJet&#39;, &#39;Jet_pt&#39;, &#39;MET_pt&#39;]
+access_log_zipper: [Accessed(branch=&#39;nJet&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;nJet&#39;)-data&#34;), Accessed(branch=&#39;Jet_pt&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Jet_pt&#39;, None)-data&#34;), Accessed(branch=&#39;MET_pt&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;MET_pt&#39;)-data&#34;)]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot_two_hists</span><span class="p">(</span><span class="n">make_events</span><span class="p">):</span>
+    <span class="n">events</span><span class="p">,</span> <span class="n">access_log</span> <span class="o">=</span> <span class="n">make_events</span><span class="p">(</span><span class="n">root_file</span><span class="p">)</span>
+
+    <span class="n">mupair</span> <span class="o">=</span> <span class="n">ak</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">events</span><span class="o">.</span><span class="n">Muon</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"mu1"</span><span class="p">,</span> <span class="s2">"mu2"</span><span class="p">])</span>
+    <span class="n">pairmass</span> <span class="o">=</span> <span class="p">(</span><span class="n">mupair</span><span class="o">.</span><span class="n">mu1</span> <span class="o">+</span> <span class="n">mupair</span><span class="o">.</span><span class="n">mu2</span><span class="p">)</span><span class="o">.</span><span class="n">mass</span>
+    <span class="n">goodevent</span> <span class="o">=</span> <span class="n">ak</span><span class="o">.</span><span class="n">any</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">pairmass</span> <span class="o">&gt;</span> <span class="mi">60</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">pairmass</span> <span class="o">&lt;</span> <span class="mi">120</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">mupair</span><span class="o">.</span><span class="n">mu1</span><span class="o">.</span><span class="n">charge</span> <span class="o">==</span> <span class="o">-</span><span class="n">mupair</span><span class="o">.</span><span class="n">mu2</span><span class="o">.</span><span class="n">charge</span><span class="p">),</span>
+        <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">q5_hist</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">hist</span><span class="o">.</span><span class="n">Hist</span><span class="o">.</span><span class="n">new</span><span class="o">.</span><span class="n">Reg</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"met"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"$E_</span><span class="si">{T}</span><span class="s2">^</span><span class="si">{miss}</span><span class="s2">$ [GeV]"</span><span class="p">)</span><span class="o">.</span><span class="n">Double</span><span class="p">()</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">events</span><span class="p">[</span><span class="n">goodevent</span><span class="p">]</span><span class="o">.</span><span class="n">MET</span><span class="o">.</span><span class="n">pt</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">access_log</span><span class="p">,</span> <span class="n">q5_hist</span>
+
+<span class="n">access_log_coffea</span><span class="p">,</span> <span class="n">q5_hist</span> <span class="o">=</span> <span class="n">plot_two_hists</span><span class="p">(</span><span class="n">make_events_coffea</span><span class="p">)</span>
+<span class="n">access_log_zipper</span><span class="p">,</span> <span class="n">q51_hist</span> <span class="o">=</span> <span class="n">plot_two_hists</span><span class="p">(</span><span class="n">make_events_zipper</span><span class="p">)</span>
+
+<span class="n">q5_hist</span><span class="o">.</span><span class="n">plot1d</span><span class="p">(</span><span class="n">flow</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span>
+<span class="n">q51_hist</span><span class="o">.</span><span class="n">plot1d</span><span class="p">(</span><span class="n">flow</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'access_log_coffea:'</span><span class="p">,</span> <span class="n">access_log_coffea</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'access_log_zipper:'</span><span class="p">,</span> <span class="n">access_log_zipper</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/usr/local/lib/python3.11/dist-packages/mplhep/utils.py:652: RuntimeWarning: All sumw are zero!  Cannot compute meaningful error bars
+  return np.abs(method_fcn(self.values(), variances) - self.values())
+/usr/local/lib/python3.11/dist-packages/mplhep/utils.py:652: RuntimeWarning: All sumw are zero!  Cannot compute meaningful error bars
+  return np.abs(method_fcn(self.values(), variances) - self.values())
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/benchmarks_compare_histograms_made_with_coffea_and_zipper_18_1.png" src="../_images/benchmarks_compare_histograms_made_with_coffea_and_zipper_18_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+access_log_coffea: [&#39;nMuon&#39;, &#39;Muon_pt&#39;, &#39;Muon_phi&#39;, &#39;Muon_eta&#39;, &#39;Muon_mass&#39;, &#39;Muon_charge&#39;, &#39;MET_pt&#39;]
+access_log_zipper: [Accessed(branch=&#39;nMuon&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;nMuon&#39;)-data&#34;), Accessed(branch=&#39;Muon_pt&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Muon_pt&#39;, None)-data&#34;), Accessed(branch=&#39;Muon_phi&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Muon_phi&#39;, None)-data&#34;), Accessed(branch=&#39;Muon_eta&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Muon_eta&#39;, None)-data&#34;), Accessed(branch=&#39;Muon_mass&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Muon_mass&#39;, None)-data&#34;), Accessed(branch=&#39;Muon_charge&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Muon_charge&#39;, None)-data&#34;), Accessed(branch=&#39;MET_pt&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;MET_pt&#39;)-data&#34;)]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot_two_hists</span><span class="p">(</span><span class="n">make_events</span><span class="p">):</span>
+    <span class="n">events</span><span class="p">,</span> <span class="n">access_log</span> <span class="o">=</span> <span class="n">make_events</span><span class="p">(</span><span class="n">root_file</span><span class="p">)</span>
+
+    <span class="n">jets</span> <span class="o">=</span> <span class="n">ak</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span>
+        <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">events</span><span class="o">.</span><span class="n">Jet</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"x"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">,</span> <span class="s2">"t"</span><span class="p">,</span> <span class="s2">"btagDeepFlavB"</span><span class="p">]},</span>
+        <span class="n">with_name</span><span class="o">=</span><span class="s2">"LorentzVector"</span><span class="p">,</span>
+        <span class="n">behavior</span><span class="o">=</span><span class="n">events</span><span class="o">.</span><span class="n">Jet</span><span class="o">.</span><span class="n">behavior</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">jets</span><span class="p">[</span><span class="s2">"btag"</span><span class="p">]</span> <span class="o">=</span> <span class="n">jets</span><span class="o">.</span><span class="n">btagDeepFlavB</span>
+    <span class="n">trijet</span> <span class="o">=</span> <span class="n">ak</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">jets</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"j1"</span><span class="p">,</span> <span class="s2">"j2"</span><span class="p">,</span> <span class="s2">"j3"</span><span class="p">])</span>
+    <span class="n">trijet</span><span class="p">[</span><span class="s2">"p4"</span><span class="p">]</span> <span class="o">=</span> <span class="n">trijet</span><span class="o">.</span><span class="n">j1</span> <span class="o">+</span> <span class="n">trijet</span><span class="o">.</span><span class="n">j2</span> <span class="o">+</span> <span class="n">trijet</span><span class="o">.</span><span class="n">j3</span>
+    <span class="n">trijet</span> <span class="o">=</span> <span class="n">ak</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">trijet</span><span class="p">[</span><span class="n">ak</span><span class="o">.</span><span class="n">singletons</span><span class="p">(</span><span class="n">ak</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">trijet</span><span class="o">.</span><span class="n">p4</span><span class="o">.</span><span class="n">mass</span> <span class="o">-</span> <span class="mf">172.5</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))])</span>
+    <span class="n">maxBtag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span>
+        <span class="n">trijet</span><span class="o">.</span><span class="n">j1</span><span class="o">.</span><span class="n">btag</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span>
+            <span class="n">trijet</span><span class="o">.</span><span class="n">j2</span><span class="o">.</span><span class="n">btag</span><span class="p">,</span>
+            <span class="n">trijet</span><span class="o">.</span><span class="n">j3</span><span class="o">.</span><span class="n">btag</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">q6_hists</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"trijetpt"</span><span class="p">:</span> <span class="n">hist</span><span class="o">.</span><span class="n">Hist</span><span class="o">.</span><span class="n">new</span><span class="o">.</span><span class="n">Reg</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"pt3j"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Trijet $p_</span><span class="si">{T}</span><span class="s2">$ [GeV]"</span><span class="p">)</span><span class="o">.</span><span class="n">Double</span><span class="p">()</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">trijet</span><span class="o">.</span><span class="n">p4</span><span class="o">.</span><span class="n">pt</span><span class="p">),</span>
+        <span class="s2">"maxbtag"</span><span class="p">:</span> <span class="n">hist</span><span class="o">.</span><span class="n">Hist</span><span class="o">.</span><span class="n">new</span><span class="o">.</span><span class="n">Reg</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"btag"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"Max jet b-tag score"</span><span class="p">)</span><span class="o">.</span><span class="n">Double</span><span class="p">()</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">maxBtag</span><span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">access_log</span><span class="p">,</span> <span class="n">q6_hists</span>
+
+<span class="n">access_log_coffea</span><span class="p">,</span> <span class="n">q6_hists</span> <span class="o">=</span> <span class="n">plot_two_hists</span><span class="p">(</span><span class="n">make_events_coffea</span><span class="p">)</span>
+<span class="n">access_log_zipper</span><span class="p">,</span> <span class="n">q61_hists</span> <span class="o">=</span> <span class="n">plot_two_hists</span><span class="p">(</span><span class="n">make_events_zipper</span><span class="p">)</span>
+
+<span class="c1">#coffea</span>
+<span class="n">out1</span> <span class="o">=</span> <span class="n">q6_hists</span>
+<span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">out1</span><span class="p">[</span><span class="s2">"trijetpt"</span><span class="p">]</span><span class="o">.</span><span class="n">plot1d</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">,</span> <span class="n">flow</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span>
+<span class="n">out1</span><span class="p">[</span><span class="s2">"maxbtag"</span><span class="p">]</span><span class="o">.</span><span class="n">plot1d</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">,</span> <span class="n">flow</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span>
+
+<span class="c1">#zipper</span>
+<span class="n">out2</span> <span class="o">=</span> <span class="n">q61_hists</span>
+<span class="n">out2</span><span class="p">[</span><span class="s2">"trijetpt"</span><span class="p">]</span><span class="o">.</span><span class="n">plot1d</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">,</span> <span class="n">flow</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span>
+<span class="n">out2</span><span class="p">[</span><span class="s2">"maxbtag"</span><span class="p">]</span><span class="o">.</span><span class="n">plot1d</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">,</span> <span class="n">flow</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'access_log_coffea:'</span><span class="p">,</span> <span class="n">access_log_coffea</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'access_log_zipper:'</span><span class="p">,</span> <span class="n">access_log_zipper</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/benchmarks_compare_histograms_made_with_coffea_and_zipper_19_0.png" src="../_images/benchmarks_compare_histograms_made_with_coffea_and_zipper_19_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+access_log_coffea: [&#39;nJet&#39;, &#39;Jet_phi&#39;, &#39;Jet_pt&#39;, &#39;Jet_eta&#39;, &#39;Jet_mass&#39;, &#39;Jet_btagDeepFlavB&#39;]
+access_log_zipper: [Accessed(branch=&#39;nJet&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;nJet&#39;)-data&#34;), Accessed(branch=&#39;Jet_phi&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Jet_phi&#39;, None)-data&#34;), Accessed(branch=&#39;Jet_pt&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Jet_pt&#39;, None)-data&#34;), Accessed(branch=&#39;Jet_eta&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Jet_eta&#39;, None)-data&#34;), Accessed(branch=&#39;Jet_mass&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Jet_mass&#39;, None)-data&#34;), Accessed(branch=&#39;Jet_btagDeepFlavB&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Jet_btagDeepFlavB&#39;, None)-data&#34;)]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot_two_hists</span><span class="p">(</span><span class="n">make_events</span><span class="p">):</span>
+    <span class="n">events</span><span class="p">,</span> <span class="n">access_log</span> <span class="o">=</span> <span class="n">make_events</span><span class="p">(</span><span class="n">root_file</span><span class="p">)</span>
+
+    <span class="n">cleanjets</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">Jet</span><span class="p">[</span>
+        <span class="n">ak</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">events</span><span class="o">.</span><span class="n">Jet</span><span class="o">.</span><span class="n">metric_table</span><span class="p">(</span><span class="n">events</span><span class="o">.</span><span class="n">Muon</span><span class="p">[</span><span class="n">events</span><span class="o">.</span><span class="n">Muon</span><span class="o">.</span><span class="n">pt</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="mf">0.4</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="o">&amp;</span> <span class="n">ak</span><span class="o">.</span><span class="n">all</span><span class="p">(</span>
+            <span class="n">events</span><span class="o">.</span><span class="n">Jet</span><span class="o">.</span><span class="n">metric_table</span><span class="p">(</span><span class="n">events</span><span class="o">.</span><span class="n">Electron</span><span class="p">[</span><span class="n">events</span><span class="o">.</span><span class="n">Electron</span><span class="o">.</span><span class="n">pt</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="mf">0.4</span><span class="p">,</span>
+            <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="o">&amp;</span> <span class="p">(</span><span class="n">events</span><span class="o">.</span><span class="n">Jet</span><span class="o">.</span><span class="n">pt</span> <span class="o">&gt;</span> <span class="mi">30</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="n">q7_hist</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">hist</span><span class="o">.</span><span class="n">Hist</span><span class="o">.</span><span class="n">new</span><span class="o">.</span><span class="n">Reg</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"sumjetpt"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s2">"Jet $\sum p_</span><span class="si">{T}</span><span class="s2">$ [GeV]"</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">Double</span><span class="p">()</span>
+        <span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">ak</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">cleanjets</span><span class="o">.</span><span class="n">pt</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">access_log</span><span class="p">,</span> <span class="n">q7_hist</span>
+
+<span class="n">access_log_coffea</span><span class="p">,</span> <span class="n">q7_hist</span> <span class="o">=</span> <span class="n">plot_two_hists</span><span class="p">(</span><span class="n">make_events_coffea</span><span class="p">)</span>
+<span class="n">access_log_zipper</span><span class="p">,</span> <span class="n">q71_hist</span> <span class="o">=</span> <span class="n">plot_two_hists</span><span class="p">(</span><span class="n">make_events_zipper</span><span class="p">)</span>
+
+<span class="n">q7_hist</span><span class="o">.</span><span class="n">plot1d</span><span class="p">(</span><span class="n">flow</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span>
+<span class="n">q71_hist</span><span class="o">.</span><span class="n">plot1d</span><span class="p">(</span><span class="n">flow</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'access_log_coffea:'</span><span class="p">,</span> <span class="n">access_log_coffea</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'access_log_zipper:'</span><span class="p">,</span> <span class="n">access_log_zipper</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/benchmarks_compare_histograms_made_with_coffea_and_zipper_20_0.png" src="../_images/benchmarks_compare_histograms_made_with_coffea_and_zipper_20_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+access_log_coffea: [&#39;nMuon&#39;, &#39;Muon_pt&#39;, &#39;nJet&#39;, &#39;Jet_pt&#39;, &#39;Jet_phi&#39;, &#39;Jet_eta&#39;, &#39;Muon_phi&#39;, &#39;Muon_eta&#39;, &#39;nElectron&#39;, &#39;Electron_pt&#39;, &#39;Electron_phi&#39;, &#39;Electron_eta&#39;]
+access_log_zipper: [Accessed(branch=&#39;nMuon&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;nMuon&#39;)-data&#34;), Accessed(branch=&#39;Muon_pt&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Muon_pt&#39;, None)-data&#34;), Accessed(branch=&#39;nJet&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;nJet&#39;)-data&#34;), Accessed(branch=&#39;Jet_pt&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Jet_pt&#39;, None)-data&#34;), Accessed(branch=&#39;Jet_phi&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Jet_phi&#39;, None)-data&#34;), Accessed(branch=&#39;Jet_eta&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Jet_eta&#39;, None)-data&#34;), Accessed(branch=&#39;Muon_phi&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Muon_phi&#39;, None)-data&#34;), Accessed(branch=&#39;Muon_eta&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Muon_eta&#39;, None)-data&#34;), Accessed(branch=&#39;nElectron&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;nElectron&#39;)-data&#34;), Accessed(branch=&#39;Electron_pt&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Electron_pt&#39;, None)-data&#34;), Accessed(branch=&#39;Electron_phi&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Electron_phi&#39;, None)-data&#34;), Accessed(branch=&#39;Electron_eta&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Electron_eta&#39;, None)-data&#34;)]
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">plot_two_hists</span><span class="p">(</span><span class="n">make_events</span><span class="p">):</span>
+    <span class="n">events</span><span class="p">,</span> <span class="n">access_log</span> <span class="o">=</span> <span class="n">make_events</span><span class="p">(</span><span class="n">root_file</span><span class="p">)</span>
+
+    <span class="n">events</span><span class="p">[</span><span class="s2">"Electron"</span><span class="p">,</span> <span class="s2">"pdgId"</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">11</span> <span class="o">*</span> <span class="n">events</span><span class="o">.</span><span class="n">Electron</span><span class="o">.</span><span class="n">charge</span>
+    <span class="n">events</span><span class="p">[</span><span class="s2">"Muon"</span><span class="p">,</span> <span class="s2">"pdgId"</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">13</span> <span class="o">*</span> <span class="n">events</span><span class="o">.</span><span class="n">Muon</span><span class="o">.</span><span class="n">charge</span>
+    <span class="n">events</span><span class="p">[</span><span class="s2">"leptons"</span><span class="p">]</span> <span class="o">=</span> <span class="n">ak</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span>
+        <span class="n">ak</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">events</span><span class="o">.</span><span class="n">Electron</span><span class="p">,</span> <span class="n">events</span><span class="o">.</span><span class="n">Muon</span><span class="p">],</span>
+            <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="s2">"PtEtaPhiMCandidate"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">events</span> <span class="o">=</span> <span class="n">events</span><span class="p">[</span><span class="n">ak</span><span class="o">.</span><span class="n">num</span><span class="p">(</span><span class="n">events</span><span class="o">.</span><span class="n">leptons</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">]</span>
+    <span class="n">pair</span> <span class="o">=</span> <span class="n">ak</span><span class="o">.</span><span class="n">argcombinations</span><span class="p">(</span><span class="n">events</span><span class="o">.</span><span class="n">leptons</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">"l1"</span><span class="p">,</span> <span class="s2">"l2"</span><span class="p">])</span>
+    <span class="n">pair</span> <span class="o">=</span> <span class="n">pair</span><span class="p">[(</span><span class="n">events</span><span class="o">.</span><span class="n">leptons</span><span class="p">[</span><span class="n">pair</span><span class="o">.</span><span class="n">l1</span><span class="p">]</span><span class="o">.</span><span class="n">pdgId</span> <span class="o">==</span> <span class="o">-</span><span class="n">events</span><span class="o">.</span><span class="n">leptons</span><span class="p">[</span><span class="n">pair</span><span class="o">.</span><span class="n">l2</span><span class="p">]</span><span class="o">.</span><span class="n">pdgId</span><span class="p">)]</span>
+
+    <span class="n">pair</span> <span class="o">=</span> <span class="n">pair</span><span class="p">[</span>
+        <span class="n">ak</span><span class="o">.</span><span class="n">singletons</span><span class="p">(</span>
+            <span class="n">ak</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span>
+                <span class="nb">abs</span><span class="p">((</span><span class="n">events</span><span class="o">.</span><span class="n">leptons</span><span class="p">[</span><span class="n">pair</span><span class="o">.</span><span class="n">l1</span><span class="p">]</span> <span class="o">+</span> <span class="n">events</span><span class="o">.</span><span class="n">leptons</span><span class="p">[</span><span class="n">pair</span><span class="o">.</span><span class="n">l2</span><span class="p">])</span><span class="o">.</span><span class="n">mass</span> <span class="o">-</span> <span class="mf">91.2</span><span class="p">),</span>
+                <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="n">events</span> <span class="o">=</span> <span class="n">events</span><span class="p">[</span><span class="n">ak</span><span class="o">.</span><span class="n">num</span><span class="p">(</span><span class="n">pair</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">pair</span> <span class="o">=</span> <span class="n">pair</span><span class="p">[</span><span class="n">ak</span><span class="o">.</span><span class="n">num</span><span class="p">(</span><span class="n">pair</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">l3</span> <span class="o">=</span> <span class="n">ak</span><span class="o">.</span><span class="n">local_index</span><span class="p">(</span><span class="n">events</span><span class="o">.</span><span class="n">leptons</span><span class="p">)</span>
+    <span class="n">l3</span> <span class="o">=</span> <span class="n">l3</span><span class="p">[(</span><span class="n">l3</span> <span class="o">!=</span> <span class="n">pair</span><span class="o">.</span><span class="n">l1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">l3</span> <span class="o">!=</span> <span class="n">pair</span><span class="o">.</span><span class="n">l2</span><span class="p">)]</span>
+    <span class="n">l3</span> <span class="o">=</span> <span class="n">l3</span><span class="p">[</span><span class="n">ak</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">events</span><span class="o">.</span><span class="n">leptons</span><span class="p">[</span><span class="n">l3</span><span class="p">]</span><span class="o">.</span><span class="n">pt</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
+    <span class="n">l3</span> <span class="o">=</span> <span class="n">events</span><span class="o">.</span><span class="n">leptons</span><span class="p">[</span><span class="n">l3</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">mt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">l3</span><span class="o">.</span><span class="n">pt</span> <span class="o">*</span> <span class="n">events</span><span class="o">.</span><span class="n">MET</span><span class="o">.</span><span class="n">pt</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">events</span><span class="o">.</span><span class="n">MET</span><span class="o">.</span><span class="n">delta_phi</span><span class="p">(</span><span class="n">l3</span><span class="p">))))</span>
+    <span class="n">q8_hist</span> <span class="o">=</span> <span class="n">hist</span><span class="o">.</span><span class="n">Hist</span><span class="o">.</span><span class="n">new</span><span class="o">.</span><span class="n">Reg</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"mt"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">r</span><span class="s2">"$\ell$-MET transverse mass [GeV]"</span><span class="p">)</span><span class="o">.</span><span class="n">Double</span><span class="p">()</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">mt</span><span class="p">)</span>
+
+
+    <span class="k">return</span> <span class="n">access_log</span><span class="p">,</span> <span class="n">q8_hist</span>
+
+<span class="n">access_log_coffea</span><span class="p">,</span> <span class="n">q8_hist</span> <span class="o">=</span> <span class="n">plot_two_hists</span><span class="p">(</span><span class="n">make_events_coffea</span><span class="p">)</span>
+<span class="n">access_log_zipper</span><span class="p">,</span> <span class="n">q81_hist</span> <span class="o">=</span> <span class="n">plot_two_hists</span><span class="p">(</span><span class="n">make_events_zipper</span><span class="p">)</span>
+
+<span class="n">q8_hist</span><span class="o">.</span><span class="n">plot1d</span><span class="p">(</span><span class="n">flow</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span>
+<span class="n">q81_hist</span><span class="o">.</span><span class="n">plot1d</span><span class="p">(</span><span class="n">flow</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'access_log_coffea:'</span><span class="p">,</span> <span class="n">access_log_coffea</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'access_log_zipper:'</span><span class="p">,</span> <span class="n">access_log_zipper</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/benchmarks_compare_histograms_made_with_coffea_and_zipper_21_0.png" src="../_images/benchmarks_compare_histograms_made_with_coffea_and_zipper_21_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+access_log_coffea: [&#39;nElectron&#39;, &#39;Electron_charge&#39;, &#39;nMuon&#39;, &#39;Muon_charge&#39;, &#39;Electron_pt&#39;, &#39;Electron_phi&#39;, &#39;Electron_eta&#39;, &#39;Electron_mass&#39;, &#39;Muon_pt&#39;, &#39;Muon_phi&#39;, &#39;Muon_eta&#39;, &#39;Muon_mass&#39;, &#39;MET_pt&#39;, &#39;MET_phi&#39;]
+access_log_zipper: [Accessed(branch=&#39;nElectron&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;nElectron&#39;)-data&#34;), Accessed(branch=&#39;Electron_charge&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Electron_charge&#39;, None)-data&#34;), Accessed(branch=&#39;nMuon&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;nMuon&#39;)-data&#34;), Accessed(branch=&#39;Muon_charge&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Muon_charge&#39;, None)-data&#34;), Accessed(branch=&#39;Electron_pt&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Electron_pt&#39;, None)-data&#34;), Accessed(branch=&#39;Electron_phi&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Electron_phi&#39;, None)-data&#34;), Accessed(branch=&#39;Electron_eta&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Electron_eta&#39;, None)-data&#34;), Accessed(branch=&#39;Electron_mass&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Electron_mass&#39;, None)-data&#34;), Accessed(branch=&#39;Muon_pt&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Muon_pt&#39;, None)-data&#34;), Accessed(branch=&#39;Muon_phi&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Muon_phi&#39;, None)-data&#34;), Accessed(branch=&#39;Muon_eta&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Muon_eta&#39;, None)-data&#34;), Accessed(branch=&#39;Muon_mass&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;Muon_mass&#39;, None)-data&#34;), Accessed(branch=&#39;MET_pt&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;MET_pt&#39;)-data&#34;), Accessed(branch=&#39;MET_phi&#39;, buffer_key=&#34;(&#39;&lt;root&gt;&#39;, &#39;MET_phi&#39;)-data&#34;)]
+</pre></div></div>
+</div>
+<p>The last part (from Iason’s notebook) is skipped since there’s no BaseSchema in zipper.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../benchmarks.html" class="btn btn-neutral float-left" title="Benchmarks" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="simple_test_of_coffea_and_zipper_speeds.html" class="btn btn-neutral float-right" title="Install libraries" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Peter Fackeldey, Maxym Naumchyk.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

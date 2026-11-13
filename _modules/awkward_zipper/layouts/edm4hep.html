@@ -1,0 +1,984 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>awkward_zipper.layouts.edm4hep &mdash; awkward-zipper 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/logo_unfilled_with_text.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            awkward-zipper
+              <img src="../../../_static/logo_unfilled_with_black_text.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">awkward-zipper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">awkward_zipper.layouts.edm4hep</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for awkward_zipper.layouts.edm4hep</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cache</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">awkward</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.assets</span><span class="w"> </span><span class="kn">import</span> <span class="n">edm4hep_ver</span><span class="p">,</span> <span class="n">versions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.awkward_util</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_non_materializing_get_field</span><span class="p">,</span>
+    <span class="n">_rewrap</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">begin_end_mapping</span><span class="p">,</span>
+    <span class="n">local2global</span><span class="p">,</span>
+    <span class="n">nested_local2global</span><span class="p">,</span>
+    <span class="n">regular_to_jagged</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.layouts.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseLayoutBuilder</span>
+
+<span class="n">_link_collection</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">"podio::LinkCollection&lt;(.+),(.+)&gt;"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="parse_members_and_relations">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.parse_members_and_relations">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_members_and_relations</span><span class="p">(</span><span class="n">members_and_relation_list</span><span class="p">,</span> <span class="n">target_text</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Convert the raw yaml Members/Relations lists into a workable mapping."""</span>
+    <span class="n">parsed</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">members_and_relation_list</span><span class="p">:</span>
+        <span class="n">separated</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"//"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">declaration</span> <span class="o">=</span> <span class="n">separated</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">doc_str</span> <span class="o">=</span> <span class="n">separated</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">separated</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">""</span>
+
+        <span class="n">type_str</span> <span class="o">=</span> <span class="n">declaration</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">name_str</span> <span class="o">=</span> <span class="n">declaration</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s2">"::"</span> <span class="ow">in</span> <span class="n">declaration</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">"&lt;"</span> <span class="ow">in</span> <span class="n">declaration</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">"&gt;"</span> <span class="ow">in</span> <span class="n">declaration</span><span class="p">):</span>
+            <span class="n">type_str</span> <span class="o">=</span> <span class="n">declaration</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">"&gt;"</span>
+            <span class="n">name_str</span> <span class="o">=</span> <span class="n">declaration</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"&gt;"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">parsed</span><span class="p">[</span><span class="n">name_str</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="n">type_str</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="s2">"doc"</span><span class="p">:</span> <span class="n">doc_str</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">target_text</span><span class="p">:</span>
+            <span class="n">parsed</span><span class="p">[</span><span class="n">name_str</span><span class="o">.</span><span class="n">strip</span><span class="p">()][</span><span class="s2">"target"</span><span class="p">]</span> <span class="o">=</span> <span class="n">type_str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"::"</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">parsed</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_synthesize_link_datatypes</span><span class="p">(</span><span class="n">loaded_dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""edm4hep &gt;= 00-99-02 defines links in a ``links`` section; rebuild them in the</span>
+<span class="sd">    datatype shape (float weight + from/to relations) the rest of the parser expects."""</span>
+    <span class="n">synthesized</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">link_name</span><span class="p">,</span> <span class="n">link_def</span> <span class="ow">in</span> <span class="n">loaded_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"links"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">from_type</span> <span class="o">=</span> <span class="n">link_def</span><span class="p">[</span><span class="s2">"From"</span><span class="p">]</span>
+        <span class="n">to_type</span> <span class="o">=</span> <span class="n">link_def</span><span class="p">[</span><span class="s2">"To"</span><span class="p">]</span>
+        <span class="n">synthesized</span><span class="p">[</span><span class="n">link_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"Description"</span><span class="p">:</span> <span class="n">link_def</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"Description"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+            <span class="s2">"Members"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"float weight  // weight of this link"</span><span class="p">],</span>
+            <span class="s2">"OneToOneRelations"</span><span class="p">:</span> <span class="p">[</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">from_type</span><span class="si">}</span><span class="s2">  from  // reference to the source object of this link"</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">to_type</span><span class="si">}</span><span class="s2">  to  // reference to the target object of this link"</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">}</span>
+    <span class="k">return</span> <span class="n">synthesized</span>
+
+
+<div class="viewcode-block" id="podio_collection_types">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.podio_collection_types">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">podio_collection_types</span><span class="p">(</span><span class="n">tree</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Map collection name to podio dataType from the file's ``podio_metadata`` tree.</span>
+
+<span class="sd">    Returns None when the file has no metadata or predates the named leaf layout</span>
+<span class="sd">    (podio &lt; 1.3 writes positional ``_0.._3`` leaves).</span>
+<span class="sd">    """</span>
+    <span class="n">directory</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">root_directory</span>
+    <span class="k">if</span> <span class="s2">"podio_metadata"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">directory</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">directory</span><span class="p">[</span><span class="s2">"podio_metadata"</span><span class="p">]</span>
+    <span class="n">branch</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">tree</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">___CollectionTypeInfo"</span>
+    <span class="k">if</span> <span class="n">branch</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">metadata</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">branch</span><span class="si">}</span><span class="s2">.name"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">[</span><span class="n">branch</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">names</span><span class="p">,</span> <span class="n">datatypes</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">branch</span><span class="si">}</span><span class="s2">.name"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">branch</span><span class="si">}</span><span class="s2">.dataType"</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="n">branch</span><span class="p">]</span><span class="o">.</span><span class="n">arrays</span><span class="p">([</span><span class="n">names</span><span class="p">,</span> <span class="n">datatypes</span><span class="p">],</span> <span class="n">library</span><span class="o">=</span><span class="s2">"ak"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="n">names</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">info</span><span class="p">[</span><span class="n">datatypes</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_relation_branches</span><span class="p">(</span><span class="n">forms</span><span class="p">,</span> <span class="n">collection</span><span class="p">,</span> <span class="n">member</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Pop the leaves of the ``_{collection}_{member}`` relation or vector-member</span>
+<span class="sd">    branch, keyed ``member.leaf``. The top-level name is matched exactly because</span>
+<span class="sd">    collection names may themselves contain underscores (``SiTracks_Refitted``)."""</span>
+    <span class="n">top</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"_</span><span class="si">{</span><span class="n">collection</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">member</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="mi">1</span><span class="p">][</span><span class="nb">len</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span> <span class="p">:]:</span> <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">forms</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">"/"</span> <span class="ow">in</span> <span class="n">name</span> <span class="ow">and</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">top</span>
+    <span class="p">}</span>
+
+
+<div class="viewcode-block" id="parse_yaml">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.parse_yaml">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_yaml</span><span class="p">(</span><span class="n">loaded_dict</span><span class="p">,</span> <span class="n">parsed_dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Post-process the loaded edm4hep yaml into the structure the builder needs."""</span>
+    <span class="n">links</span> <span class="o">=</span> <span class="n">_synthesize_link_datatypes</span><span class="p">(</span><span class="n">loaded_dict</span><span class="p">)</span>
+    <span class="n">loaded_dict</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">loaded_dict</span><span class="p">,</span> <span class="s2">"datatypes"</span><span class="p">:</span> <span class="p">{</span><span class="o">**</span><span class="n">loaded_dict</span><span class="p">[</span><span class="s2">"datatypes"</span><span class="p">],</span> <span class="o">**</span><span class="n">links</span><span class="p">}}</span>
+    <span class="n">parsed_dict</span><span class="p">[</span><span class="s2">"datatypes"</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">links</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">loaded_dict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">loaded_dict</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="k">for</span> <span class="n">subkey</span> <span class="ow">in</span> <span class="n">loaded_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">loaded_dict</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">subkey</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">subsubkey</span> <span class="ow">in</span> <span class="n">loaded_dict</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">subkey</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">subsubkey</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"Members"</span><span class="p">,</span> <span class="s2">"VectorMembers"</span><span class="p">]:</span>
+                    <span class="n">parsed_dict</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">subkey</span><span class="p">][</span><span class="n">subsubkey</span><span class="p">]</span> <span class="o">=</span> <span class="n">parse_members_and_relations</span><span class="p">(</span>
+                        <span class="n">loaded_dict</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">subkey</span><span class="p">][</span><span class="n">subsubkey</span><span class="p">]</span>
+                    <span class="p">)</span>
+                <span class="k">elif</span> <span class="n">subsubkey</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"OneToOneRelations"</span><span class="p">,</span> <span class="s2">"OneToManyRelations"</span><span class="p">]:</span>
+                    <span class="n">parsed_dict</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">subkey</span><span class="p">][</span><span class="n">subsubkey</span><span class="p">]</span> <span class="o">=</span> <span class="n">parse_members_and_relations</span><span class="p">(</span>
+                        <span class="n">loaded_dict</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">subkey</span><span class="p">][</span><span class="n">subsubkey</span><span class="p">],</span> <span class="n">target_text</span><span class="o">=</span><span class="kc">True</span>
+                    <span class="p">)</span>
+    <span class="c1"># podio::ObjectID, kept under the edm4hep namespace for parsing compatibility</span>
+    <span class="n">parsed_dict</span><span class="p">[</span><span class="s2">"datatypes"</span><span class="p">][</span><span class="s2">"edm4hep::ObjectID"</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"Description"</span><span class="p">:</span> <span class="s2">"podio ObjectID"</span><span class="p">,</span>
+        <span class="s2">"Members"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">"index"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"int64"</span><span class="p">,</span> <span class="s2">"doc"</span><span class="p">:</span> <span class="s2">"indices to the target collection"</span><span class="p">},</span>
+            <span class="s2">"collectionID"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"int64"</span><span class="p">,</span> <span class="s2">"doc"</span><span class="p">:</span> <span class="s2">"collection ID"</span><span class="p">},</span>
+        <span class="p">},</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">parsed_dict</span></div>
+
+
+
+<div class="viewcode-block" id="sort_dict">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.sort_dict">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">sort_dict</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">d</span><span class="p">)}</span></div>
+
+
+
+<div class="viewcode-block" id="load_edm4hep">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.load_edm4hep">[docs]</a>
+<span class="nd">@cache</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_edm4hep</span><span class="p">(</span><span class="n">version</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Load and parse the edm4hep yaml for a version, caching the result.</span>
+
+<span class="sd">    The returned ``(raw, parsed)`` dicts are treated as read-only by the builder,</span>
+<span class="sd">    so a single parse is shared across all builds for a given version.</span>
+<span class="sd">    """</span>
+    <span class="n">raw</span> <span class="o">=</span> <span class="n">edm4hep_ver</span><span class="p">[</span><span class="n">version</span><span class="p">]()</span>
+    <span class="k">return</span> <span class="n">raw</span><span class="p">,</span> <span class="n">parse_yaml</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">raw</span><span class="p">))</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_offsets_length</span><span class="p">(</span><span class="n">offsets</span><span class="p">,</span> <span class="n">contents</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Item count implied by ``offsets`` (``offsets[-1]``), lazily.</span>
+
+<span class="sd">    Contents may legitimately differ in length -- coffea copies Link branches onto</span>
+<span class="sd">    target collections whose item counts differ slightly -- so the collection's own</span>
+<span class="sd">    offsets define the record length rather than requiring equal lengths.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">is_all_materialized</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">_nplikes</span><span class="o">.</span><span class="n">shape</span><span class="o">.</span><span class="n">unknown_length</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">offsets</span><span class="o">.</span><span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">offsets</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">Index</span><span class="p">)</span> <span class="k">else</span> <span class="n">offsets</span>
+    <span class="c1"># a copied Link can be shorter than the collection it is attached to; keep the</span>
+    <span class="c1"># record valid by never exceeding the shortest content</span>
+    <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="o">*</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">length</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_zip_shared_offsets</span><span class="p">(</span><span class="n">members</span><span class="p">,</span> <span class="n">record_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">offsets</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Zip layouts that share per-event offsets into one jagged record.</span>
+
+<span class="sd">    ``offsets`` defaults to those of the first member (coffea's ``zip_forms``).</span>
+<span class="sd">    """</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">members</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">layouts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">members</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">offsets</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">offsets</span> <span class="o">=</span> <span class="n">layouts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">offsets</span>
+    <span class="n">contents</span> <span class="o">=</span> <span class="p">[</span><span class="n">layout</span><span class="o">.</span><span class="n">content</span> <span class="k">for</span> <span class="n">layout</span> <span class="ow">in</span> <span class="n">layouts</span><span class="p">]</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">record_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">"__record__"</span><span class="p">]</span> <span class="o">=</span> <span class="n">record_name</span>
+    <span class="k">if</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
+    <span class="n">record</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">(</span>
+        <span class="n">contents</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">_offsets_length</span><span class="p">(</span><span class="n">offsets</span><span class="p">,</span> <span class="n">contents</span><span class="p">),</span> <span class="n">parameters</span><span class="o">=</span><span class="n">params</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span><span class="n">offsets</span><span class="o">=</span><span class="n">offsets</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">record</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="EDM4HEP">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.EDM4HEP">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EDM4HEP</span><span class="p">(</span><span class="n">BaseLayoutBuilder</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP layout builder.</span>
+
+<span class="sd">    Array-based re-implementation of coffea's ``EDM4HEPSchema`` for the newest</span>
+<span class="sd">    bundled ``edm4hep.yaml`` version; use :func:`edm4hep_version` (or</span>
+<span class="sd">    ``EDM4HEP.version(...)``) to pick an older one. The layout is driven by the</span>
+<span class="sd">    vendored EDM4HEP yaml data model, which describes each datatype's Members,</span>
+<span class="sd">    VectorMembers, OneToOneRelations and OneToManyRelations:</span>
+
+<span class="sd">    - component members (``Vector3f``/``Vector4f``/...) such as</span>
+<span class="sd">      ``X.position.{x,y,z}`` are zipped into an ``X.position`` sub-record,</span>
+<span class="sd">    - ``VectorMembers`` and ``OneToManyRelations`` stored as flat per-event arrays</span>
+<span class="sd">      plus per-item ``{member}_begin``/``{member}_end`` ranges are regrouped into</span>
+<span class="sd">      doubly-jagged arrays,</span>
+<span class="sd">    - ``OneToOneRelations`` and Links get a global index (``index_Global``) into</span>
+<span class="sd">      their target collection,</span>
+<span class="sd">    - the remaining ``X.*`` branches are zipped into the ``X`` collection.</span>
+
+<span class="sd">    The collection datatypes come from the TTree's branch typenames, which are not</span>
+<span class="sd">    present in ``tree.arrays()`` output, so pass them explicitly. Generic podio</span>
+<span class="sd">    links (``vector&lt;podio::LinkData&gt;``, podio &gt;= 1.3) are typed from the file's</span>
+<span class="sd">    ``podio_metadata`` tree, which :func:`podio_collection_types` reads::</span>
+
+<span class="sd">        EDM4HEP()(</span>
+<span class="sd">            tree.arrays(...),</span>
+<span class="sd">            typenames=tree.typenames(),</span>
+<span class="sd">            podio_collection_types=podio_collection_types(tree),</span>
+<span class="sd">        )</span>
+
+<span class="sd">    ``extra_mixins`` overrides the link type of a collection. If ``typenames`` is</span>
+<span class="sd">    omitted, the datatypes are inferred by matching each collection's member branch</span>
+<span class="sd">    names against the yaml data model.</span>
+<span class="sd">    """</span>
+
+    <span class="n">edm4hep_version</span> <span class="o">=</span> <span class="n">versions</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">_components_mixins</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"Vector4f"</span><span class="p">:</span> <span class="s2">"LorentzVector"</span><span class="p">,</span>
+        <span class="s2">"Vector3f"</span><span class="p">:</span> <span class="s2">"ThreeVector"</span><span class="p">,</span>
+        <span class="s2">"Vector3d"</span><span class="p">:</span> <span class="s2">"ThreeVector"</span><span class="p">,</span>
+        <span class="s2">"Vector2i"</span><span class="p">:</span> <span class="s2">"TwoVector"</span><span class="p">,</span>
+        <span class="s2">"Vector2f"</span><span class="p">:</span> <span class="s2">"TwoVector"</span><span class="p">,</span>
+        <span class="s2">"TrackState"</span><span class="p">:</span> <span class="s2">"TrackState"</span><span class="p">,</span>
+        <span class="s2">"Quantity"</span><span class="p">:</span> <span class="s2">"Quantity"</span><span class="p">,</span>
+        <span class="s2">"covMatrix2f"</span><span class="p">:</span> <span class="s2">"covMatrix"</span><span class="p">,</span>
+        <span class="s2">"covMatrix3f"</span><span class="p">:</span> <span class="s2">"covMatrix"</span><span class="p">,</span>
+        <span class="s2">"covMatrix4f"</span><span class="p">:</span> <span class="s2">"covMatrix"</span><span class="p">,</span>
+        <span class="s2">"covMatrix6f"</span><span class="p">:</span> <span class="s2">"covMatrix"</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="n">extra_mixins</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"*idx"</span><span class="p">:</span> <span class="s2">"ObjectID"</span><span class="p">}</span>
+
+    <span class="n">_momentum_fields_e</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"energy"</span><span class="p">:</span> <span class="s2">"E"</span><span class="p">,</span>
+        <span class="s2">"momentum.x"</span><span class="p">:</span> <span class="s2">"px"</span><span class="p">,</span>
+        <span class="s2">"momentum.y"</span><span class="p">:</span> <span class="s2">"py"</span><span class="p">,</span>
+        <span class="s2">"momentum.z"</span><span class="p">:</span> <span class="s2">"pz"</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">_two_vec_replacement</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"a"</span><span class="p">:</span> <span class="s2">"x"</span><span class="p">,</span> <span class="s2">"b"</span><span class="p">:</span> <span class="s2">"y"</span><span class="p">}</span>
+    <span class="n">_replacement</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">_momentum_fields_e</span><span class="p">,</span> <span class="o">**</span><span class="n">_two_vec_replacement</span><span class="p">}</span>
+
+    <span class="c1"># By default, Links are not copied onto their target datatype collections: many</span>
+    <span class="c1"># collections may share a datatype and not all of them are compatible targets.</span>
+    <span class="c1"># Subclasses that know which link belongs to which collection can enable it and</span>
+    <span class="c1"># provide ``_datatype_priority`` (datatype -&gt; collection to copy to).</span>
+    <span class="n">copy_links_to_target_datatype</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">_datatype_priority</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">,</span> <span class="n">typenames</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">podio_collection_types</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edm4hep</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_edm4hep</span> <span class="o">=</span> <span class="n">load_edm4hep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edm4hep_version</span><span class="p">)</span>
+
+        <span class="n">n_events</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">num</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+        <span class="c1"># Work with coffea-style keys ("X/X.y") so the branch-name logic matches</span>
+        <span class="c1"># coffea's; uproot's `tree.arrays()` gives them as "X.y".</span>
+        <span class="n">forms</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">array</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+            <span class="n">layout</span> <span class="o">=</span> <span class="n">_non_materializing_get_field</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span><span class="o">.</span><span class="n">layout</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">field</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'.'</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="s2">"."</span> <span class="ow">in</span> <span class="n">field</span> <span class="k">else</span> <span class="n">field</span>
+            <span class="n">forms</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">layout</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_create_mixin</span><span class="p">(</span><span class="n">forms</span><span class="p">,</span> <span class="n">typenames</span><span class="p">,</span> <span class="n">podio_collection_types</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_collections</span><span class="p">(</span><span class="n">forms</span><span class="p">)</span>
+
+        <span class="n">contents</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">nanoevents</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span>
+            <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">(</span><span class="n">contents</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">n_events</span><span class="p">),</span>
+            <span class="n">behavior</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior</span><span class="p">(),</span>
+        <span class="p">)</span>
+        <span class="n">nanoevents</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">_rewrap</span><span class="p">(</span><span class="n">nanoevents</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">"NanoEvents"</span><span class="p">)</span>
+        <span class="n">nanoevents</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"@original_array"</span><span class="p">]</span> <span class="o">=</span> <span class="n">nanoevents</span>
+        <span class="k">return</span> <span class="n">nanoevents</span>
+
+<div class="viewcode-block" id="EDM4HEP.version">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.EDM4HEP.version">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">version</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">ver</span><span class="o">=</span><span class="s2">"latest"</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Return the layout builder class for a given edm4hep.yaml version.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">            ver : str, optional</span>
+<span class="sd">                Version of edm4hep.yaml, written either as "00.99.04" or "00-99-04".</span>
+<span class="sd">                "latest" (default) selects the newest bundled version. The available</span>
+<span class="sd">                versions are listed in ``awkward_zipper.assets.versions``.</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="n">edm4hep_version</span><span class="p">(</span><span class="n">ver</span><span class="p">)</span></div>
+
+
+    <span class="c1"># ---------------- datatype mixins ----------------</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_infer_datatype</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">forms</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Infer a collection's edm4hep datatype from its member branch names."""</span>
+        <span class="n">members</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="mi">1</span><span class="p">][</span><span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">forms</span>
+            <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="n">best</span><span class="p">,</span> <span class="n">best_score</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">dt_name</span><span class="p">,</span> <span class="n">dt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_edm4hep</span><span class="p">[</span><span class="s2">"datatypes"</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">declared</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"Members"</span><span class="p">,</span> <span class="p">{}))</span>
+            <span class="k">for</span> <span class="n">rel</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"VectorMembers"</span><span class="p">,</span> <span class="s2">"OneToOneRelations"</span><span class="p">,</span> <span class="s2">"OneToManyRelations"</span><span class="p">):</span>
+                <span class="n">declared</span> <span class="o">|=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">rel</span><span class="p">,</span> <span class="p">{}))</span>
+                <span class="n">declared</span> <span class="o">|=</span> <span class="p">{</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">_begin"</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">dt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">rel</span><span class="p">,</span> <span class="p">{})}</span>
+                <span class="n">declared</span> <span class="o">|=</span> <span class="p">{</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">_end"</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">dt</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">rel</span><span class="p">,</span> <span class="p">{})}</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">declared</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">overlap</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">declared</span> <span class="o">&amp;</span> <span class="n">members</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">overlap</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="c1"># prefer the datatype that explains the most of what is present while</span>
+            <span class="c1"># declaring the fewest members that are absent</span>
+            <span class="n">score</span> <span class="o">=</span> <span class="n">overlap</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">declared</span> <span class="o">-</span> <span class="n">members</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">score</span> <span class="o">&gt;</span> <span class="n">best_score</span><span class="p">:</span>
+                <span class="n">best</span><span class="p">,</span> <span class="n">best_score</span> <span class="o">=</span> <span class="n">dt_name</span><span class="p">,</span> <span class="n">score</span>
+        <span class="k">return</span> <span class="n">best</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_mixin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forms</span><span class="p">,</span> <span class="n">typenames</span><span class="p">,</span> <span class="n">podio_types</span><span class="p">):</span>
+        <span class="n">all_collections</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">forms</span> <span class="k">if</span> <span class="s2">"/"</span> <span class="ow">in</span> <span class="n">key</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_collections</span> <span class="o">=</span> <span class="n">all_collections</span>
+        <span class="n">collections</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">all_collections</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">c</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)}</span>
+
+        <span class="c1"># podio &gt;= 1.3 stores generic links as vector&lt;podio::LinkData&gt;; the (From, To)</span>
+        <span class="c1"># pair naming the link datatype lives only in podio_metadata</span>
+        <span class="n">link_types</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="p">(</span><span class="n">link</span><span class="p">[</span><span class="s2">"From"</span><span class="p">],</span> <span class="n">link</span><span class="p">[</span><span class="s2">"To"</span><span class="p">]):</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"::"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">link</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">edm4hep</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"links"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="n">podio_types</span> <span class="o">=</span> <span class="n">podio_types</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="n">mixins</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">collections</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">typenames</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">inferred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_infer_datatype</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">forms</span><span class="p">)</span>
+                <span class="n">mixins</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">inferred</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"::"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">inferred</span> <span class="k">else</span> <span class="s2">"edm4hep_nanocollection"</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">datatype</span> <span class="o">=</span> <span class="n">typenames</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">"edm4hep_nanocollection"</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">datatype</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">r</span><span class="s2">"vector&lt;edm4hep::"</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">datatype</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"Data&gt;"</span><span class="p">):</span>
+                        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Unknown datatype: </span><span class="si">{</span><span class="n">datatype</span><span class="si">}</span><span class="s2">"</span>
+                        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="n">mixins</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">datatype</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"::"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">5</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="n">datatype</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">r</span><span class="s2">"vector&lt;podio::"</span><span class="p">):</span>
+                    <span class="n">mixins</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">datatype</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"::"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">mixins</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">datatype</span>
+
+            <span class="k">if</span> <span class="n">mixins</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"LinkData"</span><span class="p">:</span>
+                <span class="n">endpoints</span> <span class="o">=</span> <span class="n">_link_collection</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">podio_types</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">""</span><span class="p">))</span>
+                <span class="n">stem</span> <span class="o">=</span> <span class="n">name</span><span class="p">[:</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="s2">"Collection"</span><span class="p">)]</span> <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"Collection"</span><span class="p">)</span> <span class="k">else</span> <span class="s2">""</span>
+                <span class="k">if</span> <span class="n">endpoints</span> <span class="ow">and</span> <span class="n">endpoints</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span> <span class="ow">in</span> <span class="n">link_types</span><span class="p">:</span>
+                    <span class="n">mixins</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">link_types</span><span class="p">[</span><span class="n">endpoints</span><span class="o">.</span><span class="n">groups</span><span class="p">()]</span>
+                <span class="k">elif</span> <span class="s2">"edm4hep::"</span> <span class="o">+</span> <span class="n">stem</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_edm4hep</span><span class="p">[</span><span class="s2">"datatypes"</span><span class="p">]:</span>
+                    <span class="n">mixins</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">stem</span>
+
+        <span class="n">mixins_dictionary</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">mixins</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">extra_mixins</span><span class="p">}</span>
+        <span class="n">unresolved</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">mixins_dictionary</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">m</span> <span class="o">==</span> <span class="s2">"LinkData"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">unresolved</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Cannot determine the link type of </span><span class="si">{</span><span class="n">unresolved</span><span class="si">}</span><span class="s2">: they are stored as "</span>
+                <span class="s2">"podio::LinkData and no podio_collection_types named their From/To "</span>
+                <span class="s2">"types (podio &gt;= 1.3 writes them to the file's podio_metadata tree). "</span>
+                <span class="s2">"Pass podio_collection_types=podio_collection_types(tree), or subclass "</span>
+                <span class="s2">"EDM4HEP with extra_mixins = {&lt;collection&gt;: &lt;link datatype&gt;} using the "</span>
+                <span class="s2">"names in load_edm4hep(version)[0]['links']."</span>
+            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_datatype_mixins</span> <span class="o">=</span> <span class="n">mixins_dictionary</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_datatype_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datatype</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""yaml spec for a datatype, or None when it is not a real edm4hep type."""</span>
+        <span class="k">if</span> <span class="n">datatype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_edm4hep</span><span class="p">[</span><span class="s2">"datatypes"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"edm4hep::"</span> <span class="o">+</span> <span class="n">datatype</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_lookup_branch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection_name</span><span class="p">,</span> <span class="n">branch_name</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""'type'/'doc' (or both) of a branch of a collection, from the yaml model."""</span>
+        <span class="n">unknown</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"type"</span><span class="p">:</span> <span class="s2">"unknown"</span><span class="p">,</span> <span class="s2">"doc"</span><span class="p">:</span> <span class="s2">"unknown"</span><span class="p">}</span>
+        <span class="n">datatype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datatype_mixins</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">collection_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">collection_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"_"</span><span class="p">):</span>
+            <span class="c1"># _{collection}_{member}: the collection may contain underscores, so take</span>
+            <span class="c1"># the longest known collection; no yaml member name contains one</span>
+            <span class="n">stem</span> <span class="o">=</span> <span class="n">collection_name</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">col_name</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_collections</span> <span class="k">if</span> <span class="n">stem</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">c</span> <span class="o">+</span> <span class="s2">"_"</span><span class="p">)),</span>
+                <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">,</span>
+                <span class="n">default</span><span class="o">=</span><span class="n">stem</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="p">)</span>
+            <span class="n">subcol_name</span> <span class="o">=</span> <span class="n">stem</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">col_name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span>
+            <span class="n">datatype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datatype_mixins</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">col_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">datatype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">unknown</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">unknown</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">collection_edm4hep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_edm4hep</span><span class="p">[</span><span class="s2">"datatypes"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">"edm4hep::"</span> <span class="o">+</span> <span class="n">datatype</span><span class="p">,</span> <span class="p">{}</span>
+        <span class="p">)</span>
+        <span class="n">composite</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="o">**</span><span class="n">collection_edm4hep</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"Members"</span><span class="p">,</span> <span class="p">{}),</span>
+            <span class="o">**</span><span class="n">collection_edm4hep</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"VectorMembers"</span><span class="p">,</span> <span class="p">{}),</span>
+            <span class="o">**</span><span class="n">collection_edm4hep</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"OneToOneRelations"</span><span class="p">,</span> <span class="p">{}),</span>
+            <span class="o">**</span><span class="n">collection_edm4hep</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"OneToManyRelations"</span><span class="p">,</span> <span class="p">{}),</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">collection_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"_"</span><span class="p">):</span>
+            <span class="n">matched</span> <span class="o">=</span> <span class="n">composite</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">subcol_name</span><span class="p">,</span> <span class="n">unknown</span><span class="p">)</span>
+            <span class="n">composite</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="o">**</span><span class="n">composite</span><span class="p">,</span>
+                <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">parsed_edm4hep</span><span class="p">[</span><span class="s2">"components"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                    <span class="n">matched</span><span class="p">[</span><span class="s2">"type"</span><span class="p">],</span> <span class="p">{</span><span class="s2">"Members"</span><span class="p">:</span> <span class="p">{}}</span>
+                <span class="p">)[</span><span class="s2">"Members"</span><span class="p">],</span>
+            <span class="p">}</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="n">composite</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">branch_name</span><span class="p">,</span> <span class="n">unknown</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">found</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">found</span>
+
+    <span class="c1"># ---------------- processors ----------------</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_zip_components</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collection_name</span><span class="p">,</span> <span class="n">component_branches</span><span class="p">,</span> <span class="n">forms</span><span class="p">):</span>
+        <span class="n">inverted</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">component_branches</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">var</span><span class="p">,</span> <span class="n">subvar</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">"branch_var"</span><span class="p">],</span> <span class="n">info</span><span class="p">[</span><span class="s2">"branch_subvar"</span><span class="p">]</span>
+            <span class="n">inverted</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">@</span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s1">'type'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span><span class="s2">"name"</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span> <span class="s2">"branch_subvar"</span><span class="p">:</span> <span class="n">subvar</span><span class="p">}</span>
+            <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">var</span><span class="p">,</span> <span class="n">branch_list</span> <span class="ow">in</span> <span class="n">inverted</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">assign_name</span><span class="p">,</span> <span class="n">type_str</span> <span class="o">=</span> <span class="n">var</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"@"</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">assign_name</span> <span class="o">==</span> <span class="s2">"momentum"</span><span class="p">:</span>
+                <span class="k">continue</span>  <span class="c1"># Used to create 4 vector for the whole collection, later.</span>
+            <span class="k">if</span> <span class="n">type_str</span> <span class="o">==</span> <span class="s2">"unknown"</span><span class="p">:</span>
+                <span class="k">continue</span>  <span class="c1"># not in this edm4hep version</span>
+            <span class="n">type_name</span> <span class="o">=</span> <span class="n">type_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"::"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">mixin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_components_mixins</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">type_name</span><span class="p">)</span>
+
+            <span class="n">to_zip_raw</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">item</span><span class="p">[</span><span class="s2">"branch_subvar"</span><span class="p">]:</span> <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">"name"</span><span class="p">])</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">branch_list</span>
+            <span class="p">}</span>
+            <span class="n">to_zip</span> <span class="o">=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_replacement</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span> <span class="n">f</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">to_zip_raw</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">collection_name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">collection_name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">assign_name</span><span class="si">}</span><span class="s2">"</span>
+            <span class="n">forms</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_zip_shared_offsets</span><span class="p">(</span>
+                <span class="n">sort_dict</span><span class="p">(</span><span class="n">to_zip</span><span class="p">),</span>
+                <span class="n">record_name</span><span class="o">=</span><span class="n">mixin</span><span class="p">,</span>
+                <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">"collection_name"</span><span class="p">:</span> <span class="n">assign_name</span><span class="p">},</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">forms</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_components</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forms</span><span class="p">,</span> <span class="n">all_collections</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_process</span><span class="p">(</span><span class="n">forms</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">collection</span> <span class="ow">in</span> <span class="n">all_collections</span><span class="p">:</span>
+                <span class="n">component_branches</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">forms</span><span class="p">):</span>
+                    <span class="n">slash</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">slash</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">collection</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">slash</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">parts</span> <span class="o">=</span> <span class="n">slash</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+                        <span class="n">branch_var</span><span class="p">,</span> <span class="n">branch_subvar</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="c1"># skip momentum because it will be used later to create</span>
+                        <span class="c1"># the 4 vector with E or mass</span>
+                        <span class="k">if</span> <span class="n">branch_var</span> <span class="o">==</span> <span class="s2">"momentum"</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                        <span class="n">component</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lookup_branch</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">branch_var</span><span class="p">)</span>
+                        <span class="n">component_branches</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                            <span class="s2">"type"</span><span class="p">:</span> <span class="n">component</span><span class="p">[</span><span class="s2">"type"</span><span class="p">],</span>
+                            <span class="s2">"branch_var"</span><span class="p">:</span> <span class="n">branch_var</span><span class="p">,</span>
+                            <span class="s2">"branch_subvar"</span><span class="p">:</span> <span class="n">branch_subvar</span><span class="p">,</span>
+                        <span class="p">}</span>
+                <span class="n">forms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zip_components</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">component_branches</span><span class="p">,</span> <span class="n">forms</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">forms</span>
+
+        <span class="c1"># twice, to resolve nested components</span>
+        <span class="k">return</span> <span class="n">_process</span><span class="p">(</span><span class="n">_process</span><span class="p">(</span><span class="n">forms</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_target_offsets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matched_collection</span><span class="p">,</span> <span class="n">forms</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Per-event offsets of a target collection (from its first member branch)."""</span>
+        <span class="n">datatype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datatype_mixins</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">matched_collection</span><span class="p">)</span>
+        <span class="n">spec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datatype_spec</span><span class="p">(</span><span class="n">datatype</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">spec</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">first_var</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">spec</span><span class="p">[</span><span class="s2">"Members"</span><span class="p">]))</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">matched_collection</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">matched_collection</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">first_var</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">return</span> <span class="n">forms</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">offsets</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_matched_collections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_datatype</span><span class="p">,</span> <span class="n">interfaces</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Collections whose datatype is ``target_datatype``.</span>
+
+<span class="sd">        With ``interfaces=True`` (Links) an interface target such as</span>
+<span class="sd">        ``edm4hep::TrackerHit`` resolves to the collections of its interfaced</span>
+<span class="sd">        types. OneToMany relations never consult the interfaces: coffea gates that</span>
+<span class="sd">        on the *string* ``"2"`` while the yaml stores an int, so the fallback never</span>
+<span class="sd">        fires there; match that behavior exactly.</span>
+<span class="sd">        """</span>
+        <span class="n">matched</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">name</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">datatype</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datatype_mixins</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="s2">"edm4hep::"</span> <span class="o">+</span> <span class="n">datatype</span> <span class="o">==</span> <span class="n">target_datatype</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="n">matched</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">interfaces</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">matched</span>
+        <span class="n">interfaced</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_edm4hep</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"interfaces"</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">if</span> <span class="n">target_datatype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">interfaced</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"No matched collection for </span><span class="si">{</span><span class="n">target_datatype</span><span class="si">}</span><span class="s2"> found!"</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">name</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">interfaced</span><span class="p">[</span><span class="n">target_datatype</span><span class="p">][</span><span class="s2">"Types"</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">datatype</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datatype_mixins</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="s2">"edm4hep::"</span> <span class="o">+</span> <span class="n">datatype</span> <span class="o">==</span> <span class="n">i</span>
+        <span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_vector_members</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forms</span><span class="p">,</span> <span class="n">all_collections</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">collection</span> <span class="ow">in</span> <span class="n">all_collections</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">collection</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"_"</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">datatype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datatype_mixins</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">datatype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">spec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datatype_spec</span><span class="p">(</span><span class="n">datatype</span><span class="p">)</span>
+            <span class="n">vec_members</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"VectorMembers"</span><span class="p">)</span> <span class="k">if</span> <span class="n">spec</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">vec_members</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">branch_var</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">forms</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">forms</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">collection</span> <span class="ow">and</span> <span class="s2">"/"</span> <span class="ow">in</span> <span class="n">name</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">vec_members</span><span class="p">:</span>
+                <span class="k">if</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">member</span><span class="si">}</span><span class="s2">_begin"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">branch_var</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">target_contents</span> <span class="o">=</span> <span class="n">_relation_branches</span><span class="p">(</span><span class="n">forms</span><span class="p">,</span> <span class="n">collection</span><span class="p">,</span> <span class="n">member</span><span class="p">)</span>
+                <span class="n">begin</span> <span class="o">=</span> <span class="n">branch_var</span><span class="p">[</span><span class="n">member</span> <span class="o">+</span> <span class="s2">"_begin"</span><span class="p">]</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">branch_var</span><span class="p">[</span><span class="n">member</span> <span class="o">+</span> <span class="s2">"_end"</span><span class="p">]</span>
+                <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">collection</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">collection</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">member</span><span class="si">}</span><span class="s2">_begin"</span><span class="p">)</span>
+                <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">collection</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">collection</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">member</span><span class="si">}</span><span class="s2">_end"</span><span class="p">)</span>
+
+                <span class="n">leaves</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">target_contents</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">leaves</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">vec_members</span><span class="p">[</span><span class="n">member</span><span class="p">][</span><span class="s2">"type"</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"edm4hep::"</span><span class="p">):</span>
+                        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"_</span><span class="si">{</span><span class="n">collection</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">member</span><span class="si">}</span><span class="s2"> not found!"</span>
+                        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="c1"># Example: _EventHeader_weights, a plain vector member stored</span>
+                    <span class="c1"># flat ('weights' not to be confused with 'weight')</span>
+                    <span class="n">bare</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="sa">f</span><span class="s2">"_</span><span class="si">{</span><span class="n">collection</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">member</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">bare</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">target_form</span> <span class="o">=</span> <span class="n">begin_end_mapping</span><span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">bare</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">leaves</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">target_form</span> <span class="o">=</span> <span class="n">begin_end_mapping</span><span class="p">(</span>
+                        <span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">target_contents</span><span class="p">[</span><span class="n">leaves</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">content</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Example: _TrackCollection_trackStates.D0, ...phi, etc. where</span>
+                    <span class="c1"># 'trackStates' is a VectorMember of 'TrackState' components</span>
+                    <span class="n">vec_contents</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">begin_end_mapping</span><span class="p">(</span>
+                            <span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vector_member_target</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">layout</span><span class="p">)</span>
+                        <span class="p">)</span>
+                        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">layout</span> <span class="ow">in</span> <span class="n">target_contents</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                    <span class="p">}</span>
+                    <span class="n">target_form</span> <span class="o">=</span> <span class="n">_zip_shared_offsets</span><span class="p">(</span><span class="n">vec_contents</span><span class="p">)</span>
+                <span class="n">forms</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">collection</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">collection</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">member</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span> <span class="o">=</span> <span class="n">target_form</span>
+        <span class="k">return</span> <span class="n">forms</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_vector_member_target</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">layout</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Flat content of a VectorMember target, ready for ``begin_end_mapping``.</span>
+
+<span class="sd">        Fixed-size members such as ``covMatrix.values[21]`` were zipped into a</span>
+<span class="sd">        single-field record by the component pass; coffea flattens those into</span>
+<span class="sd">        variable-length float64 lists, so unwrap and convert them here.</span>
+<span class="sd">        """</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="n">layout</span><span class="o">.</span><span class="n">content</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"covMatrix"</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">fields</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="p">):</span>
+            <span class="n">inner</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inner</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RegularArray</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">regular_to_jagged</span><span class="p">(</span><span class="n">inner</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">content</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_one_to_one_relations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forms</span><span class="p">,</span> <span class="n">all_collections</span><span class="p">,</span> <span class="n">links</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""OneToOneRelations (``links=False``) or the from/to Links (``links=True``).</span>
+
+<span class="sd">        With ``copy_links_to_target_datatype`` the Links are also copied onto the</span>
+<span class="sd">        collection their ``from`` side points to, using ``_datatype_priority`` to</span>
+<span class="sd">        pick one when several collections share the target datatype.</span>
+<span class="sd">        """</span>
+        <span class="k">for</span> <span class="n">collection</span> <span class="ow">in</span> <span class="n">all_collections</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">collection</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"_"</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">datatype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datatype_mixins</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">datatype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">spec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datatype_spec</span><span class="p">(</span><span class="n">datatype</span><span class="p">)</span>
+            <span class="n">relations</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"OneToOneRelations"</span><span class="p">)</span> <span class="k">if</span> <span class="n">spec</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">relations</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">links</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">k</span> <span class="ow">in</span> <span class="n">relations</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"from"</span><span class="p">,</span> <span class="s2">"to"</span><span class="p">)):</span>
+                <span class="k">continue</span>
+            <span class="n">copy_targets</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="n">branches_to_copy</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">relations</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">member</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"from"</span><span class="p">,</span> <span class="s2">"to"</span><span class="p">))</span> <span class="o">!=</span> <span class="n">links</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">target_contents</span> <span class="o">=</span> <span class="n">_relation_branches</span><span class="p">(</span><span class="n">forms</span><span class="p">,</span> <span class="n">collection</span><span class="p">,</span> <span class="n">member</span><span class="p">)</span>
+                <span class="n">target_datatype</span> <span class="o">=</span> <span class="n">relations</span><span class="p">[</span><span class="n">member</span><span class="p">][</span><span class="s2">"type"</span><span class="p">]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">target_datatype</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"edm4hep::"</span><span class="p">):</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">member</span><span class="si">}</span><span class="s2"> does not point to a valid datatype(</span><span class="si">{</span><span class="n">target_datatype</span><span class="si">}</span><span class="s2">)!"</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">target_contents</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">matched_collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_matched_collections</span><span class="p">(</span>
+                    <span class="n">target_datatype</span><span class="p">,</span> <span class="n">interfaces</span><span class="o">=</span><span class="n">links</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">matched_collections</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">"No matched collection for </span><span class="si">{</span><span class="n">target_datatype</span><span class="si">}</span><span class="s2"> found!</span><span class="se">\n</span><span class="s2"> skipping ..."</span><span class="p">,</span>
+                        <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="k">for</span> <span class="n">matched</span> <span class="ow">in</span> <span class="n">matched_collections</span><span class="p">:</span>
+                    <span class="n">target_offsets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target_offsets</span><span class="p">(</span><span class="n">matched</span><span class="p">,</span> <span class="n">forms</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">target_offsets</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">content</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">layout</span>
+                        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">layout</span> <span class="ow">in</span> <span class="n">target_contents</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                    <span class="p">}</span>
+                    <span class="n">index</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="s2">"index"</span><span class="p">]</span>
+                    <span class="n">content</span><span class="p">[</span><span class="s2">"index_Global"</span><span class="p">]</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+                        <span class="n">index</span><span class="o">.</span><span class="n">offsets</span><span class="p">,</span> <span class="n">local2global</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">target_offsets</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">links</span><span class="p">:</span>
+                        <span class="n">link_form</span> <span class="o">=</span> <span class="n">_zip_shared_offsets</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+                        <span class="n">forms</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">collection</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">collection</span><span class="si">}</span><span class="s2">.Link_</span><span class="si">{</span><span class="n">member</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">matched</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">link_form</span>
+                        <span class="p">)</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_should_copy_link</span><span class="p">(</span><span class="n">matched</span><span class="p">,</span> <span class="n">matched_collections</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="n">member</span> <span class="o">==</span> <span class="s2">"from"</span><span class="p">:</span>
+                                <span class="n">copy_targets</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">matched</span><span class="p">)</span>
+                            <span class="n">branches_to_copy</span><span class="p">[</span><span class="sa">f</span><span class="s2">"Link_</span><span class="si">{</span><span class="n">member</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">matched</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span> <span class="o">=</span> <span class="n">link_form</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">layout</span> <span class="ow">in</span> <span class="n">content</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                            <span class="n">forms</span><span class="p">[</span>
+                                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">collection</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">collection</span><span class="si">}</span><span class="s2">."</span>
+                                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">member</span><span class="si">}</span><span class="s2">_idx_</span><span class="si">{</span><span class="n">matched</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span>
+                            <span class="p">]</span> <span class="o">=</span> <span class="n">layout</span>
+
+            <span class="c1"># copy the collected links onto their target collections</span>
+            <span class="k">if</span> <span class="n">links</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy_links_to_target_datatype</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">matched</span> <span class="ow">in</span> <span class="n">copy_targets</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">layout</span> <span class="ow">in</span> <span class="n">branches_to_copy</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="n">forms</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">matched</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">matched</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span><span class="p">]</span> <span class="o">=</span> <span class="n">layout</span>
+        <span class="k">return</span> <span class="n">forms</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_should_copy_link</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matched</span><span class="p">,</span> <span class="n">matched_collections</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Whether a Link branch should also be copied onto ``matched``."""</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy_links_to_target_datatype</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datatype_priority</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">"Cannot copy links if no priority is given!"</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matched_collections</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># choose which one to copy</span>
+            <span class="n">datatype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datatype_mixins</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">matched</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datatype_priority</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">datatype</span><span class="p">)</span> <span class="o">==</span> <span class="n">matched</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_one_to_many_relations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forms</span><span class="p">,</span> <span class="n">all_collections</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">collection</span> <span class="ow">in</span> <span class="n">all_collections</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">collection</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"_"</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">datatype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datatype_mixins</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">collection</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">datatype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">spec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datatype_spec</span><span class="p">(</span><span class="n">datatype</span><span class="p">)</span>
+            <span class="n">relations</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"OneToManyRelations"</span><span class="p">)</span> <span class="k">if</span> <span class="n">spec</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">relations</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">branch_var</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">forms</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">forms</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">collection</span> <span class="ow">and</span> <span class="s2">"/"</span> <span class="ow">in</span> <span class="n">name</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">relations</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">member</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"from"</span><span class="p">,</span> <span class="s2">"to"</span><span class="p">)</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">member</span><span class="si">}</span><span class="s2">_begin"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">branch_var</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">target_contents</span> <span class="o">=</span> <span class="n">_relation_branches</span><span class="p">(</span><span class="n">forms</span><span class="p">,</span> <span class="n">collection</span><span class="p">,</span> <span class="n">member</span><span class="p">)</span>
+                <span class="n">begin</span> <span class="o">=</span> <span class="n">branch_var</span><span class="p">[</span><span class="n">member</span> <span class="o">+</span> <span class="s2">"_begin"</span><span class="p">]</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">branch_var</span><span class="p">[</span><span class="n">member</span> <span class="o">+</span> <span class="s2">"_end"</span><span class="p">]</span>
+                <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">collection</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">collection</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">member</span><span class="si">}</span><span class="s2">_begin"</span><span class="p">)</span>
+                <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">collection</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">collection</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">member</span><span class="si">}</span><span class="s2">_end"</span><span class="p">)</span>
+
+                <span class="n">target_datatype</span> <span class="o">=</span> <span class="n">relations</span><span class="p">[</span><span class="n">member</span><span class="p">][</span><span class="s2">"type"</span><span class="p">]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">target_datatype</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"edm4hep::"</span><span class="p">):</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">member</span><span class="si">}</span><span class="s2"> does not point to a valid datatype(</span><span class="si">{</span><span class="n">target_datatype</span><span class="si">}</span><span class="s2">)!"</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">target_contents</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">for</span> <span class="n">matched</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_matched_collections</span><span class="p">(</span><span class="n">target_datatype</span><span class="p">):</span>
+                    <span class="n">target_offsets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_target_offsets</span><span class="p">(</span><span class="n">matched</span><span class="p">,</span> <span class="n">forms</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">target_offsets</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">nested</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)[</span><span class="mi">1</span><span class="p">]:</span> <span class="n">begin_end_mapping</span><span class="p">(</span>
+                            <span class="n">begin</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">layout</span><span class="o">.</span><span class="n">content</span>
+                        <span class="p">)</span>
+                        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">layout</span> <span class="ow">in</span> <span class="n">target_contents</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                    <span class="p">}</span>
+                    <span class="n">to_zip</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">nested</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="s2">"index"</span> <span class="ow">in</span> <span class="n">nested</span><span class="p">:</span>
+                        <span class="n">idx</span> <span class="o">=</span> <span class="n">nested</span><span class="p">[</span><span class="s2">"index"</span><span class="p">]</span>
+                        <span class="n">to_zip</span><span class="p">[</span><span class="s2">"index_Global"</span><span class="p">]</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+                            <span class="n">idx</span><span class="o">.</span><span class="n">offsets</span><span class="p">,</span>
+                            <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+                                <span class="n">idx</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">offsets</span><span class="p">,</span>
+                                <span class="n">nested_local2global</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">target_offsets</span><span class="p">),</span>
+                            <span class="p">),</span>
+                        <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">layout</span> <span class="ow">in</span> <span class="n">to_zip</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="n">forms</span><span class="p">[</span>
+                            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">collection</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">collection</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">member</span><span class="si">}</span><span class="s2">_idx_</span><span class="si">{</span><span class="n">matched</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span>
+                        <span class="p">]</span> <span class="o">=</span> <span class="n">layout</span>
+        <span class="k">return</span> <span class="n">forms</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_collections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">forms</span><span class="p">):</span>
+        <span class="n">field_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">forms</span><span class="p">)</span>
+        <span class="n">collections</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">field_names</span> <span class="k">if</span> <span class="s2">"/"</span> <span class="ow">in</span> <span class="n">name</span><span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">collections</span><span class="p">:</span>
+            <span class="n">mixin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datatype_mixins</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">"edm4hep_nanocollection"</span><span class="p">)</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">k</span><span class="p">[(</span><span class="mi">2</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="p">:]:</span> <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">field_names</span>
+                <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span> <span class="ow">and</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">forms</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">content</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="c1"># the collection's offsets come from its first branch (before sorting):</span>
+            <span class="c1"># a copied Link branch carries the offsets of the link collection</span>
+            <span class="n">offsets</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span><span class="o">.</span><span class="n">offsets</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_replacement</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">content</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="k">if</span> <span class="n">mixin</span> <span class="o">==</span> <span class="s2">"ReconstructedParticle"</span><span class="p">:</span>
+                <span class="n">content</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"E"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+            <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="n">mixin</span> <span class="o">!=</span> <span class="s2">"edm4hep_nanocollection"</span><span class="p">:</span>
+                <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">"collection_name"</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+                    <span class="s2">"__doc__"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">parsed_edm4hep</span><span class="p">[</span><span class="s2">"datatypes"</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"edm4hep::"</span> <span class="o">+</span> <span class="n">mixin</span><span class="p">,</span> <span class="p">{})</span>
+                    <span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"Description"</span><span class="p">,</span> <span class="n">mixin</span><span class="p">),</span>
+                <span class="p">}</span>
+            <span class="n">output</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">_zip_shared_offsets</span><span class="p">(</span>
+                <span class="n">sort_dict</span><span class="p">(</span><span class="n">content</span><span class="p">),</span>
+                <span class="n">record_name</span><span class="o">=</span><span class="n">mixin</span><span class="p">,</span>
+                <span class="n">parameters</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+                <span class="n">offsets</span><span class="o">=</span><span class="n">offsets</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="c1"># the empty grouping branch "X" that accompanies "X/X.y" carries no info</span>
+            <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">forms</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_unknown_collections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">forms</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Handle the unknown, empty or singleton branches that remain.</span>
+
+<span class="sd">        Mirrors coffea: empty grouping records are dropped, a remaining jagged</span>
+<span class="sd">        record is left out of the output, jagged/flat singletons pass through.</span>
+<span class="sd">        """</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">layout</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layout</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">layout</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+                        <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="n">output</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">layout</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">record_name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">contents</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">k</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">record_name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span> <span class="p">:]:</span> <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">forms</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">record_name</span> <span class="o">+</span> <span class="s2">"/"</span><span class="p">)</span>
+                <span class="p">}</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">contents</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">output</span><span class="p">[</span><span class="n">record_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">_zip_shared_offsets</span><span class="p">(</span>
+                    <span class="n">sort_dict</span><span class="p">(</span><span class="n">contents</span><span class="p">),</span>
+                    <span class="n">record_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_datatype_mixins</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                        <span class="n">record_name</span><span class="p">,</span> <span class="s2">"edm4hep_nanocollection"</span>
+                    <span class="p">),</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">output</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">forms</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_collections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forms</span><span class="p">):</span>
+        <span class="n">all_collections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_collections</span>
+
+        <span class="n">forms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_components</span><span class="p">(</span><span class="n">forms</span><span class="p">,</span> <span class="n">all_collections</span><span class="p">)</span>
+        <span class="n">forms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_vector_members</span><span class="p">(</span><span class="n">forms</span><span class="p">,</span> <span class="n">all_collections</span><span class="p">)</span>
+        <span class="n">forms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_one_to_one_relations</span><span class="p">(</span><span class="n">forms</span><span class="p">,</span> <span class="n">all_collections</span><span class="p">,</span> <span class="n">links</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">forms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_one_to_many_relations</span><span class="p">(</span><span class="n">forms</span><span class="p">,</span> <span class="n">all_collections</span><span class="p">)</span>
+        <span class="n">forms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_one_to_one_relations</span><span class="p">(</span><span class="n">forms</span><span class="p">,</span> <span class="n">all_collections</span><span class="p">,</span> <span class="n">links</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">output</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">forms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_collections</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">forms</span><span class="p">)</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">forms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unknown_collections</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">forms</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sort_dict</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EDM4HEP.behavior">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.EDM4HEP.behavior">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">behavior</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Behaviors necessary to implement this schema (dict)"""</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.behaviors</span><span class="w"> </span><span class="kn">import</span> <span class="n">base</span><span class="p">,</span> <span class="n">edm4hep</span><span class="p">,</span> <span class="n">vector</span>
+
+        <span class="n">behavior</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">behavior</span><span class="p">)</span>
+        <span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">vector</span><span class="o">.</span><span class="n">behavior</span><span class="p">)</span>
+        <span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">edm4hep</span><span class="o">.</span><span class="n">behavior</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">behavior</span></div>
+</div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_versioned_builder</span><span class="p">(</span><span class="n">ver</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">"EDM4HEP_v"</span> <span class="o">+</span> <span class="n">ver</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"-"</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">)</span>
+    <span class="n">doc</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"EDM4HEP layout builder for edm4hep version </span><span class="si">{</span><span class="n">ver</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'-'</span><span class="p">,</span><span class="w"> </span><span class="s1">'.'</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span>
+        <span class="n">name</span><span class="p">,</span>
+        <span class="p">(</span><span class="n">EDM4HEP</span><span class="p">,),</span>
+        <span class="p">{</span><span class="s2">"edm4hep_version"</span><span class="p">:</span> <span class="n">ver</span><span class="p">,</span> <span class="s2">"__doc__"</span><span class="p">:</span> <span class="n">doc</span><span class="p">,</span> <span class="s2">"__module__"</span><span class="p">:</span> <span class="vm">__name__</span><span class="p">},</span>
+    <span class="p">)</span>
+
+
+<span class="c1"># Module globals keep EDM4HEP_v* importable by name and picklable by reference.</span>
+<span class="n">_versioned_builders</span> <span class="o">=</span> <span class="p">{</span><span class="n">ver</span><span class="p">:</span> <span class="n">_versioned_builder</span><span class="p">(</span><span class="n">ver</span><span class="p">)</span> <span class="k">for</span> <span class="n">ver</span> <span class="ow">in</span> <span class="n">versions</span><span class="p">}</span>
+<span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">b</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span> <span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">_versioned_builders</span><span class="o">.</span><span class="n">values</span><span class="p">()})</span>
+
+
+<div class="viewcode-block" id="edm4hep_version">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.edm4hep_version">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">edm4hep_version</span><span class="p">(</span><span class="n">ver</span><span class="o">=</span><span class="s2">"latest"</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Return the EDM4HEP layout builder class for a given edm4hep.yaml version.</span>
+
+<span class="sd">    ``ver`` is written either as ``"00.99.04"`` or ``"00-99-04"``; ``"latest"``</span>
+<span class="sd">    (default) selects the newest bundled version. The available versions are</span>
+<span class="sd">    listed in ``awkward_zipper.assets.versions``.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">ver</span> <span class="o">==</span> <span class="s2">"latest"</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">EDM4HEP</span>
+    <span class="n">builder</span> <span class="o">=</span> <span class="n">_versioned_builders</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ver</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"."</span><span class="p">,</span> <span class="s2">"-"</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">builder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"The given version </span><span class="si">{</span><span class="n">ver</span><span class="si">}</span><span class="s2"> is not found. "</span>
+            <span class="sa">f</span><span class="s2">"Available versions are : </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">versions</span><span class="p">)</span><span class="si">}</span><span class="s2"> ."</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">builder</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Peter Fackeldey, Maxym Naumchyk.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
