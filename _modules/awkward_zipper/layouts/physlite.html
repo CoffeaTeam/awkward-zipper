@@ -1,0 +1,347 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>awkward_zipper.layouts.physlite &mdash; awkward-zipper 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/logo_unfilled_with_text.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            awkward-zipper
+              <img src="../../../_static/logo_unfilled_with_black_text.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">awkward-zipper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">awkward_zipper.layouts.physlite</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for awkward_zipper.layouts.physlite</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">awkward</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.awkward_util</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_check_equal_lengths</span><span class="p">,</span>
+    <span class="n">_jagged_content</span><span class="p">,</span>
+    <span class="n">_non_materializing_get_field</span><span class="p">,</span>
+    <span class="n">_rewrap</span><span class="p">,</span>
+    <span class="n">_total_items</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">eventindex_content</span><span class="p">,</span>
+    <span class="n">full_like_from_content</span><span class="p">,</span>
+    <span class="n">qoverp_theta_to_pt</span><span class="p">,</span>
+    <span class="n">qoverp_to_p</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.layouts.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseLayoutBuilder</span>
+
+<span class="c1"># coffea's "List" form-class check: a list of fixed-size arrays (RegularArray)</span>
+<span class="c1"># still counts as single-jagged, a list of lists does not</span>
+<span class="n">_LIST_CLASSES</span> <span class="o">=</span> <span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListArray</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_zip_leaves</span><span class="p">(</span><span class="n">members</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Zip leaf layouts into one record (coffea's ``zip_forms``).</span>
+
+<span class="sd">    Jagged leaves share the offsets of the first one; anything else is zipped</span>
+<span class="sd">    into a flat per-event record.</span>
+<span class="sd">    """</span>
+    <span class="n">layouts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">members</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">)</span> <span class="k">for</span> <span class="n">layout</span> <span class="ow">in</span> <span class="n">layouts</span><span class="p">):</span>
+        <span class="n">offsets</span> <span class="o">=</span> <span class="n">layouts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">offsets</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+            <span class="n">offsets</span><span class="p">,</span>
+            <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">_jagged_content</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span> <span class="k">for</span> <span class="n">layout</span> <span class="ow">in</span> <span class="n">layouts</span><span class="p">],</span>
+                <span class="nb">list</span><span class="p">(</span><span class="n">members</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
+                <span class="n">length</span><span class="o">=</span><span class="n">_total_items</span><span class="p">(</span><span class="n">offsets</span><span class="p">),</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">(</span>
+        <span class="n">layouts</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">members</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="n">length</span><span class="o">=</span><span class="n">_check_equal_lengths</span><span class="p">(</span><span class="n">layouts</span><span class="p">)</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="PHYSLITE">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.PHYSLITE">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PHYSLITE</span><span class="p">(</span><span class="n">BaseLayoutBuilder</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""ATLAS DAOD_PHYSLITE layout builder</span>
+
+<span class="sd">    Array-based re-implementation of coffea's ``PHYSLITESchema``. Branches named</span>
+<span class="sd">    ``&lt;Collection&gt;Aux[Dyn].&lt;field&gt;`` are grouped by collection (with the</span>
+<span class="sd">    ``Analysis``/``Aux``/``AuxDyn`` affixes stripped) and zipped into jagged</span>
+<span class="sd">    records. Split ``ElementLink`` members (``link.m_persKey``/``link.m_persIndex``)</span>
+<span class="sd">    are reconstituted into sub-records, a synthetic ``_eventindex`` column is added</span>
+<span class="sd">    per collection, and ``TrackParticle``/``Muon`` collections get their derived</span>
+<span class="sd">    ``p``/``pt``/``tau``/``m`` fields.</span>
+<span class="sd">    """</span>
+
+    <span class="n">truth_collections</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">"TruthPhotons"</span><span class="p">,</span>
+        <span class="s2">"TruthMuons"</span><span class="p">,</span>
+        <span class="s2">"TruthNeutrinos"</span><span class="p">,</span>
+        <span class="s2">"TruthTaus"</span><span class="p">,</span>
+        <span class="s2">"TruthElectrons"</span><span class="p">,</span>
+        <span class="s2">"TruthBoson"</span><span class="p">,</span>
+        <span class="s2">"TruthBottom"</span><span class="p">,</span>
+        <span class="s2">"TruthTop"</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="n">mixins</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"Photons"</span><span class="p">:</span> <span class="s2">"Particle"</span><span class="p">,</span>
+        <span class="s2">"Electrons"</span><span class="p">:</span> <span class="s2">"Electron"</span><span class="p">,</span>
+        <span class="s2">"Muons"</span><span class="p">:</span> <span class="s2">"Muon"</span><span class="p">,</span>
+        <span class="s2">"Jets"</span><span class="p">:</span> <span class="s2">"Particle"</span><span class="p">,</span>
+        <span class="s2">"TauJets"</span><span class="p">:</span> <span class="s2">"Particle"</span><span class="p">,</span>
+        <span class="s2">"CombinedMuonTrackParticles"</span><span class="p">:</span> <span class="s2">"TrackParticle"</span><span class="p">,</span>
+        <span class="s2">"ExtrapolatedMuonTrackParticles"</span><span class="p">:</span> <span class="s2">"TrackParticle"</span><span class="p">,</span>
+        <span class="s2">"GSFTrackParticles"</span><span class="p">:</span> <span class="s2">"TrackParticle"</span><span class="p">,</span>
+        <span class="s2">"InDetTrackParticles"</span><span class="p">:</span> <span class="s2">"TrackParticle"</span><span class="p">,</span>
+        <span class="s2">"MuonSpectrometerTrackParticles"</span><span class="p">:</span> <span class="s2">"TrackParticle"</span><span class="p">,</span>
+        <span class="s2">"egammaClusters"</span><span class="p">:</span> <span class="s2">"NanoCollection"</span><span class="p">,</span>
+        <span class="o">**</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">truth_collections</span><span class="p">,</span> <span class="s2">"TruthParticle"</span><span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
+        <span class="n">n_events</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">num</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+        <span class="c1"># group (sub_key, layout) by collection name</span>
+        <span class="n">zip_groups</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="n">has_eventindex</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">array</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+            <span class="n">layout</span> <span class="o">=</span> <span class="n">_non_materializing_get_field</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span><span class="o">.</span><span class="n">layout</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">layout</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+                <span class="c1"># skip empty records (branches containing only the base class)</span>
+                <span class="k">continue</span>
+            <span class="n">key_fields</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"/"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span>
+            <span class="n">top_key</span> <span class="o">=</span> <span class="n">key_fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">sub_key</span> <span class="o">=</span> <span class="s2">"."</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">key_fields</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="n">objname</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">top_key</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"Analysis"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"AuxDyn"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"Aux"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">zip_groups</span><span class="p">[</span><span class="n">objname</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sub_key</span><span class="p">,</span> <span class="n">layout</span><span class="p">))</span>
+
+            <span class="c1"># add a single _eventindex column per collection, from the first</span>
+            <span class="c1"># single-jagged column</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="ow">not</span> <span class="n">has_eventindex</span><span class="p">[</span><span class="n">objname</span><span class="p">]</span>
+                <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">)</span>
+                <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layout</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="n">_LIST_CLASSES</span><span class="p">)</span>
+            <span class="p">):</span>
+                <span class="n">ev</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+                    <span class="n">layout</span><span class="o">.</span><span class="n">offsets</span><span class="p">,</span> <span class="n">eventindex_content</span><span class="p">(</span><span class="n">layout</span><span class="o">.</span><span class="n">offsets</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">zip_groups</span><span class="p">[</span><span class="n">objname</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">"_eventindex"</span><span class="p">,</span> <span class="n">ev</span><span class="p">))</span>
+                <span class="n">has_eventindex</span><span class="p">[</span><span class="n">objname</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="n">contents</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">objname</span><span class="p">,</span> <span class="n">items</span> <span class="ow">in</span> <span class="n">zip_groups</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">contents</span><span class="p">[</span><span class="n">objname</span><span class="p">]</span> <span class="o">=</span> <span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># reconstitute split ElementLink parents (e.g. ambiguityLink from</span>
+            <span class="c1"># ambiguityLink.m_persKey / ambiguityLink.m_persIndex); like coffea this</span>
+            <span class="c1"># is done unconditionally and the result replaces a same-named field</span>
+            <span class="n">to_collect</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">sk</span><span class="p">,</span> <span class="n">layout</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">"."</span> <span class="ow">in</span> <span class="n">sk</span><span class="p">:</span>
+                    <span class="n">skleft</span><span class="p">,</span> <span class="n">skright</span> <span class="o">=</span> <span class="n">sk</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">to_collect</span><span class="p">[</span><span class="n">skleft</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">skright</span><span class="p">,</span> <span class="n">layout</span><span class="p">))</span>
+            <span class="n">reconstituted</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">skleft</span><span class="p">:</span> <span class="n">_zip_leaves</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">leaves</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">skleft</span><span class="p">,</span> <span class="n">leaves</span> <span class="ow">in</span> <span class="n">to_collect</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span>
+
+            <span class="c1"># build the mapping of fields to zip (all share the collection offsets)</span>
+            <span class="n">to_zip</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">sk</span><span class="p">,</span> <span class="n">layout</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">"."</span> <span class="ow">in</span> <span class="n">sk</span><span class="p">:</span>
+                    <span class="c1"># the reconstituted parent takes the place of its first leaf</span>
+                    <span class="c1"># (coffea sees the parent branch at that position)</span>
+                    <span class="n">parent</span> <span class="o">=</span> <span class="n">sk</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">to_zip</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">reconstituted</span><span class="p">[</span><span class="n">parent</span><span class="p">])</span>
+                    <span class="k">continue</span>
+                <span class="n">field_layout</span> <span class="o">=</span> <span class="n">layout</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">layout</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+                    <span class="c1"># single-jagged ElementLink stored as RecordArray(ListOffsetArray):</span>
+                    <span class="c1"># convert to ListOffsetArray(RecordArray)</span>
+                    <span class="n">fields</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">layout</span><span class="o">.</span><span class="n">fields</span><span class="p">]</span>
+                    <span class="n">field_layout</span> <span class="o">=</span> <span class="n">_zip_leaves</span><span class="p">(</span>
+                        <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">layout</span><span class="o">.</span><span class="n">contents</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+                    <span class="p">)</span>
+                <span class="n">to_zip</span><span class="p">[</span><span class="n">sk</span><span class="p">]</span> <span class="o">=</span> <span class="n">field_layout</span>
+
+            <span class="n">mixin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mixins</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">objname</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">mixin</span> <span class="o">==</span> <span class="s2">"TrackParticle"</span><span class="p">:</span>
+                    <span class="n">offsets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collection_offsets</span><span class="p">(</span><span class="n">to_zip</span><span class="p">)</span>
+                    <span class="n">to_zip</span><span class="p">[</span><span class="s2">"p"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrap</span><span class="p">(</span>
+                        <span class="n">offsets</span><span class="p">,</span> <span class="n">qoverp_to_p</span><span class="p">(</span><span class="n">to_zip</span><span class="p">[</span><span class="s2">"qOverP"</span><span class="p">]</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="n">to_zip</span><span class="p">[</span><span class="s2">"pt"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrap</span><span class="p">(</span>
+                        <span class="n">offsets</span><span class="p">,</span>
+                        <span class="n">qoverp_theta_to_pt</span><span class="p">(</span>
+                            <span class="n">to_zip</span><span class="p">[</span><span class="s2">"qOverP"</span><span class="p">]</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="n">to_zip</span><span class="p">[</span><span class="s2">"theta"</span><span class="p">]</span><span class="o">.</span><span class="n">content</span>
+                        <span class="p">),</span>
+                    <span class="p">)</span>
+                    <span class="n">to_zip</span><span class="p">[</span><span class="s2">"tau"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrap</span><span class="p">(</span>
+                        <span class="n">offsets</span><span class="p">,</span>
+                        <span class="n">full_like_from_content</span><span class="p">(</span><span class="n">to_zip</span><span class="p">[</span><span class="s2">"theta"</span><span class="p">]</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="mf">139.570</span><span class="p">),</span>
+                    <span class="p">)</span>
+                <span class="k">if</span> <span class="n">mixin</span> <span class="o">==</span> <span class="s2">"Muon"</span> <span class="ow">and</span> <span class="s2">"m"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">to_zip</span><span class="p">:</span>
+                    <span class="n">offsets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collection_offsets</span><span class="p">(</span><span class="n">to_zip</span><span class="p">)</span>
+                    <span class="n">to_zip</span><span class="p">[</span><span class="s2">"m"</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrap</span><span class="p">(</span>
+                        <span class="n">offsets</span><span class="p">,</span> <span class="n">full_like_from_content</span><span class="p">(</span><span class="n">to_zip</span><span class="p">[</span><span class="s2">"pt"</span><span class="p">]</span><span class="o">.</span><span class="n">content</span><span class="p">,</span> <span class="mf">105.658</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="n">contents</span><span class="p">[</span><span class="n">objname</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zip_collection</span><span class="p">(</span><span class="n">to_zip</span><span class="p">,</span> <span class="n">objname</span><span class="p">,</span> <span class="n">mixin</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">NotImplementedError</span><span class="p">):</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Can't zip collection </span><span class="si">{</span><span class="n">objname</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">_contents</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">contents</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="n">_fields</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">contents</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">nanoevents</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span>
+            <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">(</span><span class="n">_contents</span><span class="p">,</span> <span class="n">_fields</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">n_events</span><span class="p">),</span>
+            <span class="n">behavior</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior</span><span class="p">(),</span>
+        <span class="p">)</span>
+        <span class="n">nanoevents</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">_rewrap</span><span class="p">(</span><span class="n">nanoevents</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">"NanoEvents"</span><span class="p">)</span>
+        <span class="n">nanoevents</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"@original_array"</span><span class="p">]</span> <span class="o">=</span> <span class="n">nanoevents</span>
+        <span class="k">return</span> <span class="n">nanoevents</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_collection_offsets</span><span class="p">(</span><span class="n">to_zip</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">layout</span> <span class="ow">in</span> <span class="n">to_zip</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">layout</span><span class="o">.</span><span class="n">offsets</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_wrap</span><span class="p">(</span><span class="n">offsets</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span><span class="n">offsets</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_zip_collection</span><span class="p">(</span><span class="n">to_zip</span><span class="p">,</span> <span class="n">objname</span><span class="p">,</span> <span class="n">mixin</span><span class="p">):</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">to_zip</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">layouts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">to_zip</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"collection_name"</span><span class="p">:</span> <span class="n">objname</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">mixin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">"__record__"</span><span class="p">]</span> <span class="o">=</span> <span class="n">mixin</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">)</span> <span class="k">for</span> <span class="n">layout</span> <span class="ow">in</span> <span class="n">layouts</span>
+        <span class="p">):</span>
+            <span class="c1"># jagged collection: share offsets, use each field's flat content</span>
+            <span class="n">offsets</span> <span class="o">=</span> <span class="n">layouts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">offsets</span>
+            <span class="n">record</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">layout</span><span class="o">.</span><span class="n">content</span> <span class="k">for</span> <span class="n">layout</span> <span class="ow">in</span> <span class="n">layouts</span><span class="p">],</span>
+                <span class="n">names</span><span class="p">,</span>
+                <span class="n">length</span><span class="o">=</span><span class="n">_total_items</span><span class="p">(</span><span class="n">offsets</span><span class="p">),</span>
+                <span class="n">parameters</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span><span class="n">offsets</span><span class="o">=</span><span class="n">offsets</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">record</span><span class="p">)</span>
+        <span class="c1"># mixed/flat collection: keep fields as-is in a per-event record</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">maybe_length_of</span><span class="p">(</span><span class="n">layouts</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">(</span>
+            <span class="n">layouts</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">params</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="PHYSLITE.behavior">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.PHYSLITE.behavior">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">behavior</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Behaviors necessary to implement this schema (dict)"""</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.behaviors</span><span class="w"> </span><span class="kn">import</span> <span class="n">physlite</span>
+
+        <span class="k">return</span> <span class="n">physlite</span><span class="o">.</span><span class="n">behavior</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Peter Fackeldey, Maxym Naumchyk.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

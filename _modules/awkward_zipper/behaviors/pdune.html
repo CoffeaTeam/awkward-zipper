@@ -1,0 +1,351 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>awkward_zipper.behaviors.pdune &mdash; awkward-zipper 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/logo_unfilled_with_text.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            awkward-zipper
+              <img src="../../../_static/logo_unfilled_with_black_text.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">awkward-zipper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">awkward_zipper.behaviors.pdune</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for awkward_zipper.behaviors.pdune</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Mixins for the ATLAS PHYSLITE schema - work in progress."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">awkward</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.behaviors</span><span class="w"> </span><span class="kn">import</span> <span class="n">base</span><span class="p">,</span> <span class="n">vector</span>
+
+<span class="n">behavior</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">behavior</span><span class="p">)</span>
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">vector</span><span class="o">.</span><span class="n">behavior</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_set_repr_name</span><span class="p">(</span><span class="n">classname</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">namefcn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">classname</span>
+
+    <span class="n">behavior</span><span class="p">[(</span><span class="s2">"__typestr__"</span><span class="p">,</span> <span class="n">classname</span><span class="p">)]</span> <span class="o">=</span> <span class="n">classname</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">+</span> <span class="n">classname</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="n">behavior</span><span class="p">[</span><span class="n">classname</span><span class="p">]</span><span class="o">.</span><span class="fm">__repr__</span> <span class="o">=</span> <span class="n">namefcn</span>
+
+
+<span class="c1"># from MetaData/EventFormat</span>
+<span class="n">_hash_to_target_name</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="mi">13267281</span><span class="p">:</span> <span class="s2">"TruthPhotons"</span><span class="p">,</span>
+    <span class="mi">342174277</span><span class="p">:</span> <span class="s2">"TruthMuons"</span><span class="p">,</span>
+    <span class="mi">368360608</span><span class="p">:</span> <span class="s2">"TruthNeutrinos"</span><span class="p">,</span>
+    <span class="mi">375408000</span><span class="p">:</span> <span class="s2">"TruthTaus"</span><span class="p">,</span>
+    <span class="mi">394100163</span><span class="p">:</span> <span class="s2">"TruthElectrons"</span><span class="p">,</span>
+    <span class="mi">614719239</span><span class="p">:</span> <span class="s2">"TruthBoson"</span><span class="p">,</span>
+    <span class="mi">660928181</span><span class="p">:</span> <span class="s2">"TruthTop"</span><span class="p">,</span>
+    <span class="mi">779635413</span><span class="p">:</span> <span class="s2">"TruthBottom"</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_element_link</span><span class="p">(</span><span class="n">target_collection</span><span class="p">,</span> <span class="n">eventindex</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="n">global_index</span> <span class="o">=</span> <span class="n">_get_global_index</span><span class="p">(</span><span class="n">target_collection</span><span class="p">,</span> <span class="n">eventindex</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+    <span class="n">global_index</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">key</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">global_index</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">target_collection</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="n">global_index</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_element_link_multiple</span><span class="p">(</span><span class="n">events</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">link_field</span><span class="p">,</span> <span class="n">with_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">link</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="n">link_field</span><span class="p">]</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="n">link</span><span class="o">.</span><span class="n">m_persKey</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="n">link</span><span class="o">.</span><span class="n">m_persIndex</span>
+    <span class="n">unique_keys</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">i</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="mi">0</span>
+    <span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">where</span><span class="p">(</span><span class="n">unique_keys</span><span class="p">):</span>
+        <span class="n">target_name</span> <span class="o">=</span> <span class="n">_hash_to_target_name</span><span class="p">[</span><span class="n">unique_keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">key</span> <span class="o">==</span> <span class="n">unique_keys</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">global_index</span> <span class="o">=</span> <span class="n">_get_global_index</span><span class="p">(</span><span class="n">events</span><span class="p">[</span><span class="n">target_name</span><span class="p">],</span> <span class="n">obj</span><span class="o">.</span><span class="n">_eventindex</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+        <span class="n">global_index</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">global_index</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">links</span> <span class="o">=</span> <span class="n">events</span><span class="p">[</span><span class="n">target_name</span><span class="p">]</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="n">global_index</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_keys</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">links</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="n">where</span><span class="p">(</span><span class="n">unique_keys</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+
+    <span class="n">out</span> <span class="o">=</span> <span class="n">where</span><span class="p">(</span><span class="n">unique_keys</span><span class="p">)</span><span class="o">.</span><span class="n">mask</span><span class="p">[</span><span class="n">key</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">with_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">with_parameter</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="s2">"__record__"</span><span class="p">,</span> <span class="n">with_name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_target_offsets</span><span class="p">(</span><span class="n">offsets</span><span class="p">,</span> <span class="n">event_index</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event_index</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">offsets</span><span class="p">[</span><span class="n">event_index</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">descend</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">layout</span><span class="o">.</span><span class="n">purelist_depth</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">NumpyArray</span><span class="p">(</span><span class="n">offsets</span><span class="p">)[</span><span class="n">layout</span><span class="p">]</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">recursively_apply</span><span class="p">(</span><span class="n">event_index</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span> <span class="n">descend</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_global_index</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">eventindex</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+    <span class="n">load_column</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">materialized</span><span class="p">(</span>
+        <span class="n">target</span><span class="p">[</span><span class="n">target</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="p">)</span>  <span class="c1"># need to load one column to extract the offsets</span>
+    <span class="n">target_offsets</span> <span class="o">=</span> <span class="n">_get_target_offsets</span><span class="p">(</span><span class="n">load_column</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">offsets</span><span class="p">,</span> <span class="n">eventindex</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">target_offsets</span> <span class="o">+</span> <span class="n">index</span>
+
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span><span class="s2">"LorentzVector"</span><span class="p">,</span> <span class="s2">"Particle"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="Particle">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.pdune.Particle">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Particle</span><span class="p">(</span><span class="n">vector</span><span class="o">.</span><span class="n">LorentzVector</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Generic particle collection that has Lorentz vector properties"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Particle"</span><span class="p">)</span>
+
+<span class="n">ParticleArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ParticleArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ParticleArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">ParticleArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ParticleArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">ParticleRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ParticleRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+    <span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span><span class="s2">"LorentzVector"</span><span class="p">,</span> <span class="s2">"TrackParticle"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">)</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="TrackParticle">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.pdune.TrackParticle">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TrackParticle</span><span class="p">(</span><span class="n">vector</span><span class="o">.</span><span class="n">LorentzVector</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Collection of track particles, following `xAOD::TrackParticle_v1</span>
+<span class="sd">    &lt;https://gitlab.cern.ch/atlas/athena/-/blob/21.2/Event/xAOD/xAODTracking/Root/TrackParticle_v1.cxx#L82&gt;`_.</span>
+<span class="sd">    """</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"TrackParticle"</span><span class="p">)</span>
+
+<span class="n">TrackParticleArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TrackParticleArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TrackParticleArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">TrackParticleArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TrackParticleArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TrackParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TrackParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TrackParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">TrackParticleRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TrackParticleRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span><span class="s2">"Particle"</span><span class="p">,</span> <span class="s2">"Muon"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="Muon">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.pdune.Muon">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Muon</span><span class="p">(</span><span class="n">Particle</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Muon collection, following `xAOD::Muon_v1</span>
+<span class="sd">    &lt;https://gitlab.cern.ch/atlas/athena/-/blob/21.2/Event/xAOD/xAODMuon/Root/Muon_v1.cxx&gt;`_.</span>
+<span class="sd">    """</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trackParticle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_element_link</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">CombinedMuonTrackParticles</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_eventindex</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">"combinedTrackParticleLink.m_persIndex"</span><span class="p">],</span>
+            <span class="bp">self</span><span class="p">[</span><span class="s2">"combinedTrackParticleLink.m_persKey"</span><span class="p">],</span>
+        <span class="p">)</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Muon"</span><span class="p">)</span>
+
+<span class="n">MuonArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MuonArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MuonArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">MuonArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MuonArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MuonRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MuonRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MuonRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">MuonRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MuonRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span><span class="s2">"Particle"</span><span class="p">,</span> <span class="s2">"Electron"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="Electron">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.pdune.Electron">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Electron</span><span class="p">(</span><span class="n">Particle</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Electron collection, following `xAOD::Electron_v1</span>
+<span class="sd">    &lt;https://gitlab.cern.ch/atlas/athena/-/blob/21.2/Event/xAOD/xAODEgamma/Root/Electron_v1.cxx&gt;`_.</span>
+<span class="sd">    """</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trackParticles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">links</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trackParticleLinks</span>
+        <span class="k">return</span> <span class="n">_element_link</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">GSFTrackParticles</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_eventindex</span><span class="p">,</span>
+            <span class="n">links</span><span class="o">.</span><span class="n">m_persIndex</span><span class="p">,</span>
+            <span class="n">links</span><span class="o">.</span><span class="n">m_persKey</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">trackParticle</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">trackParticles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trackParticles</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">trackParticles</span><span class="p">[</span>
+            <span class="nb">tuple</span><span class="p">([</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">trackParticles</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="p">]</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Electron"</span><span class="p">)</span>
+
+<span class="n">ElectronArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ElectronArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ElectronArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">ElectronArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ElectronArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ElectronRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ElectronRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ElectronRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">ElectronRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ElectronRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+    <span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span><span class="s2">"LorentzVector"</span><span class="p">,</span> <span class="s2">"TruthParticle"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">)</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="TruthParticle">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.pdune.TruthParticle">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TruthParticle</span><span class="p">(</span><span class="n">vector</span><span class="o">.</span><span class="n">LorentzVector</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Truth particle collection, following `xAOD::TruthParticle_v1</span>
+<span class="sd">    &lt;https://gitlab.cern.ch/atlas/athena/-/blob/21.2/Event/xAOD/xAODTruth/Root/TruthParticle_v1.cxx&gt;`_.</span>
+<span class="sd">    """</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">children</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_element_link_multiple</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">(),</span> <span class="bp">self</span><span class="p">,</span> <span class="s2">"childLinks"</span><span class="p">,</span> <span class="n">with_name</span><span class="o">=</span><span class="s2">"TruthParticle"</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parents</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_element_link_multiple</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">(),</span> <span class="bp">self</span><span class="p">,</span> <span class="s2">"parentLinks"</span><span class="p">,</span> <span class="n">with_name</span><span class="o">=</span><span class="s2">"TruthParticle"</span>
+        <span class="p">)</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"TruthParticle"</span><span class="p">)</span>
+
+<span class="n">TruthParticleArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TruthParticleArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TruthParticleArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">TruthParticleArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TruthParticleArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TruthParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TruthParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TruthParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">TruthParticleRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TruthParticleRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Peter Fackeldey, Maxym Naumchyk.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

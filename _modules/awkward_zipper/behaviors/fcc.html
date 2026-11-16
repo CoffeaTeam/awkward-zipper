@@ -1,0 +1,608 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>awkward_zipper.behaviors.fcc &mdash; awkward-zipper 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/logo_unfilled_with_text.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            awkward-zipper
+              <img src="../../../_static/logo_unfilled_with_black_text.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">awkward-zipper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">awkward_zipper.behaviors.fcc</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for awkward_zipper.behaviors.fcc</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">awkward</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.behaviors</span><span class="w"> </span><span class="kn">import</span> <span class="n">base</span><span class="p">,</span> <span class="n">edm4hep</span><span class="p">,</span> <span class="n">vector</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.behaviors.edm4hep</span><span class="w"> </span><span class="kn">import</span> <span class="n">_copy_behaviors</span>
+
+<span class="n">behavior</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">behavior</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">behavior</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_FCCEvents</span><span class="p">(</span><span class="n">behavior</span><span class="p">[</span><span class="s2">"NanoEvents"</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">"""FCCEvents"""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">"FCC Events"</span>
+
+
+<span class="n">behavior</span><span class="p">[</span><span class="s2">"NanoEvents"</span><span class="p">]</span> <span class="o">=</span> <span class="n">_FCCEvents</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_set_repr_name</span><span class="p">(</span><span class="n">classname</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">namefcn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">classname</span>
+
+    <span class="n">behavior</span><span class="p">[</span><span class="n">classname</span><span class="p">]</span><span class="o">.</span><span class="fm">__repr__</span> <span class="o">=</span> <span class="n">namefcn</span>
+
+
+<div class="viewcode-block" id="MomentumCandidate">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.fcc.MomentumCandidate">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MomentumCandidate</span><span class="p">(</span><span class="n">vector</span><span class="o">.</span><span class="n">LorentzVector</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""A Lorentz vector with charge</span>
+
+<span class="sd">    This mixin class requires the parent class to provide the items ``px``, ``py``, ``pz``, `E`, and ``charge``.</span>
+<span class="sd">    """</span>
+
+<div class="viewcode-block" id="MomentumCandidate.add">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.fcc.MomentumCandidate.add">[docs]</a>
+    <span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class_method</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="p">{</span><span class="s2">"MomentumCandidate"</span><span class="p">})</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Add two candidates together elementwise using ``px``, ``py``, ``pz``, `E`, and ``charge`` components"""</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"px"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">px</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">px</span><span class="p">,</span>
+                <span class="s2">"py"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">py</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">py</span><span class="p">,</span>
+                <span class="s2">"pz"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">pz</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">pz</span><span class="p">,</span>
+                <span class="s2">"E"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">E</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">E</span><span class="p">,</span>
+                <span class="s2">"charge"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">charge</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">with_name</span><span class="o">=</span><span class="s2">"MomentumCandidate"</span><span class="p">,</span>
+            <span class="n">behavior</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MomentumCandidate.sum">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.fcc.MomentumCandidate.sum">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Sum an array of vectors elementwise using ``px``, ``py``, ``pz``, `E`, and ``charge`` components"""</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"px"</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">px</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">),</span>
+                <span class="s2">"py"</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">py</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">),</span>
+                <span class="s2">"pz"</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pz</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">),</span>
+                <span class="s2">"E"</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">),</span>
+                <span class="s2">"charge"</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">charge</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">axis</span><span class="p">),</span>
+            <span class="p">},</span>
+            <span class="n">with_name</span><span class="o">=</span><span class="s2">"MomentumCandidate"</span><span class="p">,</span>
+            <span class="n">behavior</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">absolute_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mass2</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__awkward_validation__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">"charge"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> requires the 'charge' field"</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="s2">"__awkward_validation__"</span><span class="p">):</span>
+            <span class="n">parent</span><span class="o">.</span><span class="n">__awkward_validation__</span><span class="p">()</span></div>
+
+
+
+<span class="n">_copy_behaviors</span><span class="p">(</span><span class="s2">"LorentzVector"</span><span class="p">,</span> <span class="s2">"MomentumCandidate"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">)</span>
+
+<span class="n">MomentumCandidateArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MomentumCandidateArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MomentumCandidateArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MomentumCandidateArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">MomentumCandidateArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MomentumCandidateRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MomentumCandidateRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MomentumCandidateRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MomentumCandidateRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">MomentumCandidateRecord</span>  <span class="c1"># noqa: F821</span>
+
+
+<div class="viewcode-block" id="MCParticle">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.fcc.MCParticle">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MCParticle</span><span class="p">(</span><span class="n">MomentumCandidate</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Generated Monte Carlo particles"""</span>
+
+    <span class="c1"># Daughters</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_daughters_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Obtain the global indices of the daughters of each and every MCParticle</span>
+<span class="sd">        - The output is a doubly nested awkward array</span>
+<span class="sd">        - Needs the presence of Particleidx1 collection</span>
+<span class="sd">        - The Particleidx1.index contains info about the daughters</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">daughters</span><span class="o">.</span><span class="n">Particleidx1_rangesG</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_daughters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Obtain the actual MCParticle daughters to each and every MCParticle</span>
+<span class="sd">        - The output is a doubly nested awkward array</span>
+<span class="sd">        - Needs the presence of Particleidx1 collection</span>
+<span class="sd">        - The Particleidx1.index contains info about the daughters</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">Particle</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_daughters_index</span><span class="p">)</span>
+
+    <span class="c1"># Parents</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_parents_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Obtain the global indices of the parents of each and every MCParticle</span>
+<span class="sd">        - The output is a doubly nested awkward array</span>
+<span class="sd">        - Needs the presence of Particleidx0 collection</span>
+<span class="sd">        - The Particleidx0.index contains info about the parents</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parents</span><span class="o">.</span><span class="n">Particleidx0_rangesG</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_parents</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Obtain the actual MCParticle parents to each and every MCParticle</span>
+<span class="sd">        - The output is a doubly nested awkward array</span>
+<span class="sd">        - Needs the presence of Particleidx0 collection</span>
+<span class="sd">        - The Particleidx0.index contains info about the parents</span>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">Particle</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_parents_index</span><span class="p">)</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"MCParticle"</span><span class="p">)</span>
+<span class="n">_copy_behaviors</span><span class="p">(</span><span class="s2">"MomentumCandidate"</span><span class="p">,</span> <span class="s2">"MCParticle"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">)</span>
+
+<span class="n">MCParticleArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MCParticleArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MCParticleArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">MCParticleArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MCParticleArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MCParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MCParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MCParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MCParticleRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+
+<div class="viewcode-block" id="ReconstructedParticle">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.fcc.ReconstructedParticle">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ReconstructedParticle</span><span class="p">(</span><span class="n">MomentumCandidate</span><span class="p">,</span> <span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Reconstructed particle"""</span>
+
+<div class="viewcode-block" id="ReconstructedParticle.match_collection">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.fcc.ReconstructedParticle.match_collection">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">match_collection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns matched particles; pass on an ObjectID array."""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">idx</span><span class="o">.</span><span class="n">index</span><span class="p">]</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">match_muons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns matched muons; drops none values"""</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">ReconstructedParticles</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Muonidx0_indexGlobal</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">drop_none</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">behavior</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">match_electrons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns matched electrons; drops none values"""</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">ReconstructedParticles</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Electronidx0_indexGlobal</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">drop_none</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">behavior</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">match_gen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Returns the Gen level (MC) particle corresponding to the ReconstructedParticle"""</span>
+        <span class="n">prepared</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">Particle</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">MCRecoAssociations</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">prepared</span><span class="o">.</span><span class="n">_apply_global_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">MCRecoAssociationsidx0_indexGlobal</span><span class="p">)</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"ReconstructedParticle"</span><span class="p">)</span>
+<span class="n">_copy_behaviors</span><span class="p">(</span><span class="s2">"MomentumCandidate"</span><span class="p">,</span> <span class="s2">"ReconstructedParticle"</span><span class="p">,</span> <span class="n">behavior</span><span class="p">)</span>
+
+<span class="n">ReconstructedParticleArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ReconstructedParticleArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ReconstructedParticleArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">ReconstructedParticleArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ReconstructedParticleArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ReconstructedParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ReconstructedParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ReconstructedParticleRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ReconstructedParticleRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+
+<div class="viewcode-block" id="MCRecoParticleAssociation">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.fcc.MCRecoParticleAssociation">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MCRecoParticleAssociation</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""MCRecoParticleAssociation objects."""</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reco_mc_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Returns an array of indices mapping to generator particles for each reconstructed particle</span>
+<span class="sd">        """</span>
+        <span class="n">arr_reco</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reco</span><span class="o">.</span><span class="n">index</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+        <span class="n">arr_mc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">index</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">arr_reco</span><span class="p">,</span> <span class="n">arr_mc</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reco_mc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Returns an array of records mapping to generator particle record for each reconstructed particle record</span>
+<span class="sd">        - Needs 'ReconstructedParticles' and 'Particle' collections</span>
+<span class="sd">        """</span>
+        <span class="n">reco_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reco</span><span class="o">.</span><span class="n">index</span>
+        <span class="n">mc_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mc</span><span class="o">.</span><span class="n">index</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">ReconstructedParticles</span><span class="p">[</span><span class="n">reco_index</span><span class="p">][:,</span> <span class="p">:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_events</span><span class="p">()</span><span class="o">.</span><span class="n">Particle</span><span class="p">[</span><span class="n">mc_index</span><span class="p">][:,</span> <span class="p">:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">r</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"MCRecoParticleAssociation"</span><span class="p">)</span>
+
+<span class="n">MCRecoParticleAssociationArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MCRecoParticleAssociationArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MCRecoParticleAssociationArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="p">(</span>  <span class="c1"># noqa: F821</span>
+    <span class="n">MCRecoParticleAssociationArray</span>  <span class="c1"># noqa: F821  # noqa: F821</span>
+<span class="p">)</span>
+<span class="n">MCRecoParticleAssociationArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MCRecoParticleAssociationRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MCRecoParticleAssociationRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="p">(</span>  <span class="c1"># noqa: F821</span>
+    <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>
+<span class="p">)</span>
+<span class="n">MCRecoParticleAssociationRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="p">(</span>  <span class="c1"># noqa: F821</span>
+    <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>
+<span class="p">)</span>
+<span class="n">MCRecoParticleAssociationRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+
+<div class="viewcode-block" id="ParticleID">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.fcc.ParticleID">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ParticleID</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""ParticleID collection"""</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"ParticleID"</span><span class="p">)</span>
+
+<span class="n">ParticleIDArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ParticleIDArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ParticleIDArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">ParticleIDArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ParticleIDArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ParticleIDRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ParticleIDRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ParticleIDRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ParticleIDRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+
+<div class="viewcode-block" id="ObjectID">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.fcc.ObjectID">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ObjectID</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Generic Object ID storage, pointing to another collection</span>
+<span class="sd">    - All the idx collections are assigned this mixin</span>
+
+<span class="sd">    Note: The Hash tagged '#' branches have the &lt;podio::ObjectID&gt; type</span>
+<span class="sd">    """</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"ObjectID"</span><span class="p">)</span>
+
+<span class="n">ObjectIDArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ObjectIDArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ObjectIDArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">ObjectIDArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ObjectIDArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ObjectIDRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ObjectIDRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ObjectIDRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ObjectIDRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+
+<div class="viewcode-block" id="Cluster">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.fcc.Cluster">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Cluster</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Clusters</span>
+
+<span class="sd">    Note: I could not find much info on this, to build its methods</span>
+<span class="sd">    """</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Cluster"</span><span class="p">)</span>
+
+<span class="n">ClusterArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ClusterArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ClusterArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">ClusterArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ClusterArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ClusterRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ClusterRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ClusterRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">ClusterRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+
+<div class="viewcode-block" id="Track">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.fcc.Track">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Track</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">NanoCollection</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Tracks</span>
+
+<span class="sd">    Note: I could not find much info on this, to build its methods</span>
+<span class="sd">    """</span></div>
+
+
+
+<span class="n">_set_repr_name</span><span class="p">(</span><span class="s2">"Track"</span><span class="p">)</span>
+
+<span class="n">TrackArray</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TrackArray</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TrackArray</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">TrackArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TrackArray</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TrackRecord</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TrackRecord</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TrackRecord</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">TrackRecord</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+
+<span class="c1">###########################################</span>
+<span class="c1"># Overloads for FCC_edm4hep1</span>
+<span class="c1">###########################################</span>
+
+<span class="n">behavior_edm4hep1</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">behavior_edm4hep1</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">behavior</span><span class="p">)</span>
+<span class="n">behavior_edm4hep1</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">edm4hep</span><span class="o">.</span><span class="n">behavior</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_set_repr_name_edm4hep1</span><span class="p">(</span><span class="n">classname</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">namefcn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">classname</span>
+
+    <span class="n">behavior_edm4hep1</span><span class="p">[</span><span class="n">classname</span><span class="p">]</span><span class="o">.</span><span class="fm">__repr__</span> <span class="o">=</span> <span class="n">namefcn</span>
+
+
+<div class="viewcode-block" id="MCParticle_edm4hep1">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.fcc.MCParticle_edm4hep1">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior_edm4hep1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"MCParticle"</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MCParticle_edm4hep1</span><span class="p">(</span><span class="n">edm4hep</span><span class="o">.</span><span class="n">MCParticle</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Datatype: MCParticle; Modified for FCC"""</span>
+
+    <span class="c1"># Get MC Daughters</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_daughters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Map_Relation</span><span class="p">(</span><span class="s2">"daughters"</span><span class="p">,</span> <span class="s2">"Particle"</span><span class="p">)</span>
+
+    <span class="c1"># Get MC Parents</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_parents</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Map_Relation</span><span class="p">(</span><span class="s2">"parents"</span><span class="p">,</span> <span class="s2">"Particle"</span><span class="p">)</span></div>
+
+
+
+<span class="n">_set_repr_name_edm4hep1</span><span class="p">(</span><span class="s2">"MCParticle"</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">_key</span><span class="p">,</span> <span class="n">_value</span> <span class="ow">in</span> <span class="n">awkward</span><span class="o">.</span><span class="n">_util</span><span class="o">.</span><span class="n">copy_behaviors</span><span class="p">(</span>
+    <span class="s2">"MomentumCandidate"</span><span class="p">,</span> <span class="s2">"MCParticle"</span><span class="p">,</span> <span class="n">behavior</span>
+<span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">behavior_edm4hep1</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">_key</span><span class="p">,</span> <span class="n">_value</span><span class="p">)</span>
+<span class="k">del</span> <span class="n">_key</span><span class="p">,</span> <span class="n">_value</span>
+<span class="n">MCParticle_edm4hep1Array</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MCParticle_edm4hep1Array</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MCParticle_edm4hep1Array</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">MCParticle_edm4hep1Array</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MCParticle_edm4hep1Array</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MCParticle_edm4hep1Record</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MCParticle_edm4hep1Record</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MCParticle_edm4hep1Record</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+<span class="n">MCParticle_edm4hep1Record</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>  <span class="c1"># noqa: F821</span>
+
+
+<div class="viewcode-block" id="ReconstructedParticle_edm4hep1">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.fcc.ReconstructedParticle_edm4hep1">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior_edm4hep1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"ReconstructedParticle"</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ReconstructedParticle_edm4hep1</span><span class="p">(</span><span class="n">edm4hep</span><span class="o">.</span><span class="n">ReconstructedParticle</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Datatype: Reconstructed particle; Modified for FCC"""</span>
+
+    <span class="c1"># Get MC counterpart</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">match_gen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Map_Link</span><span class="p">(</span><span class="s2">"to"</span><span class="p">,</span> <span class="s2">"Particle"</span><span class="p">)</span>
+
+    <span class="c1"># Get cluster EFlowPhoton</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_cluster_photons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Map_Relation</span><span class="p">(</span><span class="s2">"clusters"</span><span class="p">,</span> <span class="s2">"EFlowPhoton"</span><span class="p">)</span>
+
+    <span class="c1"># Get ReconstructedParticle</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_reconstructedparticles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Map_Relation</span><span class="p">(</span><span class="s2">"particles"</span><span class="p">,</span> <span class="s2">"ReconstructedParticles"</span><span class="p">)</span>
+
+    <span class="c1"># Get Tracks</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_tracks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Map_Relation</span><span class="p">(</span><span class="s2">"tracks"</span><span class="p">,</span> <span class="s2">"EFlowTrack"</span><span class="p">)</span></div>
+
+
+
+<span class="n">_set_repr_name_edm4hep1</span><span class="p">(</span><span class="s2">"ReconstructedParticle"</span><span class="p">)</span>
+<span class="n">_copy_behaviors</span><span class="p">(</span><span class="s2">"MomentumCandidate"</span><span class="p">,</span> <span class="s2">"ReconstructedParticle"</span><span class="p">,</span> <span class="n">behavior_edm4hep1</span><span class="p">)</span>
+<span class="n">_recop_array</span> <span class="o">=</span> <span class="n">ReconstructedParticle_edm4hep1Array</span>  <span class="c1"># noqa: F821</span>
+<span class="n">_recop_record</span> <span class="o">=</span> <span class="n">ReconstructedParticle_edm4hep1Record</span>  <span class="c1"># noqa: F821</span>
+<span class="n">_recop_array</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorArray</span>
+<span class="n">_recop_array</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorArray</span>
+<span class="n">_recop_array</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">_recop_array</span>
+<span class="n">_recop_array</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorArray</span>
+<span class="n">_recop_record</span><span class="o">.</span><span class="n">ProjectionClass2D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">TwoVectorRecord</span>
+<span class="n">_recop_record</span><span class="o">.</span><span class="n">ProjectionClass3D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">ThreeVectorRecord</span>
+<span class="n">_recop_record</span><span class="o">.</span><span class="n">ProjectionClass4D</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>
+<span class="n">_recop_record</span><span class="o">.</span><span class="n">MomentumClass</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">LorentzVectorRecord</span>
+<span class="k">del</span> <span class="n">_recop_array</span><span class="p">,</span> <span class="n">_recop_record</span>
+
+
+<div class="viewcode-block" id="ParticleID_edm4hep1">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.fcc.ParticleID_edm4hep1">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior_edm4hep1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"ParticleID"</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ParticleID_edm4hep1</span><span class="p">(</span><span class="n">edm4hep</span><span class="o">.</span><span class="n">ParticleID</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Datatype: ParticleID; Modified for FCC"""</span>
+
+    <span class="c1"># Get ReconstructedParticle</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_reconstructedparticles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Map_Relation</span><span class="p">(</span><span class="s2">"particle"</span><span class="p">,</span> <span class="s2">"ReconstructedParticles"</span><span class="p">)</span></div>
+
+
+
+<span class="n">_set_repr_name_edm4hep1</span><span class="p">(</span><span class="s2">"ParticleID"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Cluster_edm4hep1">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.fcc.Cluster_edm4hep1">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior_edm4hep1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Cluster"</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Cluster_edm4hep1</span><span class="p">(</span><span class="n">edm4hep</span><span class="o">.</span><span class="n">Cluster</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Datatype: Cluster; Modified for FCC"""</span>
+
+    <span class="c1"># Get cluster EFlowPhoton</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_cluster_photons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Map_Relation</span><span class="p">(</span><span class="s2">"clusters"</span><span class="p">,</span> <span class="s2">"EFlowPhoton"</span><span class="p">)</span>
+
+    <span class="c1"># Get calorimeter hits</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_hits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Map_Relation</span><span class="p">(</span><span class="s2">"hits"</span><span class="p">,</span> <span class="s2">"CalorimeterHits"</span><span class="p">)</span></div>
+
+
+
+<span class="n">_set_repr_name_edm4hep1</span><span class="p">(</span><span class="s2">"Cluster"</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Track_edm4hep1">
+<a class="viewcode-back" href="../../../awkward_zipper.behaviors.html#awkward_zipper.behaviors.fcc.Track_edm4hep1">[docs]</a>
+<span class="nd">@awkward</span><span class="o">.</span><span class="n">mixin_class</span><span class="p">(</span><span class="n">behavior_edm4hep1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Track"</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Track_edm4hep1</span><span class="p">(</span><span class="n">edm4hep</span><span class="o">.</span><span class="n">Track</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""EDM4HEP Datatype: Track; Modified for FCC"""</span>
+
+    <span class="c1"># Get Tracks</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_tracks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Map_Relation</span><span class="p">(</span><span class="s2">"tracks"</span><span class="p">,</span> <span class="s2">"EFlowTrack"</span><span class="p">)</span>
+
+    <span class="c1"># Get tracker hits</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_trackerhits</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">Map_Relation</span><span class="p">(</span><span class="s2">"trackerHits"</span><span class="p">,</span> <span class="s2">"TrackerHits"</span><span class="p">)</span></div>
+
+
+
+<span class="n">_set_repr_name_edm4hep1</span><span class="p">(</span><span class="s2">"Track"</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Peter Fackeldey, Maxym Naumchyk.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,988 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Install libraries &mdash; awkward-zipper 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+    <link rel="shortcut icon" href="../_static/logo_unfilled_with_text.png"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Documentation" href="../modules.html" />
+    <link rel="prev" title="Install libraries" href="compare_histograms_made_with_coffea_and_zipper.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            awkward-zipper
+              <img src="../_static/logo_unfilled_with_black_text.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../notebooks.html">Examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../benchmarks.html">Benchmarks</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../benchmarks.html#compare-histograms-made-with-coffea-and-zipper">Compare histograms made with coffea and zipper</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../benchmarks.html#simple-test-of-coffea-and-zipper-speeds">Simple test of coffea and zipper speeds</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Install libraries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Virtual-mode">Virtual mode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#try-another-root-file">try another root file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#yet-another-root-file">yet another root file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Eager-mode">Eager mode</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">awkward-zipper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../benchmarks.html">Benchmarks</a></li>
+      <li class="breadcrumb-item active">Install libraries</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/benchmarks/simple_test_of_coffea_and_zipper_speeds.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># to get the test root file manually</span>
+<span class="c1"># !wget {'https://github.com/ikrommyd/coffea-virtual-array-demo/raw/de75f6d8a17be5cb1c71dbbf962b366fc92dc251/data/DYto2E.root'}</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+--2025-07-28 11:01:12--  https://github.com/ikrommyd/coffea-virtual-array-demo/raw/de75f6d8a17be5cb1c71dbbf962b366fc92dc251/data/DYto2E.root
+Resolving github.com (github.com)... 140.82.114.3
+Connecting to github.com (github.com)|140.82.114.3|:443... connected.
+HTTP request sent, awaiting response... 302 Found
+Location: https://media.githubusercontent.com/media/ikrommyd/coffea-virtual-array-demo/de75f6d8a17be5cb1c71dbbf962b366fc92dc251/data/DYto2E.root [following]
+--2025-07-28 11:01:12--  https://media.githubusercontent.com/media/ikrommyd/coffea-virtual-array-demo/de75f6d8a17be5cb1c71dbbf962b366fc92dc251/data/DYto2E.root
+Resolving media.githubusercontent.com (media.githubusercontent.com)... 185.199.108.133, 185.199.109.133, 185.199.110.133, ...
+Connecting to media.githubusercontent.com (media.githubusercontent.com)|185.199.108.133|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 3376397 (3.2M) [application/octet-stream]
+Saving to: ‘DYto2E.root’
+
+DYto2E.root         100%[===================&gt;]   3.22M  --.-KB/s    in 0.08s
+
+2025-07-28 11:01:12 (42.6 MB/s) - ‘DYto2E.root’ saved [3376397/3376397]
+
+</pre></div></div>
+</div>
+<section id="Install-libraries">
+<h1>Install libraries<a class="headerlink" href="#Install-libraries" title="Link to this heading"></a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">awkward</span> <span class="n">coffea</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Collecting awkward
+  Downloading awkward-2.8.5-py3-none-any.whl.metadata (6.9 kB)
+Collecting coffea
+  Downloading coffea-2025.7.3-py3-none-any.whl.metadata (8.1 kB)
+Collecting awkward-cpp==47 (from awkward)
+  Downloading awkward_cpp-47-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (2.1 kB)
+Requirement already satisfied: fsspec&gt;=2022.11.0 in /usr/local/lib/python3.11/dist-packages (from awkward) (2025.3.0)
+Requirement already satisfied: importlib-metadata&gt;=4.13.0 in /usr/local/lib/python3.11/dist-packages (from awkward) (8.7.0)
+Requirement already satisfied: numpy&gt;=1.18.0 in /usr/local/lib/python3.11/dist-packages (from awkward) (2.0.2)
+Requirement already satisfied: packaging in /usr/local/lib/python3.11/dist-packages (from awkward) (25.0)
+Requirement already satisfied: aiohttp in /usr/local/lib/python3.11/dist-packages (from coffea) (3.12.14)
+Requirement already satisfied: cachetools in /usr/local/lib/python3.11/dist-packages (from coffea) (5.5.2)
+Requirement already satisfied: cloudpickle&gt;=1.2.3 in /usr/local/lib/python3.11/dist-packages (from coffea) (3.1.1)
+Collecting correctionlib&gt;=2.6.0 (from coffea)
+  Downloading correctionlib-2.7.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.3 kB)
+Collecting dask-awkward&gt;=2025.5.0 (from coffea)
+  Downloading dask_awkward-2025.5.0-py3-none-any.whl.metadata (3.9 kB)
+Collecting dask-histogram&gt;=2025.2.0 (from coffea)
+  Downloading dask_histogram-2025.2.0-py3-none-any.whl.metadata (3.8 kB)
+Requirement already satisfied: dask&gt;=2024.3.0 in /usr/local/lib/python3.11/dist-packages (from dask[array]&gt;=2024.3.0-&gt;coffea) (2025.5.0)
+Collecting hist&gt;=2 (from coffea)
+  Downloading hist-2.8.1-py3-none-any.whl.metadata (16 kB)
+Collecting lz4 (from coffea)
+  Downloading lz4-4.4.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (3.8 kB)
+Requirement already satisfied: matplotlib&gt;=3 in /usr/local/lib/python3.11/dist-packages (from coffea) (3.10.0)
+Collecting mplhep&gt;=0.1.18 (from coffea)
+  Downloading mplhep-0.4.0-py3-none-any.whl.metadata (10 kB)
+Requirement already satisfied: numba&gt;=0.58.1 in /usr/local/lib/python3.11/dist-packages (from coffea) (0.60.0)
+Requirement already satisfied: pandas in /usr/local/lib/python3.11/dist-packages (from coffea) (2.2.2)
+Requirement already satisfied: pyarrow&lt;21.0.0,&gt;=6.0.0 in /usr/local/lib/python3.11/dist-packages (from coffea) (18.1.0)
+Requirement already satisfied: requests in /usr/local/lib/python3.11/dist-packages (from coffea) (2.32.3)
+Requirement already satisfied: scipy&gt;=1.1.0 in /usr/local/lib/python3.11/dist-packages (from coffea) (1.16.0)
+Requirement already satisfied: toml&gt;=0.10.2 in /usr/local/lib/python3.11/dist-packages (from coffea) (0.10.2)
+Requirement already satisfied: tqdm&gt;=4.27.0 in /usr/local/lib/python3.11/dist-packages (from coffea) (4.67.1)
+Collecting uproot&gt;=5.6.0 (from coffea)
+  Downloading uproot-5.6.3-py3-none-any.whl.metadata (33 kB)
+Collecting vector!=1.6.0,&gt;=1.4.1 (from coffea)
+  Downloading vector-1.6.3-py3-none-any.whl.metadata (16 kB)
+Requirement already satisfied: pydantic&gt;=2 in /usr/local/lib/python3.11/dist-packages (from correctionlib&gt;=2.6.0-&gt;coffea) (2.11.7)
+Requirement already satisfied: rich in /usr/local/lib/python3.11/dist-packages (from correctionlib&gt;=2.6.0-&gt;coffea) (13.9.4)
+Requirement already satisfied: click&gt;=8.1 in /usr/local/lib/python3.11/dist-packages (from dask&gt;=2024.3.0-&gt;dask[array]&gt;=2024.3.0-&gt;coffea) (8.2.1)
+Requirement already satisfied: partd&gt;=1.4.0 in /usr/local/lib/python3.11/dist-packages (from dask&gt;=2024.3.0-&gt;dask[array]&gt;=2024.3.0-&gt;coffea) (1.4.2)
+Requirement already satisfied: pyyaml&gt;=5.3.1 in /usr/local/lib/python3.11/dist-packages (from dask&gt;=2024.3.0-&gt;dask[array]&gt;=2024.3.0-&gt;coffea) (6.0.2)
+Requirement already satisfied: toolz&gt;=0.10.0 in /usr/local/lib/python3.11/dist-packages (from dask&gt;=2024.3.0-&gt;dask[array]&gt;=2024.3.0-&gt;coffea) (0.12.1)
+Collecting dask&gt;=2024.3.0 (from dask[array]&gt;=2024.3.0-&gt;coffea)
+  Downloading dask-2025.3.0-py3-none-any.whl.metadata (3.8 kB)
+Requirement already satisfied: typing-extensions&gt;=4.8.0 in /usr/local/lib/python3.11/dist-packages (from dask-awkward&gt;=2025.5.0-&gt;coffea) (4.14.1)
+Collecting boost-histogram&gt;=1.3.2 (from dask-histogram&gt;=2025.2.0-&gt;coffea)
+  Downloading boost_histogram-1.5.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (23 kB)
+INFO: pip is looking at multiple versions of dask[array] to determine which version is compatible with other requirements. This could take a while.
+Collecting dask[array]&gt;=2024.3.0 (from coffea)
+  Downloading dask-2025.7.0-py3-none-any.whl.metadata (3.8 kB)
+  Downloading dask-2025.5.1-py3-none-any.whl.metadata (3.8 kB)
+  Downloading dask-2025.4.1-py3-none-any.whl.metadata (3.8 kB)
+  Downloading dask-2025.4.0-py3-none-any.whl.metadata (3.8 kB)
+Collecting histoprint&gt;=2.2.0 (from hist&gt;=2-&gt;coffea)
+  Downloading histoprint-2.6.0-py3-none-any.whl.metadata (17 kB)
+Requirement already satisfied: zipp&gt;=3.20 in /usr/local/lib/python3.11/dist-packages (from importlib-metadata&gt;=4.13.0-&gt;awkward) (3.23.0)
+Requirement already satisfied: contourpy&gt;=1.0.1 in /usr/local/lib/python3.11/dist-packages (from matplotlib&gt;=3-&gt;coffea) (1.3.2)
+Requirement already satisfied: cycler&gt;=0.10 in /usr/local/lib/python3.11/dist-packages (from matplotlib&gt;=3-&gt;coffea) (0.12.1)
+Requirement already satisfied: fonttools&gt;=4.22.0 in /usr/local/lib/python3.11/dist-packages (from matplotlib&gt;=3-&gt;coffea) (4.59.0)
+Requirement already satisfied: kiwisolver&gt;=1.3.1 in /usr/local/lib/python3.11/dist-packages (from matplotlib&gt;=3-&gt;coffea) (1.4.8)
+Requirement already satisfied: pillow&gt;=8 in /usr/local/lib/python3.11/dist-packages (from matplotlib&gt;=3-&gt;coffea) (11.3.0)
+Requirement already satisfied: pyparsing&gt;=2.3.1 in /usr/local/lib/python3.11/dist-packages (from matplotlib&gt;=3-&gt;coffea) (3.2.3)
+Requirement already satisfied: python-dateutil&gt;=2.7 in /usr/local/lib/python3.11/dist-packages (from matplotlib&gt;=3-&gt;coffea) (2.9.0.post0)
+Collecting mplhep-data&gt;=0.0.4 (from mplhep&gt;=0.1.18-&gt;coffea)
+  Downloading mplhep_data-0.0.4-py3-none-any.whl.metadata (3.4 kB)
+Collecting uhi&gt;=0.2.0 (from mplhep&gt;=0.1.18-&gt;coffea)
+  Downloading uhi-0.5.0-py3-none-any.whl.metadata (7.5 kB)
+Requirement already satisfied: llvmlite&lt;0.44,&gt;=0.43.0dev0 in /usr/local/lib/python3.11/dist-packages (from numba&gt;=0.58.1-&gt;coffea) (0.43.0)
+Requirement already satisfied: cramjam&gt;=2.5.0 in /usr/local/lib/python3.11/dist-packages (from uproot&gt;=5.6.0-&gt;coffea) (2.10.0)
+Requirement already satisfied: xxhash in /usr/local/lib/python3.11/dist-packages (from uproot&gt;=5.6.0-&gt;coffea) (3.5.0)
+Requirement already satisfied: aiohappyeyeballs&gt;=2.5.0 in /usr/local/lib/python3.11/dist-packages (from aiohttp-&gt;coffea) (2.6.1)
+Requirement already satisfied: aiosignal&gt;=1.4.0 in /usr/local/lib/python3.11/dist-packages (from aiohttp-&gt;coffea) (1.4.0)
+Requirement already satisfied: attrs&gt;=17.3.0 in /usr/local/lib/python3.11/dist-packages (from aiohttp-&gt;coffea) (25.3.0)
+Requirement already satisfied: frozenlist&gt;=1.1.1 in /usr/local/lib/python3.11/dist-packages (from aiohttp-&gt;coffea) (1.7.0)
+Requirement already satisfied: multidict&lt;7.0,&gt;=4.5 in /usr/local/lib/python3.11/dist-packages (from aiohttp-&gt;coffea) (6.6.3)
+Requirement already satisfied: propcache&gt;=0.2.0 in /usr/local/lib/python3.11/dist-packages (from aiohttp-&gt;coffea) (0.3.2)
+Requirement already satisfied: yarl&lt;2.0,&gt;=1.17.0 in /usr/local/lib/python3.11/dist-packages (from aiohttp-&gt;coffea) (1.20.1)
+Requirement already satisfied: pytz&gt;=2020.1 in /usr/local/lib/python3.11/dist-packages (from pandas-&gt;coffea) (2025.2)
+Requirement already satisfied: tzdata&gt;=2022.7 in /usr/local/lib/python3.11/dist-packages (from pandas-&gt;coffea) (2025.2)
+Requirement already satisfied: charset-normalizer&lt;4,&gt;=2 in /usr/local/lib/python3.11/dist-packages (from requests-&gt;coffea) (3.4.2)
+Requirement already satisfied: idna&lt;4,&gt;=2.5 in /usr/local/lib/python3.11/dist-packages (from requests-&gt;coffea) (3.10)
+Requirement already satisfied: urllib3&lt;3,&gt;=1.21.1 in /usr/local/lib/python3.11/dist-packages (from requests-&gt;coffea) (2.5.0)
+Requirement already satisfied: certifi&gt;=2017.4.17 in /usr/local/lib/python3.11/dist-packages (from requests-&gt;coffea) (2025.7.14)
+Requirement already satisfied: locket in /usr/local/lib/python3.11/dist-packages (from partd&gt;=1.4.0-&gt;dask&gt;=2024.3.0-&gt;dask[array]&gt;=2024.3.0-&gt;coffea) (1.0.0)
+Requirement already satisfied: annotated-types&gt;=0.6.0 in /usr/local/lib/python3.11/dist-packages (from pydantic&gt;=2-&gt;correctionlib&gt;=2.6.0-&gt;coffea) (0.7.0)
+Requirement already satisfied: pydantic-core==2.33.2 in /usr/local/lib/python3.11/dist-packages (from pydantic&gt;=2-&gt;correctionlib&gt;=2.6.0-&gt;coffea) (2.33.2)
+Requirement already satisfied: typing-inspection&gt;=0.4.0 in /usr/local/lib/python3.11/dist-packages (from pydantic&gt;=2-&gt;correctionlib&gt;=2.6.0-&gt;coffea) (0.4.1)
+Requirement already satisfied: six&gt;=1.5 in /usr/local/lib/python3.11/dist-packages (from python-dateutil&gt;=2.7-&gt;matplotlib&gt;=3-&gt;coffea) (1.17.0)
+Requirement already satisfied: markdown-it-py&gt;=2.2.0 in /usr/local/lib/python3.11/dist-packages (from rich-&gt;correctionlib&gt;=2.6.0-&gt;coffea) (3.0.0)
+Requirement already satisfied: pygments&lt;3.0.0,&gt;=2.13.0 in /usr/local/lib/python3.11/dist-packages (from rich-&gt;correctionlib&gt;=2.6.0-&gt;coffea) (2.19.2)
+Requirement already satisfied: mdurl~=0.1 in /usr/local/lib/python3.11/dist-packages (from markdown-it-py&gt;=2.2.0-&gt;rich-&gt;correctionlib&gt;=2.6.0-&gt;coffea) (0.1.2)
+Downloading awkward-2.8.5-py3-none-any.whl (886 kB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">886.8/886.8 kB</span> <span class="ansi-red-fg">15.1 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Downloading awkward_cpp-47-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (638 kB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">638.8/638.8 kB</span> <span class="ansi-red-fg">30.9 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Downloading coffea-2025.7.3-py3-none-any.whl (281 kB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">281.9/281.9 kB</span> <span class="ansi-red-fg">15.0 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Downloading correctionlib-2.7.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (436 kB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">436.1/436.1 kB</span> <span class="ansi-red-fg">24.2 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Downloading dask_awkward-2025.5.0-py3-none-any.whl (90 kB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">90.1/90.1 kB</span> <span class="ansi-red-fg">5.1 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Downloading dask-2025.3.0-py3-none-any.whl (1.4 MB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">1.4/1.4 MB</span> <span class="ansi-red-fg">48.9 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Downloading dask_histogram-2025.2.0-py3-none-any.whl (27 kB)
+Downloading hist-2.8.1-py3-none-any.whl (40 kB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">40.9/40.9 kB</span> <span class="ansi-red-fg">1.9 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Downloading mplhep-0.4.0-py3-none-any.whl (48 kB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">48.4/48.4 kB</span> <span class="ansi-red-fg">2.9 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Downloading uproot-5.6.3-py3-none-any.whl (382 kB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">382.8/382.8 kB</span> <span class="ansi-red-fg">22.2 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Downloading vector-1.6.3-py3-none-any.whl (179 kB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">179.6/179.6 kB</span> <span class="ansi-red-fg">10.8 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Downloading lz4-4.4.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.3 MB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">1.3/1.3 MB</span> <span class="ansi-red-fg">42.4 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Downloading boost_histogram-1.5.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.1 MB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">1.1/1.1 MB</span> <span class="ansi-red-fg">45.9 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Downloading histoprint-2.6.0-py3-none-any.whl (16 kB)
+Downloading mplhep_data-0.0.4-py3-none-any.whl (9.1 MB)
+   <span class="ansi-black-intense-fg">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span> <span class="ansi-green-fg">9.1/9.1 MB</span> <span class="ansi-red-fg">88.1 MB/s</span> eta <span class="ansi-cyan-fg">0:00:00</span>
+Downloading uhi-0.5.0-py3-none-any.whl (13 kB)
+Installing collected packages: vector, uhi, mplhep-data, lz4, boost-histogram, awkward-cpp, histoprint, dask, awkward, uproot, mplhep, hist, dask-awkward, correctionlib, dask-histogram, coffea
+  Attempting uninstall: dask
+    Found existing installation: dask 2025.5.0
+    Uninstalling dask-2025.5.0:
+      Successfully uninstalled dask-2025.5.0
+<span class="ansi-red-fg">ERROR: pip&#39;s dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+rapids-dask-dependency 25.6.0 requires dask==2025.5.0, but you have dask 2025.3.0 which is incompatible.
+distributed 2025.5.0 requires dask==2025.5.0, but you have dask 2025.3.0 which is incompatible.</span><span class="ansi-red-fg">
+</span>Successfully installed awkward-2.8.5 awkward-cpp-47 boost-histogram-1.5.2 coffea-2025.7.3 correctionlib-2.7.0 dask-2025.3.0 dask-awkward-2025.5.0 dask-histogram-2025.2.0 hist-2.8.1 histoprint-2.6.0 lz4-4.4.4 mplhep-0.4.0 mplhep-data-0.0.4 uhi-0.5.0 uproot-5.6.3 vector-1.6.3
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">git</span><span class="o">+</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">CoffeaTeam</span><span class="o">/</span><span class="n">awkward</span><span class="o">-</span><span class="n">zipper</span><span class="o">.</span><span class="n">git</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Collecting git+https://github.com/maxymnaumchyk/awkward-zipper.git
+  Cloning https://github.com/maxymnaumchyk/awkward-zipper.git to /tmp/pip-req-build-og7utoyf
+  Running command git clone --filter=blob:none --quiet https://github.com/maxymnaumchyk/awkward-zipper.git /tmp/pip-req-build-og7utoyf
+  Resolved https://github.com/maxymnaumchyk/awkward-zipper.git to commit 9b0aba48999f387885c0d90844bebf1552d72b31
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... done
+  Preparing metadata (pyproject.toml) ... done
+Collecting awkward@ git+https://github.com/scikit-hep/awkward@main (from awkward-zipper==0.0.1)
+  Cloning https://github.com/scikit-hep/awkward (to revision main) to /tmp/pip-install-v5dpnq5m/awkward_bd03197589a54ff1a2644779363ffcc5
+  Running command git clone --filter=blob:none --quiet https://github.com/scikit-hep/awkward /tmp/pip-install-v5dpnq5m/awkward_bd03197589a54ff1a2644779363ffcc5
+  Resolved https://github.com/scikit-hep/awkward to commit d94895ecc949ba0d1de40bc4d447e65bdb582c1a
+  Running command git submodule update --init --recursive -q
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... done
+  Preparing metadata (pyproject.toml) ... done
+Requirement already satisfied: numba in /usr/local/lib/python3.11/dist-packages (from awkward-zipper==0.0.1) (0.60.0)
+Requirement already satisfied: vector in /usr/local/lib/python3.11/dist-packages (from awkward-zipper==0.0.1) (1.6.3)
+Requirement already satisfied: awkward-cpp==47 in /usr/local/lib/python3.11/dist-packages (from awkward@ git+https://github.com/scikit-hep/awkward@main-&gt;awkward-zipper==0.0.1) (47)
+Requirement already satisfied: fsspec&gt;=2022.11.0 in /usr/local/lib/python3.11/dist-packages (from awkward@ git+https://github.com/scikit-hep/awkward@main-&gt;awkward-zipper==0.0.1) (2025.3.0)
+Requirement already satisfied: importlib-metadata&gt;=4.13.0 in /usr/local/lib/python3.11/dist-packages (from awkward@ git+https://github.com/scikit-hep/awkward@main-&gt;awkward-zipper==0.0.1) (8.7.0)
+Requirement already satisfied: numpy&gt;=1.18.0 in /usr/local/lib/python3.11/dist-packages (from awkward@ git+https://github.com/scikit-hep/awkward@main-&gt;awkward-zipper==0.0.1) (2.0.2)
+Requirement already satisfied: packaging in /usr/local/lib/python3.11/dist-packages (from awkward@ git+https://github.com/scikit-hep/awkward@main-&gt;awkward-zipper==0.0.1) (25.0)
+Requirement already satisfied: llvmlite&lt;0.44,&gt;=0.43.0dev0 in /usr/local/lib/python3.11/dist-packages (from numba-&gt;awkward-zipper==0.0.1) (0.43.0)
+Requirement already satisfied: zipp&gt;=3.20 in /usr/local/lib/python3.11/dist-packages (from importlib-metadata&gt;=4.13.0-&gt;awkward@ git+https://github.com/scikit-hep/awkward@main-&gt;awkward-zipper==0.0.1) (3.23.0)
+Building wheels for collected packages: awkward-zipper
+  Building wheel for awkward-zipper (pyproject.toml) ... done
+  Created wheel for awkward-zipper: filename=awkward_zipper-0.0.1-py3-none-any.whl size=24548 sha256=f46e70a2016aabaff10dea18aadc1731b58bea784877a25f351344a876334852
+  Stored in directory: /tmp/pip-ephem-wheel-cache-z895kchm/wheels/13/ff/6a/a86ac1ebbfd7f56ba74dec9ccffa35df23b6890fac28284fed
+Successfully built awkward-zipper
+Installing collected packages: awkward-zipper
+Successfully installed awkward-zipper-0.0.1
+</pre></div></div>
+</div>
+<p>Use a branch from main to load virtual arrays with uproot</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">uproot</span><span class="nd">@git</span><span class="o">+</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">scikit</span><span class="o">-</span><span class="n">hep</span><span class="o">/</span><span class="n">uproot5</span><span class="nd">@pfackeldey</span><span class="o">/</span><span class="n">uproot_lazy</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Collecting uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy
+  Cloning https://github.com/scikit-hep/uproot5 (to revision pfackeldey/uproot_lazy) to /tmp/pip-install-si6us5uj/uproot_00eaa98e35b445e9bc12b36636dca556
+  Running command git clone --filter=blob:none --quiet https://github.com/scikit-hep/uproot5 /tmp/pip-install-si6us5uj/uproot_00eaa98e35b445e9bc12b36636dca556
+  Running command git checkout -b pfackeldey/uproot_lazy --track origin/pfackeldey/uproot_lazy
+  Switched to a new branch &#39;pfackeldey/uproot_lazy&#39;
+  Branch &#39;pfackeldey/uproot_lazy&#39; set up to track remote branch &#39;pfackeldey/uproot_lazy&#39; from &#39;origin&#39;.
+  Resolved https://github.com/scikit-hep/uproot5 to commit f8a3461cdeba7ae5a909898ff14e881aa380d986
+  Installing build dependencies ... done
+  Getting requirements to build wheel ... done
+  Preparing metadata (pyproject.toml) ... done
+Requirement already satisfied: awkward&gt;=2.8.2 in /usr/local/lib/python3.11/dist-packages (from uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (2.8.5)
+Requirement already satisfied: cramjam&gt;=2.5.0 in /usr/local/lib/python3.11/dist-packages (from uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (2.10.0)
+Requirement already satisfied: fsspec in /usr/local/lib/python3.11/dist-packages (from uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (2025.3.0)
+Requirement already satisfied: numpy in /usr/local/lib/python3.11/dist-packages (from uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (2.0.2)
+Requirement already satisfied: packaging in /usr/local/lib/python3.11/dist-packages (from uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (25.0)
+Requirement already satisfied: xxhash in /usr/local/lib/python3.11/dist-packages (from uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (3.5.0)
+Requirement already satisfied: awkward-cpp==47 in /usr/local/lib/python3.11/dist-packages (from awkward&gt;=2.8.2-&gt;uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (47)
+Requirement already satisfied: importlib-metadata&gt;=4.13.0 in /usr/local/lib/python3.11/dist-packages (from awkward&gt;=2.8.2-&gt;uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (8.7.0)
+Requirement already satisfied: zipp&gt;=3.20 in /usr/local/lib/python3.11/dist-packages (from importlib-metadata&gt;=4.13.0-&gt;awkward&gt;=2.8.2-&gt;uproot@ git+https://github.com/scikit-hep/uproot5@pfackeldey/uproot_lazy) (3.23.0)
+Building wheels for collected packages: uproot
+  Building wheel for uproot (pyproject.toml) ... done
+  Created wheel for uproot: filename=uproot-5.6.3.dev29+gf8a3461-py3-none-any.whl size=377233 sha256=04d5b597d5f7b0ff30ce100a94a88b11027b16608b0f4265a9766dd893936f1f
+  Stored in directory: /tmp/pip-ephem-wheel-cache-avm3geh8/wheels/6d/4a/38/cca594ce698fdd158d6039640034edca9dda20c890c171703a
+Successfully built uproot
+Installing collected packages: uproot
+  Attempting uninstall: uproot
+    Found existing installation: uproot 5.6.3
+    Uninstalling uproot-5.6.3:
+      Successfully uninstalled uproot-5.6.3
+Successfully installed uproot-5.6.3.dev29+gf8a3461
+</pre></div></div>
+</div>
+</section>
+<section id="Virtual-mode">
+<h1>Virtual mode<a class="headerlink" href="#Virtual-mode" title="Link to this heading"></a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">awkward</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ak</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">coffea.nanoevents</span><span class="w"> </span><span class="kn">import</span> <span class="n">NanoEventsFactory</span><span class="p">,</span> <span class="n">NanoAODSchema</span><span class="p">,</span> <span class="n">BaseSchema</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">awkward_zipper</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uproot</span>
+
+<span class="c1">#Helper functions for data loading</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_events_coffea</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">schemaclass</span><span class="o">=</span><span class="n">NanoAODSchema</span><span class="p">):</span>
+    <span class="n">access_log</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">events</span> <span class="o">=</span> <span class="n">NanoEventsFactory</span><span class="o">.</span><span class="n">from_root</span><span class="p">(</span>
+        <span class="p">{</span><span class="n">file</span><span class="p">:</span> <span class="s2">"Events"</span><span class="p">},</span>
+        <span class="n">mode</span><span class="o">=</span><span class="s2">"virtual"</span><span class="p">,</span>
+        <span class="n">schemaclass</span><span class="o">=</span><span class="n">schemaclass</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"dataset"</span><span class="p">:</span> <span class="n">file</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">"data/"</span><span class="p">)</span><span class="o">.</span><span class="n">removesuffix</span><span class="p">(</span><span class="s2">".root"</span><span class="p">)},</span>
+        <span class="n">access_log</span><span class="o">=</span><span class="n">access_log</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">events</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">events</span><span class="p">,</span> <span class="n">access_log</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">make_events_zipper</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+    <span class="n">access_log</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># Create a TTree from root</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">uproot</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">file</span><span class="p">)[</span><span class="s2">"Events"</span><span class="p">]</span>
+    <span class="c1"># TTree -&gt; awkward.Array[awkward.Record[str, awkward.Array]]</span>
+    <span class="n">array</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">arrays</span><span class="p">(</span><span class="n">virtual</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ak_add_doc</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">access_log</span><span class="o">=</span><span class="n">access_log</span><span class="p">)</span>
+
+    <span class="c1"># construct an awkward array using awkward-zipper</span>
+    <span class="n">restructure</span> <span class="o">=</span> <span class="n">awkward_zipper</span><span class="o">.</span><span class="n">NanoAOD</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="s2">"latest"</span><span class="p">)</span>
+    <span class="n">zipper_array</span> <span class="o">=</span> <span class="n">restructure</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">zipper_array</span><span class="p">,</span> <span class="n">access_log</span>
+</pre></div>
+</div>
+</div>
+<p>run coffea first then zipper</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">root_file</span> <span class="o">=</span> <span class="s2">"DYto2E.root"</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">timeit</span>
+<span class="n">events_coffea</span><span class="p">,</span> <span class="n">access_log_coffea</span> <span class="o">=</span> <span class="n">make_events_coffea</span><span class="p">(</span><span class="n">root_file</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2.06 s ± 613 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">timeit</span>
+<span class="n">events_zipper</span><span class="p">,</span> <span class="n">access_log_zipper</span> <span class="o">=</span> <span class="n">make_events_zipper</span><span class="p">(</span><span class="n">root_file</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1.56 s ± 271 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+</pre></div></div>
+</div>
+<p>change order</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">root_file2</span> <span class="o">=</span> <span class="s2">"DYto2E.root"</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">timeit</span>
+<span class="n">events_zipper</span><span class="p">,</span> <span class="n">access_log_zipper</span> <span class="o">=</span> <span class="n">make_events_zipper</span><span class="p">(</span><span class="n">root_file2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1.55 s ± 214 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">timeit</span>
+<span class="n">events_coffea</span><span class="p">,</span> <span class="n">access_log_coffea</span> <span class="o">=</span> <span class="n">make_events_coffea</span><span class="p">(</span><span class="n">root_file2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1.37 s ± 262 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+</pre></div></div>
+</div>
+</section>
+<section id="try-another-root-file">
+<h1>try another root file<a class="headerlink" href="#try-another-root-file" title="Link to this heading"></a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="err">!</span><span class="n">wget</span> <span class="p">{</span><span class="s1">'https://raw.githubusercontent.com/scikit-hep/coffea/refs/heads/master/tests/samples/nano_dy.root'</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+--2025-07-28 11:15:04--  https://raw.githubusercontent.com/scikit-hep/coffea/refs/heads/master/tests/samples/nano_dy.root
+Resolving raw.githubusercontent.com (raw.githubusercontent.com)... 185.199.110.133, 185.199.111.133, 185.199.109.133, ...
+Connecting to raw.githubusercontent.com (raw.githubusercontent.com)|185.199.110.133|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 352599 (344K) [application/octet-stream]
+Saving to: ‘nano_dy.root’
+
+nano_dy.root        100%[===================&gt;] 344.33K  --.-KB/s    in 0.04s
+
+2025-07-28 11:15:04 (7.81 MB/s) - ‘nano_dy.root’ saved [352599/352599]
+
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">root_file_n</span> <span class="o">=</span> <span class="s2">"nano_dy.root"</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">timeit</span>
+<span class="n">events_coffea</span><span class="p">,</span> <span class="n">access_log_coffea</span> <span class="o">=</span> <span class="n">make_events_coffea</span><span class="p">(</span><span class="n">root_file_n</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/usr/local/lib/python3.11/dist-packages/coffea/nanoevents/schemas/nanoaod.py:264: RuntimeWarning: Missing cross-reference index for LowPtElectron_electronIdx =&gt; Electron
+  warnings.warn(
+/usr/local/lib/python3.11/dist-packages/coffea/nanoevents/schemas/nanoaod.py:264: RuntimeWarning: Missing cross-reference index for LowPtElectron_genPartIdx =&gt; GenPart
+  warnings.warn(
+/usr/local/lib/python3.11/dist-packages/coffea/nanoevents/schemas/nanoaod.py:264: RuntimeWarning: Missing cross-reference index for LowPtElectron_photonIdx =&gt; Photon
+  warnings.warn(
+/usr/local/lib/python3.11/dist-packages/coffea/nanoevents/schemas/nanoaod.py:264: RuntimeWarning: Missing cross-reference index for FatJet_genJetAK8Idx =&gt; GenJetAK8
+  warnings.warn(
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+831 ms ± 8.2 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">timeit</span>
+<span class="n">events_zipper</span><span class="p">,</span> <span class="n">access_log_zipper</span> <span class="o">=</span> <span class="n">make_events_zipper</span><span class="p">(</span><span class="n">root_file_n</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/tmp/ipython-input-5-3098901281.py:29: RuntimeWarning: Missing cross-reference index for LowPtElectron_electronIdx =&gt; Electron
+  zipper_array = restructure(array)
+/tmp/ipython-input-5-3098901281.py:29: RuntimeWarning: Missing cross-reference index for LowPtElectron_genPartIdx =&gt; GenPart
+  zipper_array = restructure(array)
+/tmp/ipython-input-5-3098901281.py:29: RuntimeWarning: Missing cross-reference index for LowPtElectron_photonIdx =&gt; Photon
+  zipper_array = restructure(array)
+/tmp/ipython-input-5-3098901281.py:29: RuntimeWarning: Missing cross-reference index for FatJet_genJetAK8Idx =&gt; GenJetAK8
+  zipper_array = restructure(array)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1.02 s ± 121 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+</pre></div></div>
+</div>
+<p>change order</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">root_file_n2</span> <span class="o">=</span> <span class="s2">"nano_dy.root"</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">timeit</span>
+<span class="n">events_zipper</span><span class="p">,</span> <span class="n">access_log_zipper</span> <span class="o">=</span> <span class="n">make_events_zipper</span><span class="p">(</span><span class="n">root_file_n2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/tmp/ipython-input-5-3098901281.py:29: RuntimeWarning: Missing cross-reference index for LowPtElectron_electronIdx =&gt; Electron
+  zipper_array = restructure(array)
+/tmp/ipython-input-5-3098901281.py:29: RuntimeWarning: Missing cross-reference index for LowPtElectron_genPartIdx =&gt; GenPart
+  zipper_array = restructure(array)
+/tmp/ipython-input-5-3098901281.py:29: RuntimeWarning: Missing cross-reference index for LowPtElectron_photonIdx =&gt; Photon
+  zipper_array = restructure(array)
+/tmp/ipython-input-5-3098901281.py:29: RuntimeWarning: Missing cross-reference index for FatJet_genJetAK8Idx =&gt; GenJetAK8
+  zipper_array = restructure(array)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+966 ms ± 9.07 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">timeit</span>
+<span class="n">events_coffea</span><span class="p">,</span> <span class="n">access_log_coffea</span> <span class="o">=</span> <span class="n">make_events_coffea</span><span class="p">(</span><span class="n">root_file_n2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/usr/local/lib/python3.11/dist-packages/coffea/nanoevents/schemas/nanoaod.py:264: RuntimeWarning: Missing cross-reference index for LowPtElectron_electronIdx =&gt; Electron
+  warnings.warn(
+/usr/local/lib/python3.11/dist-packages/coffea/nanoevents/schemas/nanoaod.py:264: RuntimeWarning: Missing cross-reference index for LowPtElectron_genPartIdx =&gt; GenPart
+  warnings.warn(
+/usr/local/lib/python3.11/dist-packages/coffea/nanoevents/schemas/nanoaod.py:264: RuntimeWarning: Missing cross-reference index for LowPtElectron_photonIdx =&gt; Photon
+  warnings.warn(
+/usr/local/lib/python3.11/dist-packages/coffea/nanoevents/schemas/nanoaod.py:264: RuntimeWarning: Missing cross-reference index for FatJet_genJetAK8Idx =&gt; GenJetAK8
+  warnings.warn(
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+976 ms ± 227 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="yet-another-root-file">
+<h1>yet another root file<a class="headerlink" href="#yet-another-root-file" title="Link to this heading"></a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="err">!</span><span class="n">wget</span> <span class="p">{</span><span class="s1">'https://raw.githubusercontent.com/scikit-hep/coffea/refs/heads/master/tests/samples/pfnano.root'</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+--2025-07-28 11:21:24--  https://raw.githubusercontent.com/scikit-hep/coffea/refs/heads/master/tests/samples/pfnano.root
+Resolving raw.githubusercontent.com (raw.githubusercontent.com)... 185.199.108.133, 185.199.109.133, 185.199.110.133, ...
+Connecting to raw.githubusercontent.com (raw.githubusercontent.com)|185.199.108.133|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 2958960 (2.8M) [application/octet-stream]
+Saving to: ‘pfnano.root.1’
+
+pfnano.root.1       100%[===================&gt;]   2.82M  --.-KB/s    in 0.08s
+
+2025-07-28 11:21:25 (35.8 MB/s) - ‘pfnano.root.1’ saved [2958960/2958960]
+
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">root_file_p</span> <span class="o">=</span> <span class="s2">"pfnano.root"</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">timeit</span>
+<span class="n">events_coffea</span><span class="p">,</span> <span class="n">access_log_coffea</span> <span class="o">=</span> <span class="n">make_events_coffea</span><span class="p">(</span><span class="n">root_file_p</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1.14 s ± 197 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">timeit</span>
+<span class="n">events_zipper</span><span class="p">,</span> <span class="n">access_log_zipper</span> <span class="o">=</span> <span class="n">make_events_zipper</span><span class="p">(</span><span class="n">root_file_p</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/tmp/ipython-input-5-3098901281.py:29: RuntimeWarning: Missing cross-reference index for LowPtElectron_electronIdx =&gt; Electron
+  zipper_array = restructure(array)
+/tmp/ipython-input-5-3098901281.py:29: RuntimeWarning: Missing cross-reference index for LowPtElectron_genPartIdx =&gt; GenPart
+  zipper_array = restructure(array)
+/tmp/ipython-input-5-3098901281.py:29: RuntimeWarning: Missing cross-reference index for LowPtElectron_photonIdx =&gt; Photon
+  zipper_array = restructure(array)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1.28 s ± 239 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+</pre></div></div>
+</div>
+<p>change order</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">root_file_p2</span> <span class="o">=</span> <span class="s2">"pfnano.root"</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">timeit</span>
+<span class="n">events_zipper</span><span class="p">,</span> <span class="n">access_log_zipper</span> <span class="o">=</span> <span class="n">make_events_zipper</span><span class="p">(</span><span class="n">root_file_p2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/tmp/ipython-input-5-3098901281.py:29: RuntimeWarning: Missing cross-reference index for LowPtElectron_electronIdx =&gt; Electron
+  zipper_array = restructure(array)
+/tmp/ipython-input-5-3098901281.py:29: RuntimeWarning: Missing cross-reference index for LowPtElectron_genPartIdx =&gt; GenPart
+  zipper_array = restructure(array)
+/tmp/ipython-input-5-3098901281.py:29: RuntimeWarning: Missing cross-reference index for LowPtElectron_photonIdx =&gt; Photon
+  zipper_array = restructure(array)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1.36 s ± 290 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">timeit</span>
+<span class="n">events_coffea</span><span class="p">,</span> <span class="n">access_log_coffea</span> <span class="o">=</span> <span class="n">make_events_coffea</span><span class="p">(</span><span class="n">root_file_p2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1.12 s ± 232 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Eager-mode">
+<h1>Eager mode<a class="headerlink" href="#Eager-mode" title="Link to this heading"></a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#Helper functions for data loading</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_events_coffea_eager</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">schemaclass</span><span class="o">=</span><span class="n">NanoAODSchema</span><span class="p">):</span>
+    <span class="n">events</span> <span class="o">=</span> <span class="n">NanoEventsFactory</span><span class="o">.</span><span class="n">from_root</span><span class="p">(</span>
+        <span class="p">{</span><span class="n">file</span><span class="p">:</span> <span class="s2">"Events"</span><span class="p">},</span>
+        <span class="n">mode</span><span class="o">=</span><span class="s2">"eager"</span><span class="p">,</span>
+        <span class="n">schemaclass</span><span class="o">=</span><span class="n">schemaclass</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">"dataset"</span><span class="p">:</span> <span class="n">file</span><span class="o">.</span><span class="n">removeprefix</span><span class="p">(</span><span class="s2">"data/"</span><span class="p">)</span><span class="o">.</span><span class="n">removesuffix</span><span class="p">(</span><span class="s2">".root"</span><span class="p">)},</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">events</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">events</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">make_events_zipper_eager</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+    <span class="c1"># Create a TTree from root</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">uproot</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">file</span><span class="p">)[</span><span class="s2">"Events"</span><span class="p">]</span>
+    <span class="c1"># TTree -&gt; awkward.Array[awkward.Record[str, awkward.Array]]</span>
+    <span class="n">array</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">arrays</span><span class="p">(</span><span class="n">ak_add_doc</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># construct an awkward array using awkward-zipper</span>
+    <span class="n">restructure</span> <span class="o">=</span> <span class="n">awkward_zipper</span><span class="o">.</span><span class="n">NanoAOD</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="s2">"latest"</span><span class="p">)</span>
+    <span class="n">zipper_array</span> <span class="o">=</span> <span class="n">restructure</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">zipper_array</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">root_file3</span> <span class="o">=</span> <span class="s2">"DYto2E.root"</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">timeit</span>
+<span class="n">events_coffea_eager</span> <span class="o">=</span> <span class="n">make_events_coffea_eager</span><span class="p">(</span><span class="n">root_file3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+3.48 s ± 253 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">timeit</span>
+<span class="n">events_zipper_eager</span> <span class="o">=</span> <span class="n">make_events_zipper_eager</span><span class="p">(</span><span class="n">root_file3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/usr/local/lib/python3.11/dist-packages/awkward_zipper/kernels.py:144: DeprecationWarning: __array__ implementation doesn&#39;t accept a copy keyword, so passing copy=False failed. __array__ must implement &#39;dtype&#39; and &#39;copy&#39; keyword arguments.
+  out[i::n] = idx
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2.38 s ± 280 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+</pre></div></div>
+</div>
+<p>change order</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">root_file4</span> <span class="o">=</span> <span class="s2">"DYto2E.root"</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">timeit</span>
+<span class="n">events_zipper_eager</span> <span class="o">=</span> <span class="n">make_events_zipper_eager</span><span class="p">(</span><span class="n">root_file4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2.27 s ± 246 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">timeit</span>
+<span class="n">events_coffea_eager</span> <span class="o">=</span> <span class="n">make_events_coffea_eager</span><span class="p">(</span><span class="n">root_file4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+3.54 s ± 205 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-python notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="compare_histograms_made_with_coffea_and_zipper.html" class="btn btn-neutral float-left" title="Install libraries" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../modules.html" class="btn btn-neutral float-right" title="Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Peter Fackeldey, Maxym Naumchyk.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

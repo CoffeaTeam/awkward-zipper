@@ -1,0 +1,315 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>awkward_zipper.layouts.treemaker &mdash; awkward-zipper 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=fd3f3429" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/logo_unfilled_with_text.png"/>
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            awkward-zipper
+              <img src="../../../_static/logo_unfilled_with_black_text.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../benchmarks.html">Benchmarks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">awkward-zipper</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">awkward_zipper.layouts.treemaker</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for awkward_zipper.layouts.treemaker</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tp</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">awkward</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.awkward_util</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_append_record_fields</span><span class="p">,</span>
+    <span class="n">_check_equal_lengths</span><span class="p">,</span>
+    <span class="n">_jagged_content</span><span class="p">,</span>
+    <span class="n">_jagged_offsets</span><span class="p">,</span>
+    <span class="n">_non_materializing_get_field</span><span class="p">,</span>
+    <span class="n">_rewrap</span><span class="p">,</span>
+    <span class="n">_zip_jagged</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="n">counts2offsets</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.layouts.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseLayoutBuilder</span>
+
+
+<div class="viewcode-block" id="TreeMaker">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.TreeMaker">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TreeMaker</span><span class="p">(</span><span class="n">BaseLayoutBuilder</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""TreeMaker layout builder</span>
+
+<span class="sd">    The TreeMaker layout is built from all branches found in the supplied file,</span>
+<span class="sd">    based on the naming pattern of the branches. There are two steps to the</span>
+<span class="sd">    generation of the array collections:</span>
+
+<span class="sd">    - Objects with vector-like quantities (momentum, coordinate points) in the</span>
+<span class="sd">      TreeMaker n-tuples are stored using ROOT ``PtEtaPhiEVector`` and</span>
+<span class="sd">      ``XYZPoint`` classes with maximum TTree splitting. These split branches</span>
+<span class="sd">      (``&lt;Object&gt;.fCoordinates.f{Pt,Eta,Phi,E}`` and</span>
+<span class="sd">      ``&lt;Object&gt;.fCoordinates.f{X,Y,Z}``) are grouped into a single collection</span>
+<span class="sd">      with the original object name, mapping the coordinate variables to the</span>
+<span class="sd">      standard names used by the vector behaviors (``pt``, ``eta``, ``phi``,</span>
+<span class="sd">      ``energy`` and ``x``, ``y``, ``z``).</span>
+
+<span class="sd">    - Extended quantities of physics objects are stored as ``&lt;Object&gt;_&lt;variable&gt;``</span>
+<span class="sd">      (e.g. ``Jets_jecFactor``) and are merged into the collection ``&lt;Object&gt;``.</span>
+
+<span class="sd">    Sub-collections, signalled by a ``&lt;Object&gt;_&lt;subcol&gt;Counts`` branch, are</span>
+<span class="sd">    nested as doubly-jagged arrays inside their parent collection.</span>
+
+<span class="sd">    All collections are then zipped into one ``base.NanoEvents`` record.</span>
+<span class="sd">    """</span>
+
+    <span class="c1"># coordinate members of the ROOT composite vector classes and the field</span>
+    <span class="c1"># name they are mapped to for the vector behaviors</span>
+    <span class="n">_lorentz_map</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"pt"</span><span class="p">:</span> <span class="s2">"fPt"</span><span class="p">,</span>
+        <span class="s2">"eta"</span><span class="p">:</span> <span class="s2">"fEta"</span><span class="p">,</span>
+        <span class="s2">"phi"</span><span class="p">:</span> <span class="s2">"fPhi"</span><span class="p">,</span>
+        <span class="s2">"energy"</span><span class="p">:</span> <span class="s2">"fE"</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">_threevec_map</span><span class="p">:</span> <span class="n">tp</span><span class="o">.</span><span class="n">ClassVar</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="s2">"fX"</span><span class="p">,</span> <span class="s2">"y"</span><span class="p">:</span> <span class="s2">"fY"</span><span class="p">,</span> <span class="s2">"z"</span><span class="p">:</span> <span class="s2">"fZ"</span><span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">:</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">:</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">fields</span><span class="p">)</span>
+        <span class="n">n_events</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">num</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+        <span class="c1"># working dict of name -&gt; low-level layout (Content); raw branches and</span>
+        <span class="c1"># any collections built along the way live here together</span>
+        <span class="n">forms</span> <span class="o">=</span> <span class="p">{</span><span class="n">f</span><span class="p">:</span> <span class="n">_non_materializing_get_field</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">layout</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_build_composite_objects</span><span class="p">(</span><span class="n">forms</span><span class="p">)</span>
+        <span class="n">subcollections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_collections</span><span class="p">(</span><span class="n">forms</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nest_subcollections</span><span class="p">(</span><span class="n">forms</span><span class="p">,</span> <span class="n">subcollections</span><span class="p">)</span>
+
+        <span class="c1"># final (outermost) zip into NanoEvents</span>
+        <span class="n">contents</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">nanoevents</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span>
+            <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">(</span><span class="n">contents</span><span class="p">,</span> <span class="n">names</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="n">n_events</span><span class="p">),</span>
+            <span class="n">behavior</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior</span><span class="p">(),</span>
+        <span class="p">)</span>
+        <span class="n">nanoevents</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="n">_rewrap</span><span class="p">(</span><span class="n">nanoevents</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">"NanoEvents"</span><span class="p">)</span>
+        <span class="n">nanoevents</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">"@original_array"</span><span class="p">]</span> <span class="o">=</span> <span class="n">nanoevents</span>
+        <span class="k">return</span> <span class="n">nanoevents</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_composite_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forms</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Zip the split ROOT vector branches into vector-like collections."""</span>
+        <span class="c1"># any split (dotted) branch is a composite object; a skimmed n-tuple stores</span>
+        <span class="c1"># the object under a trailing underscore (``Jets_.fCoordinates.fPt``)</span>
+        <span class="n">composite_objects</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="p">{</span><span class="n">k</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">forms</span> <span class="k">if</span> <span class="s2">"."</span> <span class="ow">in</span> <span class="n">k</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">objname</span> <span class="ow">in</span> <span class="n">composite_objects</span><span class="p">:</span>
+            <span class="n">components</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">k</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"."</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span> <span class="n">k</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">forms</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="n">objname</span> <span class="o">+</span> <span class="s2">"."</span><span class="p">,</span> <span class="n">objname</span> <span class="o">+</span> <span class="s2">"_."</span><span class="p">))</span>
+            <span class="p">}</span>
+            <span class="n">present</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">components</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">present</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lorentz_map</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+                <span class="n">mapping</span><span class="p">,</span> <span class="n">record_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lorentz_map</span><span class="p">,</span> <span class="s2">"PtEtaPhiELorentzVector"</span>
+            <span class="k">elif</span> <span class="n">present</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_threevec_map</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+                <span class="n">mapping</span><span class="p">,</span> <span class="n">record_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_threevec_map</span><span class="p">,</span> <span class="s2">"ThreeVector"</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"Unrecognized class with split branches of object "</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">objname</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">components</span><span class="o">.</span><span class="n">values</span><span class="p">())</span><span class="si">}</span><span class="s2">"</span>
+                <span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+            <span class="n">first_key</span> <span class="o">=</span> <span class="n">components</span><span class="p">[</span><span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">mapping</span><span class="o">.</span><span class="n">values</span><span class="p">()))]</span>
+            <span class="n">offsets</span> <span class="o">=</span> <span class="n">_jagged_offsets</span><span class="p">(</span><span class="n">forms</span><span class="p">[</span><span class="n">first_key</span><span class="p">])</span>
+            <span class="n">members</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">out</span><span class="p">:</span> <span class="n">_jagged_content</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">components</span><span class="p">[</span><span class="n">src</span><span class="p">]))</span>
+                <span class="k">for</span> <span class="n">out</span><span class="p">,</span> <span class="n">src</span> <span class="ow">in</span> <span class="n">mapping</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span>
+            <span class="n">forms</span><span class="p">[</span><span class="n">objname</span><span class="p">]</span> <span class="o">=</span> <span class="n">_zip_jagged</span><span class="p">(</span><span class="n">members</span><span class="p">,</span> <span class="n">offsets</span><span class="p">,</span> <span class="n">record_name</span><span class="o">=</span><span class="n">record_name</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_collections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forms</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Merge/zip ``&lt;Object&gt;_&lt;var&gt;`` branches into their collections.</span>
+
+<span class="sd">        Returns the list of discovered sub-collections to nest afterwards.</span>
+<span class="sd">        """</span>
+        <span class="n">collection_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">forms</span> <span class="k">if</span> <span class="s2">"_"</span> <span class="ow">in</span> <span class="n">k</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"n"</span><span class="p">)]</span>
+        <span class="n">collection_names</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">"_"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">collection_names</span>
+                <span class="c1"># exclude per-event variables with AK8 variants (Mjj, MT, ...)</span>
+                <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"_"</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">"AK8"</span>
+            <span class="p">},</span>
+            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">name</span><span class="p">:</span> <span class="n">name</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">"_"</span><span class="p">),</span>
+            <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">subcollections</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">cname</span> <span class="ow">in</span> <span class="n">collection_names</span><span class="p">:</span>
+            <span class="n">items</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">forms</span> <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">cname</span> <span class="o">+</span> <span class="s2">"_"</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">items</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># split off &lt;collection&gt;_&lt;subcol&gt;Counts sub-collections</span>
+            <span class="n">countitems</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">items</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"Counts"</span><span class="p">)]</span>
+            <span class="n">subcols</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="mi">6</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">countitems</span><span class="p">}</span>
+            <span class="k">for</span> <span class="n">subcol</span> <span class="ow">in</span> <span class="n">subcols</span><span class="p">:</span>
+                <span class="n">items</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">items</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">subcol</span><span class="p">)</span> <span class="ow">or</span> <span class="n">k</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">"Counts"</span><span class="p">)</span>
+                <span class="p">]</span>
+                <span class="n">subname</span> <span class="o">=</span> <span class="n">subcol</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">cname</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span>
+                <span class="n">subcollections</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">"colname"</span><span class="p">:</span> <span class="n">cname</span><span class="p">,</span>
+                        <span class="s2">"subcol"</span><span class="p">:</span> <span class="n">subcol</span><span class="p">,</span>
+                        <span class="s2">"countname"</span><span class="p">:</span> <span class="n">subname</span> <span class="o">+</span> <span class="s2">"Counts"</span><span class="p">,</span>
+                        <span class="s2">"subname"</span><span class="p">:</span> <span class="n">subname</span><span class="p">,</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">cname</span> <span class="ow">in</span> <span class="n">forms</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">forms</span><span class="p">[</span><span class="n">cname</span><span class="p">],</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">):</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">cname</span><span class="si">}</span><span class="s2"> isn't a jagged array, not sure what to do"</span>
+                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                <span class="n">new_members</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">k</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">cname</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]:</span> <span class="n">_jagged_content</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">items</span>
+                <span class="p">}</span>
+                <span class="n">forms</span><span class="p">[</span><span class="n">cname</span><span class="p">]</span> <span class="o">=</span> <span class="n">_append_record_fields</span><span class="p">(</span><span class="n">forms</span><span class="p">[</span><span class="n">cname</span><span class="p">],</span> <span class="n">new_members</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># pure "_"-grouped collection with no composite base</span>
+                <span class="n">members</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">cname</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]:</span> <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">items</span><span class="p">}</span>
+                <span class="n">forms</span><span class="p">[</span><span class="n">cname</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zip_members</span><span class="p">(</span><span class="n">members</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">subcollections</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_zip_members</span><span class="p">(</span><span class="n">members</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Zip member layouts into one record (coffea's ``zip_forms``).</span>
+
+<span class="sd">        Jagged members share the offsets of the first one (all share the same</span>
+<span class="sd">        per-event counts); anything else is zipped into a flat per-event record.</span>
+<span class="sd">        """</span>
+        <span class="n">layouts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">members</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">layout</span><span class="p">,</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">)</span> <span class="k">for</span> <span class="n">layout</span> <span class="ow">in</span> <span class="n">layouts</span>
+        <span class="p">):</span>
+            <span class="n">offsets</span> <span class="o">=</span> <span class="n">_jagged_offsets</span><span class="p">(</span><span class="n">layouts</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">contents</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_jagged_content</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">members</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="k">return</span> <span class="n">_zip_jagged</span><span class="p">(</span><span class="n">contents</span><span class="p">,</span> <span class="n">offsets</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">RecordArray</span><span class="p">(</span>
+            <span class="n">layouts</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">members</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span> <span class="n">length</span><span class="o">=</span><span class="n">_check_equal_lengths</span><span class="p">(</span><span class="n">layouts</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_nest_subcollections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forms</span><span class="p">,</span> <span class="n">subcollections</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">sub</span> <span class="ow">in</span> <span class="n">subcollections</span><span class="p">:</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="n">forms</span><span class="p">[</span><span class="n">sub</span><span class="p">[</span><span class="s2">"colname"</span><span class="p">]]</span>
+            <span class="n">child</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">sub</span><span class="p">[</span><span class="s2">"subcol"</span><span class="p">])</span>
+            <span class="n">record</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">content</span>
+            <span class="n">counts_content</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="n">record</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">sub</span><span class="p">[</span><span class="s2">"countname"</span><span class="p">])]</span>
+            <span class="n">inner_offsets</span> <span class="o">=</span> <span class="n">counts2offsets</span><span class="p">(</span><span class="n">awkward</span><span class="o">.</span><span class="n">Array</span><span class="p">(</span><span class="n">counts_content</span><span class="p">))</span>
+            <span class="n">inner</span> <span class="o">=</span> <span class="n">awkward</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">ListOffsetArray</span><span class="p">(</span>
+                <span class="n">offsets</span><span class="o">=</span><span class="n">awkward</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">inner_offsets</span><span class="p">),</span>
+                <span class="n">content</span><span class="o">=</span><span class="n">child</span><span class="o">.</span><span class="n">content</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">forms</span><span class="p">[</span><span class="n">sub</span><span class="p">[</span><span class="s2">"colname"</span><span class="p">]]</span> <span class="o">=</span> <span class="n">_append_record_fields</span><span class="p">(</span>
+                <span class="n">parent</span><span class="p">,</span> <span class="p">{</span><span class="n">sub</span><span class="p">[</span><span class="s2">"subname"</span><span class="p">]:</span> <span class="n">inner</span><span class="p">}</span>
+            <span class="p">)</span>
+
+<div class="viewcode-block" id="TreeMaker.behavior">
+<a class="viewcode-back" href="../../../awkward_zipper.layouts.html#awkward_zipper.TreeMaker.behavior">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">behavior</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Behaviors necessary to implement this schema (dict)"""</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">awkward_zipper.behaviors</span><span class="w"> </span><span class="kn">import</span> <span class="n">treemaker</span>
+
+        <span class="k">return</span> <span class="n">treemaker</span><span class="o">.</span><span class="n">behavior</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Peter Fackeldey, Maxym Naumchyk.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
