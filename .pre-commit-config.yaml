@@ -23,14 +23,14 @@ repos:
       - id: trailing-whitespace
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.17.4"
+    rev: "v0.17.5"
     hooks:
       - id: ruff-check
         args: ["--fix", "--show-fixes"]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: v0.17.4
+    rev: v0.17.5
     hooks:
       - id: ruff-format
 
@@ -57,7 +57,7 @@ repos:
           - black==22.12.0
 
   - repo: https://github.com/henryiii/validate-pyproject-schema-store
-    rev: 2026.11.07
+    rev: 2026.11.14
     hooks:
       - id: validate-pyproject
 
